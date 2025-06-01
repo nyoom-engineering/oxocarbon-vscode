@@ -52,26 +52,7 @@ Any language with a textmate parser and/or language server is supported (i.e. mo
 
 ### Recommended VSCode Settings
 
-Personal Opinionated `settings.json`. Recommended to install the `icons-carbon` extension and `Liga SF Nerd Font` font beforehand. 
-
-```
-    "editor.fontFamily": "Liga SF Nerd Font, monospace",
-    "editor.fontLigatures": false,
-    "editor.fontSize": 14,
-
-    "editor.wordWrap": "off",
-    "editor.lineNumbers": "off",
-    "editor.bracketPairColorization.enabled": false,
-    "editor.guides.indentation": false,
-
-    "workbench.layoutControl.enabled": false,
-    "workbench.productIconTheme": "icons-carbon",
-    "workbench.iconTheme": null,
-    "workbench.colorTheme": "oxocarbon",
-
-    "window.customTitleBarVisibility": "windowed",
-    "zenMode.showTabs": "none",
-```
+Personal Opinionated `settings.json` and `keybindings.json` located under `assets/` in the GitHub Repository. Recommended to install the `icons-carbon` extension and `Liga SFMono Nerd Font` font beforehand. 
 
 ### Development
 

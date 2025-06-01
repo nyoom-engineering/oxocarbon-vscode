@@ -1,12 +1,12 @@
-# Makefile to build toml2json and generate Oxocarbon-color-theme.json
-
 CARGO      := cargo
 PROG       := target/release/toml2json
 INPUT      := oxocarbon.toml
 OUTDIR     := themes
 OUTFILE    := $(OUTDIR)/oxocarbon-color-theme.json
+ASSETS     := assets
+CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 
-.PHONY: all build clean
+.PHONY: all build clean dotfiles
 
 all: build $(OUTFILE)
 
@@ -20,3 +20,8 @@ $(OUTFILE): build $(INPUT)
 clean:
 	$(CARGO) clean
 	rm -f $(OUTFILE)
+
+dotfiles:
+	mkdir -p $(ASSETS)
+	cp $(CURSOR_CFG)/settings.json $(ASSETS)/settings.json
+	cp $(CURSOR_CFG)/keybindings.json $(ASSETS)/keybindings.json

@@ -1,0 +1,31 @@
+{
+  "vim.enableNeovim": true,
+  "extensions.experimental.affinity": {
+    "vscodevim.vim": 1
+  },
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "editor.fontFamily": "Liga SFMono Nerd Font, monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.smoothScrolling": true,
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.wordWrap": "off",
+  "editor.lineNumbers": "off",
+  "editor.guides.indentation": false,
+  "editor.bracketPairColorization.enabled": true,
+  "workbench.layoutControl.enabled": false,
+  "workbench.productIconTheme": "icons-carbon",
+  "workbench.iconTheme": null,
+  "workbench.colorTheme": "oxocarbon",
+  "workbench.list.smoothScrolling": true,
+  "zenMode.showTabs": "none",
+  "zenMode.centerLayout": false,
+  "zenMode.hideActivityBar": false,
+  "zenMode.silentNotifications": false,
+  "terminal.integrated.smoothScrolling": true,
+  "terminal.integrated.cursorBlinking": true,
+  "window.customTitleBarVisibility": "windowed",
+  "breadcrumbs.enabled": false
+}
