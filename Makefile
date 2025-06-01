@@ -4,7 +4,7 @@ CARGO      := cargo
 PROG       := target/release/toml2json
 INPUT      := oxocarbon.toml
 OUTDIR     := themes
-OUTFILE    := $(OUTDIR)/Oxocarbon-color-theme.json
+OUTFILE    := $(OUTDIR)/oxocarbon-color-theme.json
 
 .PHONY: all build clean
 
