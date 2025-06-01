@@ -1,7 +1,5 @@
 # <img src="./assets/output-3840x1330-shadow.png"> 
 
-# WIP WIP WIP
-
 <img width="720" alt="Screenshot 2025-06-01 at 6 07 19 PM" src="https://github.com/user-attachments/assets/4ded25ac-dab1-4670-998d-d02bd748e21b" />
 
 <img width="720" alt="Screenshot 2025-06-01 at 6 09 04 PM" src="https://github.com/user-attachments/assets/5c6c8e9c-7d06-4b94-83b9-bbb8eb713d45" />
@@ -10,13 +8,36 @@
 
 Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines
 
+Work in Progress
+
 ## Features
 
-- TODO
+- Comprehensive semantic highlighting for multiple programming languages
+- Carefully crafted color palette for maximum contrast and readability
+- Support for various editor features:
+  - Semantic tokens
+  - Git decorations
+  - Debug UI
+  - Terminal colors
+  - Status bar indicators
+  - Editor widgets and overlays
+  - Bracket pair colorization
+  - Inlay hints
+  - Peek view
+  - Diff editor
+  - Jupyter Notebook support
 
-### Plugin Support
+### Language Support
 
-- TODO 
+Oxocarbon currently provides optimized syntax highlighting for:
+- C/C++
+- Rust
+- OCaml
+- Lisp
+- TOML
+- Markdown
+
+Any language with a textmate parser and/or language server is supported (i.e. most of them), but your mileage may vary regarding readability and proper highlighting. 
 
 ## Installation
 
@@ -28,8 +49,6 @@ Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It d
 
 - Download repository source as ZIP
 - Unpack in `~/.vscode/extensions` (VSCode) or `~/.cursor/extensions` (Cursor)
-- Installation Instructions
-- clone to `~/.vscode/extensions`
 
 ### Recommended VSCode Settings
 

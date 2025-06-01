@@ -141,7 +141,7 @@ disabledForeground = "#525252"
 "statusBarItem.errorBackground" = "#ee5396"
 "statusBarItem.warningBackground" = "#ff7eb6"
 
-"list.highlightForeground" = "#3ddbd9"
+"list.highlightForeground" = "#ffffff"
 "list.focusHighlightForeground" = "#ff7eb6"
 "list.activeSelectionBackground" = "#393939"
 "list.activeSelectionForeground" = "#ffffff"
@@ -320,3 +320,8 @@ settings = { foreground = "#ff7eb6" }
 [[tokenColors]]
 scope = ["support.type.property-name.array"]
 settings = { foreground = "#08bdba" }
+
+# Markdown
+[[tokenColors]]
+scope = ["punctuation.definition.heading.markdown"]
+settings = { foreground = "#ff7eb6" }
