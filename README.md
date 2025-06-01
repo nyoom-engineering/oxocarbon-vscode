@@ -1,8 +1,6 @@
-# <img src="https://github.com/nyoom-engineering/nyoom-engineering/blob/main/out/made-with-3840x1330-shadow.png?raw=true"> 
+# <img src="./assets/output-3840x1330-shadow.png"> 
 
-(replace header with either generation or logo of choice)
-
-- screenshot/showcase
+WIP WIP WIP
 
 Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines
 
@@ -17,15 +15,37 @@ Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It d
 ## Installation
 
 - Installation Instructions
+- clone to `~/.vscode/extensions`
+- TODO https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+
+### Recommended VSCode Settings
+
+Personal Opinionated Config. Recommended to install the `icons-carbon` extension and `Liga SF Nerd Font` font beforehand. 
+
+```
+"editor.fontFamily": "Liga SF Nerd Font, monospace",
+"editor.fontLigatures": true,
+"editor.fontSize": 14,
+
+"editor.wordWrap": "off",
+"editor.lineNumbers": "off",
+"editor.bracketPairColorization.enabled": true,
+"editor.guides.indentation": false,
+
+"workbench.layoutControl.enabled": false,
+"workbench.productIconTheme": "icons-carbon",
+"workbench.iconTheme": null,
+```
 
 ### Development
 
-- Development Instructions
+The following requires `Cargo`/`Rust`. Changes should be made in `oxocarbon.toml`
 
-## FAQ (optional)
+```
+make
+```
 
-- Q: **_"Where can I find the doc?"_**\
- A: Run `:help theme`
+Open in VSCode, press `F5`
 
 ## Contributing
 
