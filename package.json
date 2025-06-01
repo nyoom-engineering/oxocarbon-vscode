@@ -1,0 +1,21 @@
+{
+  "name": "oxocarbon-vscode",
+  "displayName": "Oxocarbon For VSCode",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Oxocarbon",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Oxocarbon-color-theme.json"
+      }
+    ]
+  }
+}

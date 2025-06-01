@@ -1,0 +1,75 @@
+//    {
+//      "scope": [
+//        "entity.name.type"
+//      ],
+//      "settings": {
+//        "foreground": "#78a9ff"
+//      }
+//    },
+//    {
+//      "scope": "enum",
+//      "settings": {
+//        "foreground": "#78a9ff"
+//      }
+//    },
+//    {
+//      "scope": "parameter",
+//      "settings": {
+//        "foreground": "#dde1e6"
+//      }
+//    },
+//    {
+//      "scope": "label",
+//      "settings": {
+//        "foreground": "#82cfff"
+//      }
+//    },
+//    {
+//      "scope": "decorator",
+//      "settings": {
+//        "foreground": "#ff7eb6",
+//      }
+//    },
+//    {
+//      "scope": "macro",
+//      "settings": {
+//        "foreground": "#08bdba",
+//      }
+//    },
+//    {
+//      "scope": "namespace",
+//      "settings": {
+//        "foreground": "#08bdba",
+//      }
+//    },
+//    {
+//      "scope": "struct",
+//      "settings": {
+//        "foreground": "#78a9ff",
+//      }
+//    },
+//    {
+//      "scope": "class",
+//      "settings": {
+//        "foreground": "#78a9ff",
+//      }
+//    },
+//    {
+//      "scope": "typeParameter",
+//      "settings": {
+//        "foreground": "#78a9ff",
+//      }
+//    },
+//    {
+//      "scope": "property",
+//      "settings": {
+//        "foreground": "#ee5396",
+//      }
+//    },
+//    {
+//      "scope": "regexp",
+//      "settings": {
+//        "foreground": "#08bdba",
+//      }
+//    }, 
+
