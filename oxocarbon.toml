@@ -9,7 +9,7 @@ disabledForeground = "#525252"
 "sash.hoverBorder" = "#525252"
 "editor.background" = "#161616"
 "editor.foreground" = "#f2f4f8"
-"editor.inactiveSelectionBackground" = "#3a3d4120"
+"editor.inactiveSelectionBackground" = "#39393920"
 "editor.selectionBackground" = "#393939"
 "editor.findMatchBackground" = "#ee5396"
 "editor.findMatchForeground" = "#ffffff"
@@ -123,17 +123,49 @@ scope    = [ "constant" ]
 settings = { foreground = "#82cfff" }
 
 [[tokenColors]]
-scope    = [ "storage" ]
+scope    = [ "keyword" ]
 settings = { foreground = "#78a9ff" }
 
 [[tokenColors]]
+scope    = [ "keyword.other" ]
+settings = { foreground = "#33b1ff" }
+
+[[tokenColors]]
 scope    = [ "storage.modifier" ]
+settings = { foreground = "#ee5396" }
+
+[[tokenColors]]
+scope    = [ "storage.type", "support.type", "keyword.other.fn", "keyword.operator", "punctuation.separator" ]
 settings = { foreground = "#3ddbd9" }
 
 [[tokenColors]]
-scope    = [ "keyword.other.fn", "storage.type.function", ]
+scope    = [ "entity.name.function", ]
 settings = { foreground = "#ff7eb6", fontStyle = "bold" }
 
+# c
 [[tokenColors]]
-scope    = [ "meta.function-call.generic", "keyword" ]
+scope    = [ "keyword.control.directive" ]
+settings = { foreground = "#08bdba" }
+
+# rust
+[[tokenColors]]
+scope    = [ "storage.type.rust" ]
+settings = { foreground = "#78a9ff" }
+
+# ocaml
+[[tokenColors]]
+scope    = [ "keyword.other.ocaml" ]
+settings = { foreground = "#ff7eb6" }
+
+[[tokenColors]]
+scope    = [ "constant.language.capital-identifier" ]
+settings = { foreground = "#08bdba" }
+
+# lisp
+[[tokenColors]]
+scope    = [ "storage.type.function.m.nosideeffects" ]
+settings = { foreground = "#ff7eb6" }
+
+[[tokenColors]]
+scope    = [ "variable.other.constant" ]
 settings = { foreground = "#08bdba" }
