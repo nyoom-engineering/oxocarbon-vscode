@@ -5,29 +5,83 @@ type = "dark"
 foreground = "#f2f4f8"
 focusBorder = "#00000000"
 disabledForeground = "#525252"
+
 "selection.background" = "#6F6F6F"
 "sash.hoverBorder" = "#525252"
+
+"widget.border" = "#00000000"
+"widget.shadow" = "#00000000"
+
+"button.background" = "#393939"
+"button.hoverBackground" = "#525252"
+
+"welcomePage.progress.background" = "#393939"
+"welcomePage.progress.foreground" = "#525252"
+"textLink.foreground" = "#ff7eb6"
+"textLink.activeForeground" = "#be95ff"
+
 "editor.background" = "#161616"
 "editor.foreground" = "#f2f4f8"
 "editor.inactiveSelectionBackground" = "#39393920"
 "editor.selectionBackground" = "#393939"
+"editor.selectionHighlightBackground" = "#52525290"
 "editor.findMatchBackground" = "#ee5396"
 "editor.findMatchForeground" = "#ffffff"
 "editor.findMatchHighlightBackground" = "#52525290"
+"editor.snippetTabstopHighlightBackground" = "#393939"
+"editor.snippetFinalTabstopHighlightBackground" = "#525252"
+"editor.snippetTabstopHighlightBorder" = "#ff7eb6"
+"editor.snippetFinalTabstopHighlightBorder" = "#ee5396"
+
 "editorCursor.foreground" = "#ffffff"
 "editorLink.activeForeground" = "#ff7eb6"
-"editorInlayHint.foreground" = "#6f6f6f"
+"editorInlayHint.foreground" = "#878d96"
 "editorInlayHint.background" = "#00000000"
-"editorGutter.addedBackground" = "#42be65"
-"editorGutter.modifiedBackground" = "#08bdba"
-"editorGutter.deletedBackground" = "#ee5396"
+"editorGroup.dropBackground" = "#39393940"
+"editorGroup.border" = "#262626"
+"editorStickyScroll.border" = "#262626"
+
 "editorError.foreground" = "#ee5396"
 "editorWarning.foreground" = "#ff7eb6"
 "editorInfo.foreground" = "#dde1e6"
 "editorHint.foreground" = "#dde1e6"
+
+"editorGutter.addedBackground" = "#42be65"
+"editorGutter.modifiedBackground" = "#08bdba"
+"editorGutter.deletedBackground" = "#ee5396"
+
+"editorSuggestWidget.background" = "#1B1B1B"
+"editorSuggestWidget.border" = "#00000000"
+"editorSuggestWidget.foreground" = "#dde1e6"
+"editorSuggestWidget.highlightForeground" = "#ffffff"
+"editorSuggestWidget.focusHighlightForeground" = "#ff7eb6"
+"editorSuggestWidget.selectedBackground" = "#393939"
+"editorSuggestWidget.selectedForeground" = "#ffffff"
+"editorSuggestWidget.selectedIconForeground" = "#ffffff"
+
+"editor.wordHighlightBackground" = "#262626"
+"editor.wordHighlightBorder" = "#00000000"
+
+"editorHoverWidget.background" = "#1B1B1B"
+"editorHoverWidget.border" = "#262626"
+"editorHoverWidget.foreground" = "#dde1e6"
+
+"editorBracketHighlight.foreground1" = "#6F6F6F"
+"editorBracketHighlight.foreground2" = "#525252"
+"editorBracketHighlight.foreground3" = "#6F6F6F"
+"editorBracketHighlight.foreground4" = "#525252"
+"editorBracketHighlight.foreground5" = "#6F6F6F"
+"editorBracketHighlight.foreground6" = "#525252"
+
+"titleBar.activeBackground" = "#161616"
+"titleBar.activeForeground" = "#ffffff"
+"titleBar.inactiveBackground" = "#262626"
+"titleBar.inactiveForeground" = "#dde1e6"
+
 "problemsErrorIcon.foreground" = "#ee5396"
 "problemsWarningIcon.foreground" = "#ff7eb6"
 "problemsInfoIcon.foreground" = "#be95ff"
+
 "peekView.border" = "#262626"
 "peekViewEditor.background" = "#1B1B1B"
 "peekViewEditor.matchHighlightBackground" = "#525252"
@@ -36,6 +90,7 @@ disabledForeground = "#525252"
 "peekViewResult.matchHighlightBackground" = "#6F6F6F"
 "peekViewResult.selectionBackground" = "#393939"
 "peekViewResult.selectionForeground" = "#ffffff"
+
 "diffEditor.diagonalFill" = "#525252"
 "diffEditor.insertedLineBackground" = "#42be6520"
 "diffEditor.insertedTextBackground" = "#42be6540"
@@ -43,46 +98,38 @@ disabledForeground = "#525252"
 "diffEditor.removedTextBackground" = "#ee539640"
 "diffEditorGutter.insertedLineBackground" = "#42be6520"
 "diffEditorGutter.removedLineBackground" = "#ee539620"
+
 "gitDecoration.addedResourceForeground" = "#42be65"
 "gitDecoration.modifiedResourceForeground" = "#ff7eb6"
 "gitDecoration.deletedResourceForeground" = "#ee5396"
-"gitDecoration.ignoredResourceForeground" = "#525252"
+"gitDecoration.ignoredResourceForeground" = "#8d8d8d"
 "gitDecoration.renamedResourceForeground" = "#a6c8ff"
 "gitDecoration.untrackedResourceForeground" = "#c1c7cd"
 "gitDecoration.stageDeletedResourceForeground" = "#ee5396"
 "gitDecoration.stageModifiedResourceForeground" = "#08bdba"
-"debugToolBar.background" = "#363636"
-"widget.border" = "#00000000"
-"widget.shadow" = "#00000000"
-"button.background" = "#393939"
-"button.hoverBackground" = "#525252"
+
 "input.background" = "#262626"
 "input.foreground" = "#dde1e6"
 "inputOption.hoverBackground" = "#52525290"
 "inputOption.activeBackground" = "#52525290"
 "inputOption.activeBorder" = "#525252"
 "inputOption.activeForeground" = "#ffffff"
+
 "tab.activeBackground" = "#161616"
 "tab.activeForeground" = "#ffffff"
 "tab.inactiveBackground" = "#262626"
 "tab.inactiveForeground" = "#dde1e6"
 "tab.dragAndDropBorder" = "#ff7eb6"
-"editorGroup.dropBackground" = "#39393940"
+
 "activityBar.background" = "#262626"
 "activityBar.foreground" = "#f2f4f8"
+
 "sideBar.background" = "#161616"
 "sideBar.dropBackground" = "#36363640"
 "sideBar.border" = "#262626"
 "sideBarTitle.foreground" = "#ffffff"
 "sideBarSectionHeader.background" = "#393939"
-"list.activeSelectionBackground" = "#393939"
-"list.activeSelectionForeground" = "#ffffff"
-"list.dropBackground" = "#52525240"
-"panel.border" = "#262626"
-"panelSection.border" = "#262626"
-"panelSection.dropBackground" = "#39393940"
-"panelTitle.activeBorder" = "#262626"
-"panelTitle.activeForeground" = "#ffffff"
+
 "statusBar.background" = "#161616"
 "statusBar.foreground" = "#dde1e6"
 "statusBar.debuggingBackground" = "#0f62fe"
@@ -93,79 +140,183 @@ disabledForeground = "#525252"
 "statusBarItem.remoteForeground" = "#ffffff"
 "statusBarItem.errorBackground" = "#ee5396"
 "statusBarItem.warningBackground" = "#ff7eb6"
-"editorBracketHighlight.foreground1" = "#6F6F6F"
-"editorBracketHighlight.foreground2" = "#525252"
-"editorBracketHighlight.foreground3" = "#6F6F6F"
-"editorBracketHighlight.foreground4" = "#525252"
-"editorBracketHighlight.foreground5" = "#6F6F6F"
-"editorBracketHighlight.foreground6" = "#525252"
-"welcomePage.progress.background" = "#393939"
-"welcomePage.progress.foreground" = "#525252"
+
+"list.highlightForeground" = "#3ddbd9"
+"list.focusHighlightForeground" = "#ff7eb6"
+"list.activeSelectionBackground" = "#393939"
+"list.activeSelectionForeground" = "#ffffff"
+"list.dropBackground" = "#52525240"
+
+"panel.background" = "#1B1B1B"
+"panel.border" = "#262626"
+"panelSection.border" = "#262626"
+"panelSection.dropBackground" = "#39393940"
+"panelTitle.activeBorder" = "#262626"
+"panelTitle.activeForeground" = "#ffffff"
+
+"notebook.cellBorderColor" = "#262626"
+"notebook.focusedCellBorder" = "#ff7eb6"
+"notebook.cellEditorBackground" = "#1B1B1B"
+"notebook.cellStatusBarItemHoverBackground" = "#393939"
+"notebook.outputContainerBackgroundColor" = "#181818"
+
+"debugIcon.breakpointForeground" = "#ee5396"
+"debugIcon.breakpointDisabledForeground" = "#525252"
+"debugIcon.breakpointUnverifiedForeground" = "#ff7eb6"
+"debugIcon.breakpointCurrentStackframeForeground" = "#08bdba"
+"debugIcon.breakpointStackframeForeground" = "#78a9ff"
+"debugIcon.startForeground" = "#42be65"
+"debugIcon.pauseForeground" = "#ff7eb6"
+"debugIcon.stopForeground" = "#ee5396"
+"debugIcon.disconnectForeground" = "#c1c7cd"
+"debugIcon.restartForeground" = "#08bdba"
+"debugIcon.stepOverForeground" = "#be95ff"
+"debugIcon.stepIntoForeground" = "#78a9ff"
+"debugIcon.stepOutForeground" = "#78a9ff"
+"debugIcon.continueForeground" = "#42be65"
+"debugIcon.stepBackForeground" = "#ff7eb6"
+
+"debugConsole.infoForeground" = "#dde1e6"
+"debugConsole.warningForeground" = "#ff7eb6"
+"debugConsole.errorForeground" = "#ee5396"
+"debugConsole.sourceForeground" = "#82cfff"
+"debugConsoleInputIcon.foreground" = "#ff7eb6"
+
+"testing.iconFailed" = "#ee5396"
+"testing.iconErrored" = "#ee5396"
+"testing.iconPassed" = "#42be65"
+"testing.iconSkipped" = "#ff7eb6"
+"testing.runAction" = "#08bdba"
+
+"keybindingLabel.background" = "#262626"
+"keybindingLabel.foreground" = "#dde1e6"
+"keybindingLabel.border" = "#525252"
+
+"quickInput.background" = "#212121"
+"quickInput.foreground" = "#dde1e6"
+"quickInputTitle.background" = "#262626"
+
+"pickerGroup.border" = "#393939"
+"pickerGroup.foreground" = "#ff7eb6"
+
+"banner.background" = "#1B1B1B"
+"banner.foreground" = "#dde1e6"
+
+"menu.background" = "#262626"
+"menu.foreground" = "#dde1e6"
+"menu.selectionBackground" = "#393939"
+"menu.selectionForeground" = "#ffffff"
+"menu.separatorBackground" = "#525252"
+"menu.border" = "#262626"
+
+"symbolIcon.arrayForeground" = "#ffffff"
+"symbolIcon.booleanForeground" = "#ffffff"
+"symbolIcon.classForeground" = "#ffffff"
+"symbolIcon.constantForeground" = "#ffffff"
+"symbolIcon.constructorForeground" = "#ffffff"
+"symbolIcon.enumeratorForeground" = "#ffffff"
+"symbolIcon.fieldForeground" = "#ffffff"
+"symbolIcon.functionForeground" = "#ffffff"
+"symbolIcon.interfaceForeground" = "#ffffff"
+"symbolIcon.keyForeground" = "#ffffff"
+"symbolIcon.keywordForeground" = "#ffffff"
+"symbolIcon.methodForeground" = "#ffffff"
+"symbolIcon.moduleForeground" = "#ffffff"
+"symbolIcon.namespaceForeground" = "#ffffff"
+"symbolIcon.numberForeground" = "#ffffff"
+"symbolIcon.objectForeground" = "#ffffff"
+"symbolIcon.operatorForeground" = "#ffffff"
+"symbolIcon.packageForeground" = "#ffffff"
+"symbolIcon.propertyForeground" = "#ffffff"
+"symbolIcon.stringForeground" = "#ffffff"
+"symbolIcon.structForeground" = "#ffffff"
+"symbolIcon.typeParameterForeground" = "#ffffff"
+"symbolIcon.variableForeground" = "#ffffff"
 
 [[tokenColors]]
-scope    = [ "comment" ]
+scope = ["comment"]
 settings = { foreground = "#6f6f6f" }
 
 [[tokenColors]]
-scope    = [ "string" ]
+scope = ["string"]
 settings = { foreground = "#be95ff" }
 
 [[tokenColors]]
-scope    = [ "entity" ]
+scope = ["entity"]
 settings = { foreground = "#dde1e6" }
 
 [[tokenColors]]
-scope    = [ "variable" ]
+scope = ["variable"]
 settings = { foreground = "#ffffff" }
 
 [[tokenColors]]
-scope    = [ "constant" ]
+scope = ["constant"]
 settings = { foreground = "#82cfff" }
 
 [[tokenColors]]
-scope    = [ "keyword" ]
+scope = ["keyword"]
 settings = { foreground = "#78a9ff" }
 
 [[tokenColors]]
-scope    = [ "keyword.other" ]
+scope = ["keyword.other"]
 settings = { foreground = "#33b1ff" }
 
 [[tokenColors]]
-scope    = [ "storage.modifier" ]
+scope = ["storage.modifier"]
 settings = { foreground = "#ee5396" }
 
 [[tokenColors]]
-scope    = [ "storage.type", "support.type", "keyword.other.fn", "keyword.operator", "punctuation.separator" ]
+scope = [
+    "storage.type",
+    "keyword.other.fn",
+    "keyword.operator",
+    "punctuation.separator",
+]
 settings = { foreground = "#3ddbd9" }
 
 [[tokenColors]]
-scope    = [ "entity.name.function", ]
+scope = ["entity.name.function"]
 settings = { foreground = "#ff7eb6", fontStyle = "bold" }
 
-# c
+# C
 [[tokenColors]]
-scope    = [ "keyword.control.directive" ]
+scope = ["keyword.control.directive", "support.type.posix-reserved"]
 settings = { foreground = "#08bdba" }
 
-# rust
+# Rust
 [[tokenColors]]
-scope    = [ "storage.type.rust" ]
+scope = ["storage.type.rust"]
 settings = { foreground = "#78a9ff" }
 
-# ocaml
+# OCaml
 [[tokenColors]]
-scope    = [ "keyword.other.ocaml" ]
+scope = ["keyword.other.ocaml"]
 settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
-scope    = [ "constant.language.capital-identifier" ]
+scope = ["constant.language.capital-identifier"]
 settings = { foreground = "#08bdba" }
 
-# lisp
+# Lisp
 [[tokenColors]]
-scope    = [ "storage.type.function.m.nosideeffects" ]
+scope = [
+    "storage.type.function.m.nosideeffects",
+    "variable.other.constant.sharpsign",
+]
 settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
-scope    = [ "variable.other.constant" ]
+scope = [
+    "variable.other.constant.singlequote",
+    "variable.other.constant.backquote",
+]
+settings = { foreground = "#08bdba" }
+
+# TOML
+[[tokenColors]]
+scope = ["support.type.property-name.table"]
+settings = { foreground = "#ff7eb6" }
+
+[[tokenColors]]
+scope = ["support.type.property-name.array"]
 settings = { foreground = "#08bdba" }
