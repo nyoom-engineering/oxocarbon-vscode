@@ -16,7 +16,7 @@ disabledForeground = "#525252"
 "editor.findMatchHighlightBackground" = "#52525290"
 "editorCursor.foreground" = "#ffffff"
 "editorLink.activeForeground" = "#ff7eb6"
-"editorInlayHint.foreground" = "#525252"
+"editorInlayHint.foreground" = "#6f6f6f"
 "editorInlayHint.background" = "#00000000"
 "editorGutter.addedBackground" = "#42be65"
 "editorGutter.modifiedBackground" = "#08bdba"
@@ -51,6 +51,7 @@ disabledForeground = "#525252"
 "gitDecoration.untrackedResourceForeground" = "#c1c7cd"
 "gitDecoration.stageDeletedResourceForeground" = "#ee5396"
 "gitDecoration.stageModifiedResourceForeground" = "#08bdba"
+"debugToolBar.background" = "#363636"
 "widget.border" = "#00000000"
 "widget.shadow" = "#00000000"
 "button.background" = "#393939"
@@ -84,7 +85,7 @@ disabledForeground = "#525252"
 "panelTitle.activeForeground" = "#ffffff"
 "statusBar.background" = "#161616"
 "statusBar.foreground" = "#dde1e6"
-"statusBar.debuggingBackground" = "#ee5396"
+"statusBar.debuggingBackground" = "#0f62fe"
 "statusBar.debuggingForeground" = "#ffffff"
 "statusBar.noFolderBackground" = "#0f62fe"
 "statusBar.noFolderForeground" = "#ffffff"
@@ -102,56 +103,37 @@ disabledForeground = "#525252"
 "welcomePage.progress.foreground" = "#525252"
 
 [[tokenColors]]
-scope = "emphasis"
-
-[tokenColors.settings]
-fontStyle = "bold"
+scope    = [ "comment" ]
+settings = { foreground = "#6f6f6f" }
 
 [[tokenColors]]
-scope = "strong"
-
-[tokenColors.settings]
-fontStyle = "bold"
+scope    = [ "string" ]
+settings = { foreground = "#be95ff" }
 
 [[tokenColors]]
-scope = "comment"
-
-[tokenColors.settings]
-foreground = "#525252"
+scope    = [ "entity" ]
+settings = { foreground = "#dde1e6" }
 
 [[tokenColors]]
-scope = "string"
-
-[tokenColors.settings]
-foreground = "#be95ff"
+scope    = [ "variable" ]
+settings = { foreground = "#ffffff" }
 
 [[tokenColors]]
-scope = ["number", "constant.numeric"]
-
-[tokenColors.settings]
-foreground = "#82cfff"
+scope    = [ "constant" ]
+settings = { foreground = "#82cfff" }
 
 [[tokenColors]]
-scope = ["function", "method", "keyword.other.fn", "storage.type.function"]
-
-[tokenColors.settings]
-foreground = "#ff7eb6"
-fontStyle = "bold"
+scope    = [ "storage" ]
+settings = { foreground = "#78a9ff" }
 
 [[tokenColors]]
-scope = ["variable", "variable.other"]
-
-[tokenColors.settings]
-foreground = "#dde1e6"
+scope    = [ "storage.modifier" ]
+settings = { foreground = "#3ddbd9" }
 
 [[tokenColors]]
-scope = ["keyword.control", "keyword.other"]
-
-[tokenColors.settings]
-foreground = "#78a9ff"
+scope    = [ "keyword.other.fn", "storage.type.function", ]
+settings = { foreground = "#ff7eb6", fontStyle = "bold" }
 
 [[tokenColors]]
-scope = ["keyword.operator"]
-
-[tokenColors.settings]
-foreground = "#08bdba"
+scope    = [ "meta.function-call.generic", "keyword" ]
+settings = { foreground = "#08bdba" }
