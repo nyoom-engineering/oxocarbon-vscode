@@ -54,9 +54,9 @@ Oxocarbon also provides handrolled syntax highlighting for:
 
 ## Installation
 
-### Automatic
+Install using your package manager of choice: [Oxocarbon Theme - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=NyoomEngineering.oxocarbon-vscode)
 
-Install using the package manager of choice https://marketplace.visualstudio.com/items?itemName=NyoomEngineering.oxocarbon-vscode
+Alternatively, a VSIX package can be found under [releases](https://github.com/nyoom-engineering/oxocarbon-vscode/releases)
 
 ### Manual
 
@@ -70,7 +70,7 @@ Personal Opinionated `settings.json`, `keybindings.json`, and list of extensions
 
 (optional) install the `Liga SFMono Nerd Font` font for the best experience
 
-### Development
+## Development
 
 The following requires `Cargo`/`Rust`. Changes should be made in `oxocarbon.toml`
 
