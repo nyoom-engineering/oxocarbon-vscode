@@ -9,7 +9,7 @@
 <br>
 
 <figure>
-  <img alt="" src="https://github.com/user-attachments/assets/2e348f8d-39c3-4cff-85a4-b0f4d033ef64" />
+  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe" />
   <figcaption>Oxocarbon OLED</figcaption>
 </figure>
 
