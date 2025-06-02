@@ -346,11 +346,11 @@ settings = { foreground = "#08bdba" }
 
 # TOML
 [[tokenColors]]
-scope = ["support.type.property-name.table"]
+scope = ["meta.table.toml"]
 settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
-scope = ["support.type.property-name.array"]
+scope = ["meta.array.table.toml"]
 settings = { foreground = "#08bdba" }
 
 # Markdown

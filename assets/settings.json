@@ -60,7 +60,6 @@
 
   "window.customTitleBarVisibility": "windowed",
   "window.autoDetectColorScheme": true,
-  "window.restoreFullscreen": true,
 
   "search.globalFindClipboard": true,
   "search.decorations.badges": false,
