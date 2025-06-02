@@ -3,12 +3,13 @@ PROG       := target/release/toml2json
 INPUT      := oxocarbon.toml
 OUTDIR     := themes
 OUTFILE    := $(OUTDIR)/oxocarbon-color-theme.json
+OLEDFILE   := $(OUTDIR)/oxocarbon-oled-color-theme.json
 ASSETS     := assets
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 
 .PHONY: all build clean dotfiles
 
-all: build $(OUTFILE)
+all: build $(OUTFILE) $(OLEDFILE)
 
 build:
 	$(CARGO) build --release
@@ -17,9 +18,13 @@ $(OUTFILE): build $(INPUT)
 	mkdir -p $(OUTDIR)
 	$(PROG) $(INPUT) > $(OUTFILE)
 
+$(OLEDFILE): build $(INPUT)
+	mkdir -p $(OUTDIR)
+	$(PROG) --oled $(INPUT) > $(OLEDFILE)
+
 clean:
 	$(CARGO) clean
-	rm -f $(OUTFILE)
+	rm -f $(OUTFILE) $(OLEDFILE)
 
 dotfiles:
 	mkdir -p $(ASSETS)

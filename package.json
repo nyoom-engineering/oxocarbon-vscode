@@ -28,6 +28,11 @@
         "label": "oxocarbon",
         "uiTheme": "vs-dark",
         "path": "./themes/oxocarbon-color-theme.json"
+      },
+      {
+        "label": "oxocarbon OLED",
+        "uiTheme": "vs-dark",
+        "path": "./themes/oxocarbon-oled-color-theme.json"
       }
     ]
   }
