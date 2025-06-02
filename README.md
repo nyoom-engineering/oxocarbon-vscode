@@ -12,12 +12,12 @@ Work in Progress
 
 ## Features
 
-- Comprehensive semantic highlighting for multiple programming languages
+- Comprehensive semantic highlighting
 - Carefully crafted color palette for maximum contrast and readability
 - Support for various editor features:
   - Semantic tokens
   - Git decorations
-  - Debug UI
+  - Debug & Testing
   - Terminal colors
   - Status bar indicators
   - Editor widgets and overlays
@@ -26,18 +26,23 @@ Work in Progress
   - Peek view
   - Diff editor
   - Jupyter Notebook support
+  - Quick input
+  - Menu styling
+  - Gauge indicators
+  - Minimap customization
+  - Banner styling
 
 ### Language Support
 
-Oxocarbon currently provides optimized syntax highlighting for:
+Any language with a textmate parser and/or language server is supported (i.e. almost all of them)
+
+Oxocarbon also provides handrolled syntax highlighting for:
+
 - C/C++
 - Rust
 - OCaml
 - Lisp
 - TOML
-- Markdown
-
-Any language with a textmate parser and/or language server is supported (i.e. most of them), but your mileage may vary regarding readability and proper highlighting. 
 
 ## Installation
 
