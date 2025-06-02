@@ -2,12 +2,12 @@
   "name": "oxocarbon-vscode",
   "displayName": "Oxocarbon Theme",
   "description": "Oxocarbon theme for VSCode",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "NyoomEngineering",
 	"license": "MIT",
   "icon": "icon.png",
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.96.2"
   },
 	"repository": {
 		"type": "git",
