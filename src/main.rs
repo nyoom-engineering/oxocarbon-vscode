@@ -40,7 +40,7 @@ fn main() {
         // Perform chained replacements for OLED
         let replacements = [
             ("#161616", "#000000"),
-            ("#1b1b1b", "#070707"),
+            ("#1b1b1b", "#0b0b0b"),
             ("#1e1e1e", "#0b0b0b"),
             ("#212121", "#0f0f0f"),
             ("#262626", "#161616"),
