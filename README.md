@@ -30,6 +30,7 @@ Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It d
   - Status bar indicators
   - Editor widgets and overlays
   - Bracket pair colorization
+  - Remote Development
   - Inlay hints
   - Peek view
   - Diff editor
@@ -39,18 +40,21 @@ Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It d
   - Gauge indicators
   - Minimap customization
   - Banner styling
+  - Cursor Chat
 
 ### Language Support
 
-Any language with a textmate parser and/or language server is supported (i.e. almost all of them)
+Any language with a textmate parser and/or semantic highlghting support is supported (i.e. almost all of them)
 
 Oxocarbon also provides handrolled syntax highlighting for:
 
-- C/C++
+- C
 - Rust
+- Haskell
 - OCaml
 - Lisp
 - TOML
+- Markdown
 
 ## Installation
 
@@ -64,11 +68,70 @@ Alternatively, a VSIX package can be found under [releases](https://github.com/n
 - Unpack in `~/.vscode/extensions` (VSCode) or `~/.cursor/extensions` (Cursor)
 - Reload editor then set theme to either `oxocarbon` or `oxocarbon OLED`
 
-### Recommended VSCode Settings
+### Additional Configuration
 
-Personal Opinionated `settings.json`, `keybindings.json`, and list of extensions located under `assets/` in the GitHub Repository. On UNIX systems, you may clone this repository, install Cursor, and run `make install` to intall the configuration.
+It is recommended to enable Semantic Parsing by default
 
-(optional) install the `Liga SFMono Nerd Font` font for the best experience
+```json
+{
+  "editor.semanticHighlighting.enabled": true,
+}
+```
+
+Rust semantic parsing is buggy so it is recommended to default back to TextMate Parsing. In your `settings.json`
+
+```json
+{
+  "[rust]": {
+    "editor.semanticHighlighting.enabled": false,
+  },
+}
+```
+
+It is recommended to disable Bracket Pair Colorization by default and enable it on a case-by-case basis
+
+```json
+{
+  "editor.bracketPairColorization.enabled": false,
+  "[commonlisp]": {
+    "editor.bracketPairColorization.enabled": true,
+  },
+}
+```
+
+(optional) Install the `Liga SFMono Nerd Font` font for the best experience
+
+```json
+{
+  "editor.fontFamily": "Liga SFMono Nerd Font, monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+}
+```
+
+On HiDPI/Retina displays, you may find text rendering improved by adjusting font ant-aliasing
+
+```json
+{
+  "workbench.fontAliasing": "auto",
+}
+```
+
+(optional) enable smooth scrolling and cursor effects
+
+```json
+{
+  "editor.smoothScrolling": true,
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+
+  "terminal.integrated.smoothScrolling": true,
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.enableVisualBell": true,
+}
+```
+
+An opinionated `settings.json`, `keybindings.json`, and list of extensions is also provided under `assets/` in the GitHub Repository. On UNIX systems, you may clone this repository, install Cursor, and run `make install` to intall the configuration.
 
 ## Development
 
@@ -76,7 +139,7 @@ The following requires `Cargo`/`Rust`. Changes should be made in `oxocarbon.toml
 
 To generate the JSON file, run `make` in the root directory. To test the colorscheme, press `F5`
 
-Reference https://code.visualstudio.com/api/references/theme-color#editor-widget-colors and https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide for highlight groups
+Reference the [Theme Color Reference](https://code.visualstudio.com/api/references/theme-color#editor-widget-colors) & [Semantic Highlight Guide]*https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide) for highlight groups
 
 Additionally, add the following in your `keybindings.json` to use `cmd+shift+i` to inspect the highlight at cursor
 
@@ -89,7 +152,7 @@ Additionally, add the following in your `keybindings.json` to use `cmd+shift+i` 
 
 ## Contributing
 
-Before contributing, its recommended to read through the [style guide](https://github.com/nyoom-engineering/oxocarbon/blob/main/docs/style-guide.md). Discussion primarily takes place on the Nyoom Engineering discord server: https://discord.gg/M528tDKXRG
+Before contributing, its recommended to read through the [style guide](https://github.com/nyoom-engineering/oxocarbon/blob/main/docs/style-guide.md). Discussion primarily takes place on the [Nyoom Engineering Discord Server](https://discord.gg/M528tDKXRG)
 
 ## License
 
