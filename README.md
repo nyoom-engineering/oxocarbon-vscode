@@ -1,14 +1,22 @@
 # <img src="./assets/output-3840x1330-shadow.png"> 
 
-<img width="720" alt="Screenshot 2025-06-01 at 6 07 19 PM" src="https://github.com/user-attachments/assets/4ded25ac-dab1-4670-998d-d02bd748e21b" />
+<figure>
+  <img alt="" src="https://github.com/user-attachments/assets/0cb2aa5e-81ed-4b60-bfac-4bdba8249592" />
+  <figcaption>Oxocarbon Dark</figcaption>
+</figure>
 
-<img width="720" alt="Screenshot 2025-06-01 at 6 09 04 PM" src="https://github.com/user-attachments/assets/5c6c8e9c-7d06-4b94-83b9-bbb8eb713d45" />
+<br>
+<br>
 
-<img width="720" alt="Screenshot 2025-06-01 at 6 14 12 PM" src="https://github.com/user-attachments/assets/b40da027-9f38-49b5-ac66-d425f31b0030" />
+<figure>
+  <img alt="" src="https://github.com/user-attachments/assets/2e348f8d-39c3-4cff-85a4-b0f4d033ef64" />
+  <figcaption>Oxocarbon OLED</figcaption>
+</figure>
 
-Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines
+<br>
+<br>
 
-Work in Progress
+Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines. Now with an OLED variant!
 
 ## Features
 
@@ -54,6 +62,7 @@ Oxocarbon also provides handrolled syntax highlighting for:
 
 - Download repository source as ZIP
 - Unpack in `~/.vscode/extensions` (VSCode) or `~/.cursor/extensions` (Cursor)
+- Reload editor then set theme to either `oxocarbon` or `oxocarbon OLED`
 
 ### Recommended VSCode Settings
 
