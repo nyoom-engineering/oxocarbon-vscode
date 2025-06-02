@@ -377,6 +377,8 @@ scope = [
     "keyword.other.fn",
     "keyword.operator",
     "punctuation.separator",
+    "punctuation.definition.tag",
+    "punctuation.definition.list",
 ]
 settings = { foreground = "#3ddbd9" }
 
@@ -399,8 +401,9 @@ settings = { foreground = "#78a9ff" }
 scope = ["keyword.other.ocaml"]
 settings = { foreground = "#ff7eb6" }
 
+# Haskell
 [[tokenColors]]
-scope = ["constant.language.capital-identifier"]
+scope = ["storage.type.haskell"]
 settings = { foreground = "#08bdba" }
 
 # Lisp
@@ -420,14 +423,25 @@ settings = { foreground = "#08bdba" }
 
 # TOML
 [[tokenColors]]
-scope = ["meta.table.toml"]
+scope = ["support.type.property-name.table.toml"]
 settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
-scope = ["meta.array.table.toml"]
+scope = ["support.type.property-name.array.toml"]
 settings = { foreground = "#08bdba" }
 
 # Markdown
 [[tokenColors]]
+scope = ["entity.name.section.markdown", "markup.inline.raw.string.markdown"]
+settings = { foreground = "#ffffff", fontStyle = "bold" }
+
+[[tokenColors]]
 scope = ["punctuation.definition.heading.markdown"]
 settings = { foreground = "#ff7eb6" }
+
+[[tokenColors]]
+scope = [
+    "punctuation.definition.raw.markdown",
+    "punctuation.definition.markdown",
+]
+settings = { foreground = "#08bdba" }

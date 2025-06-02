@@ -13,6 +13,7 @@
   "workbench.colorTheme": "oxocarbon",
   "workbench.productIconTheme": "icons-carbon",
   "workbench.preferredLightColorTheme": "Visual Studio Light - C++",
+  "workbench.preferredDarkColorTheme": "oxocarbon",
 
   "editor.fontFamily": "Liga SFMono Nerd Font, monospace",
   "editor.fontLigatures": true,
@@ -28,7 +29,7 @@
   "editor.inlayHints.enabled": "offUnlessPressed",
   "editor.inlayHints.padding": true,
   "editor.peekWidgetDefaultFocus": "editor",
-  //"editor.semanticHighlighting.enabled": true,
+  "editor.semanticHighlighting.enabled": true,
   "editor.cursorSurroundingLines": 4,
   "editor.formatOnPaste": true,
   "breadcrumbs.enabled": false,
@@ -75,9 +76,14 @@
   "[commonlisp]": {
     "editor.bracketPairColorization.enabled": true,
   },
+  "[rust]": {
+    "editor.semanticHighlighting.enabled": false,
+  },
+  "[markdown]": {
+    "editor.wordWrap": "off",
+  },
   "terminal.integrated.commandsToSkipShell": [
     "language-julia.interrupt"
   ],
-  "julia.symbolCacheDownload": true,
-  "workbench.preferredDarkColorTheme": "oxocarbon"
+  "julia.symbolCacheDownload": true
 }
