@@ -4,7 +4,6 @@
 
   "editor.experimental.treeSitterTelemetry": true,
   "editor.experimentalEditContextEnabled": true,
-  "application.experimental.rendererProfiling": true,
   "ipynb.experimental.serialization": true,
   "search.experimental.closedNotebookRichContentResults": true,
   "extensions.experimental.affinity": {
@@ -24,6 +23,7 @@
   "editor.cursorSmoothCaretAnimation": "on",
   "editor.wordWrap": "off",
   "editor.lineNumbers": "off",
+  "editor.rulers": [80],
   "editor.guides.indentation": false,
   "editor.bracketPairColorization.enabled": true,
   "editor.inlayHints.enabled": "offUnlessPressed",
@@ -42,6 +42,7 @@
   "workbench.layoutControl.enabled": false,
   "workbench.iconTheme": null,
   "workbench.list.smoothScrolling": true,
+  "workbench.tree.renderIndentGuides": "none",
   "workbench.fontAliasing": "auto",
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultKeybindings": true,
