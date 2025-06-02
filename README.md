@@ -56,7 +56,7 @@ Oxocarbon also provides handrolled syntax highlighting for:
 
 ### Automatic
 
-- TODO https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+Install using the package manager of choice https://marketplace.visualstudio.com/items?itemName=NyoomEngineering.oxocarbon-vscode
 
 ### Manual
 
