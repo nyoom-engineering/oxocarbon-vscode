@@ -1,10 +1,21 @@
 {
-  "vim.enableNeovim": true,
+  "cursor.composer.textSizeScale": 1.15,
+  "cursor.general.enableShadowWorkspace": true,
+
+  "editor.experimental.treeSitterTelemetry": true,
+  "editor.experimentalEditContextEnabled": true,
+  "application.experimental.rendererProfiling": true,
+  "ipynb.experimental.serialization": true
+  "search.experimental.closedNotebookRichContentResults": true,
   "extensions.experimental.affinity": {
     "vscodevim.vim": 1
   },
-  "git.enableSmartCommit": true,
-  "git.confirmSync": false,
+
+  "workbench.colorTheme": "oxocarbon",
+  "workbench.productIconTheme": "icons-carbon",
+  "workbench.preferredDarkColorTheme": "oxocarbon",
+  "workbench.preferredLightColorTheme": "Visual Studio Light - C++",
+
   "editor.fontFamily": "Liga SFMono Nerd Font, monospace",
   "editor.fontLigatures": true,
   "editor.fontSize": 14,
@@ -15,17 +26,50 @@
   "editor.lineNumbers": "off",
   "editor.guides.indentation": false,
   "editor.bracketPairColorization.enabled": true,
+  "editor.inlayHints.enabled": "offUnlessPressed",
+  "editor.inlayHints.padding": true,
+  "editor.peekWidgetDefaultFocus": "editor",
+  "editor.semanticHighlighting.enabled": true,
+  "editor.cursorSurroundingLines": 4,
+  "editor.formatOnPaste": true,
+  "breadcrumbs.enabled": false,
+
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "diffEditor.experimental.showMoves": true,
+  "diffEditor.experimental.useTrueInlineView": true,
+
   "workbench.layoutControl.enabled": false,
-  "workbench.productIconTheme": "icons-carbon",
   "workbench.iconTheme": null,
-  "workbench.colorTheme": "oxocarbon",
   "workbench.list.smoothScrolling": true,
+  "workbench.fontAliasing": "auto",
+  "workbench.settings.editor": "json",
+  "workbench.settings.openDefaultKeybindings": true,
+  "workbench.settings.openDefaultSettings": true,
+
   "zenMode.showTabs": "none",
   "zenMode.centerLayout": false,
-  "zenMode.hideActivityBar": false,
   "zenMode.silentNotifications": false,
+
   "terminal.integrated.smoothScrolling": true,
   "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.enableVisualBell": true,
+
+  "files.autoGuessEncoding": true,
+  "files.hotExit": "off",
+
   "window.customTitleBarVisibility": "windowed",
-  "breadcrumbs.enabled": false
+  "window.autoDetectColorScheme": true,
+  "window.restoreFullscreen": true,
+
+  "search.globalFindClipboard": true,
+  "search.decorations.badges": false,
+  "search.decorations.colors": false,
+
+  "extensions.autoCheckUpdates": false,
+  "extensions.autoUpdate": false,
+  "extensions.experimental.deferredStartupFinishedActivation": true,
+  "extensions.ignoreRecommendations": true,
+
+  "vim.enableNeovim": true,
 }

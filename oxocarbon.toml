@@ -184,11 +184,6 @@ disabledForeground = "#525252"
 "debugConsole.sourceForeground" = "#82cfff"
 "debugConsoleInputIcon.foreground" = "#ff7eb6"
 
-"checkbox.background" = "#ff7eb6"
-"checkbox.foreground" = "#ffffff"
-"checkbox.disabled.background" = "#262626"
-"checkbox.disabled.foreground" = "#dde1e6"
-
 "testing.iconFailed" = "#ee5396"
 "testing.iconErrored" = "#ee5396"
 "testing.iconPassed" = "#42be65"
