@@ -66,7 +66,9 @@ Install using the package manager of choice https://marketplace.visualstudio.com
 
 ### Recommended VSCode Settings
 
-Personal Opinionated `settings.json` and `keybindings.json` located under `assets/` in the GitHub Repository. Recommended to install the `icons-carbon` extension and `Liga SFMono Nerd Font` font beforehand. 
+Personal Opinionated `settings.json`, `keybindings.json`, and list of extensions located under `assets/` in the GitHub Repository. On UNIX systems, you may clone this repository, install Cursor, and run `make install` to intall the configuration.
+
+(optional) install the `Liga SFMono Nerd Font` font for the best experience
 
 ### Development
 
@@ -78,11 +80,11 @@ Reference https://code.visualstudio.com/api/references/theme-color#editor-widget
 
 Additionally, add the following in your `keybindings.json` to use `cmd+shift+i` to inspect the highlight at cursor
 
-```
-    {
-        "key": "cmd+shift+i",
-        "command": "editor.action.inspectTMScopes"
-    }
+```json
+{
+    "key": "cmd+shift+i",
+    "command": "editor.action.inspectTMScopes"
+}
 ```
 
 ## Contributing

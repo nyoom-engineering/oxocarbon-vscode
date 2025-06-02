@@ -12,7 +12,6 @@
 
   "workbench.colorTheme": "oxocarbon",
   "workbench.productIconTheme": "icons-carbon",
-  "workbench.preferredDarkColorTheme": "oxocarbon OLED",
   "workbench.preferredLightColorTheme": "Visual Studio Light - C++",
 
   "editor.fontFamily": "Liga SFMono Nerd Font, monospace",
@@ -75,5 +74,10 @@
 
   "[commonlisp]": {
     "editor.bracketPairColorization.enabled": true,
-  }
+  },
+  "terminal.integrated.commandsToSkipShell": [
+    "language-julia.interrupt"
+  ],
+  "julia.symbolCacheDownload": true,
+  "workbench.preferredDarkColorTheme": "oxocarbon"
 }

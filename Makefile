@@ -6,8 +6,9 @@ OUTFILE    := $(OUTDIR)/oxocarbon-color-theme.json
 OLEDFILE   := $(OUTDIR)/oxocarbon-oled-color-theme.json
 ASSETS     := assets
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
+EXTENSIONS := $(ASSETS)/extensions.txt
 
-.PHONY: all build clean dotfiles
+.PHONY: all build clean dotfiles install
 
 all: build $(OUTFILE) $(OLEDFILE)
 
@@ -28,5 +29,12 @@ clean:
 
 dotfiles:
 	mkdir -p $(ASSETS)
+	cursor --list-extensions > $(EXTENSIONS)
 	cp $(CURSOR_CFG)/settings.json $(ASSETS)/settings.json
 	cp $(CURSOR_CFG)/keybindings.json $(ASSETS)/keybindings.json
+
+install: dotfiles
+	cat $(EXTENSIONS) | xargs -I {} cursor --install-extension {}
+	mkdir -p $(CURSOR_CFG)
+	cp $(ASSETS)/settings.json $(CURSOR_CFG)/
+	cp $(ASSETS)/keybindings.json $(CURSOR_CFG)/
