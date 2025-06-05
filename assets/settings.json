@@ -1,6 +1,7 @@
 {
   "cursor.composer.textSizeScale": 1.15,
   "cursor.general.enableShadowWorkspace": true,
+  "cursor.terminal.usePreviewBox": true,
 
   "editor.experimental.treeSitterTelemetry": true,
   "editor.experimentalEditContextEnabled": true,
@@ -64,7 +65,6 @@
 
   "search.globalFindClipboard": true,
   "search.decorations.badges": false,
-  "search.decorations.colors": false,
 
   "extensions.autoCheckUpdates": false,
   "extensions.autoUpdate": false,
@@ -85,5 +85,8 @@
   "terminal.integrated.commandsToSkipShell": [
     "language-julia.interrupt"
   ],
-  "julia.symbolCacheDownload": true
+  "julia.symbolCacheDownload": true,
+
+
+  "update.releaseTrack": "prerelease"
 }

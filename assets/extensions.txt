@@ -2,6 +2,7 @@ antfu.icons-carbon
 anysphere.cpptools
 anysphere.remote-wsl
 davidanson.vscode-markdownlint
+dioxuslabs.dioxus
 eduarddyckman.vscode-parinfer
 gkarlos.vscode-ptx-syntax
 haskell.haskell
