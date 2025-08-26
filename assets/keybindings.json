@@ -4,6 +4,10 @@
         "command": "composerMode.agent"
     },
     {
+        "key": "cmd+e",
+        "command": "composerMode.background"
+    },
+    {
         "key": "cmd+shift+i",
         "command": "editor.action.inspectTMScopes"
     },
@@ -11,20 +15,20 @@
         "key": "up",
         "command": "cursorUp",
         "when": "editorTextFocus && vim.active && !inDebugRepl && !suggestWidgetMultipleSuggestions && !suggestWidgetVisible"
-      },
-      {
+    },
+    {
         "key": "down",
         "command": "cursorDown",
         "when": "editorTextFocus && vim.active && !inDebugRepl && !suggestWidgetMultipleSuggestions && !suggestWidgetVisible"
-      },
-      {
+    },
+    {
         "key": "k",
         "command": "cursorUp",
         "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode == 'Normal' && !suggestWidgetMultipleSuggestions && !suggestWidgetVisible"
-      },
-      {
+    },
+    {
         "key": "j",
         "command": "cursorDown",
         "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode == 'Normal' && !suggestWidgetMultipleSuggestions && !suggestWidgetVisible"
-      }
+    }
 ]

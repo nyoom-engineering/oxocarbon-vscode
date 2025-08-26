@@ -37,7 +37,6 @@ fn main() {
     }
 
     if oled {
-        // Perform chained replacements for OLED
         let replacements = [
             ("#161616", "#000000"),
             ("#1b1b1b", "#0b0b0b"),

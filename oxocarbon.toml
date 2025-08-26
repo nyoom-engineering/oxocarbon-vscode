@@ -344,32 +344,23 @@ scope = ["comment"]
 settings = { foreground = "#6f6f6f" }
 
 [[tokenColors]]
-scope = ["string"]
-settings = { foreground = "#be95ff" }
-
-[[tokenColors]]
 scope = ["entity"]
 settings = { foreground = "#dde1e6" }
+
+[[tokenColors]]
+scope = ["storage.modifier.package", "storage.modifier.import"]
+settings = { foreground = "#f2f4f8" }
 
 [[tokenColors]]
 scope = ["variable"]
 settings = { foreground = "#ffffff" }
 
-[[tokenColors]]
-scope = ["constant"]
-settings = { foreground = "#82cfff" }
+#0dbdba for language-specific e.g.
 
+# Lisp (more below)
 [[tokenColors]]
-scope = ["keyword"]
-settings = { foreground = "#78a9ff" }
-
-[[tokenColors]]
-scope = ["keyword.other"]
-settings = { foreground = "#33b1ff" }
-
-[[tokenColors]]
-scope = ["storage.modifier"]
-settings = { foreground = "#ee5396" }
+scope = ["support.function.f.sideeffects"]
+settings = { foreground = "#08bdba" }
 
 [[tokenColors]]
 scope = [
@@ -379,16 +370,53 @@ scope = [
     "punctuation.separator",
     "punctuation.definition.tag",
     "punctuation.definition.list",
+    "variable.other.constant.singlequote",
+    "variable.other.constant.backquote",
+    "variable.other.constant.sharpsign",
 ]
 settings = { foreground = "#3ddbd9" }
 
 [[tokenColors]]
-scope = ["entity.name.function"]
-settings = { foreground = "#ff7eb6", fontStyle = "bold" }
+scope = ["keyword"]
+settings = { foreground = "#78a9ff" }
+
+[[tokenColors]]
+scope = ["support"]
+settings = { foreground = "#ee5396" }
+
+[[tokenColors]]
+scope = ["storage.modifier", "keyword.other"]
+settings = { foreground = "#33b1ff" }
+
+[[tokenColors]]
+scope = ["entity.name.function", "storage.type.function.m.nosideeffects"]
+settings = { foreground = "#ff7eb6" }
+
+[[tokenColors]]
+scope = ["string"]
+settings = { foreground = "#be95ff" }
+
+[[tokenColors]]
+scope = ["constant"]
+settings = { foreground = "#82cfff" }
+
+# styles
+
+# [[tokenColors]]
+# scope = ["entity.name.type"]
+# settings = { fontStyle = "underline" }
+
+[[tokenColors]]
+scope = ["entity.name.function", "variable.other.definition"]
+settings = { fontStyle = "bold" }
+
+[[tokenColors]]
+scope = ["storage.type", "variable.parameter"]
+settings = { fontStyle = "italic" }
 
 # C
 [[tokenColors]]
-scope = ["keyword.control.directive", "support.type.posix-reserved"]
+scope = ["keyword.control.directive"]
 settings = { foreground = "#08bdba" }
 
 # Rust
@@ -396,39 +424,10 @@ settings = { foreground = "#08bdba" }
 scope = ["storage.type.rust"]
 settings = { foreground = "#78a9ff" }
 
-# OCaml
+# Go
 [[tokenColors]]
-scope = ["keyword.other.ocaml"]
-settings = { foreground = "#ff7eb6" }
-
-# Haskell
-[[tokenColors]]
-scope = ["storage.type.haskell"]
-settings = { foreground = "#08bdba" }
-
-# Lisp
-[[tokenColors]]
-scope = [
-    "storage.type.function.m.nosideeffects",
-    "variable.other.constant.sharpsign",
-]
-settings = { foreground = "#ff7eb6" }
-
-[[tokenColors]]
-scope = [
-    "variable.other.constant.singlequote",
-    "variable.other.constant.backquote",
-]
-settings = { foreground = "#08bdba" }
-
-# TOML
-[[tokenColors]]
-scope = ["support.type.property-name.table.toml"]
-settings = { foreground = "#ff7eb6" }
-
-[[tokenColors]]
-scope = ["support.type.property-name.array.toml"]
-settings = { foreground = "#08bdba" }
+scope = ["entity.name.import.go"]
+settings = { foreground = "#be95ff" }
 
 # Markdown
 [[tokenColors]]
@@ -441,7 +440,7 @@ settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
 scope = [
-    "punctuation.definition.raw.markdown",
-    "punctuation.definition.markdown",
+    "punctuation.definition.raw.markdown", 
+    "punctuation.definition.markdown"
 ]
 settings = { foreground = "#08bdba" }
