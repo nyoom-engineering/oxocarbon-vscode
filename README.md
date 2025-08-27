@@ -1,22 +1,44 @@
 # <img src="./assets/output-3840x1330-shadow.png"> 
 
 <figure>
-  <img alt="" src="https://github.com/user-attachments/assets/0cb2aa5e-81ed-4b60-bfac-4bdba8249592" />
+  <img alt="" src="https://github.com/user-attachments/assets/0cb2aa5e-81ed-4b60-bfac-4bdba8249592"/>
   <figcaption>Oxocarbon Dark</figcaption>
 </figure>
 
 <br>
 <br>
 
-<figure>
-  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe" />
-  <figcaption>Oxocarbon OLED</figcaption>
-</figure>
+Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines
 
-<br>
-<br>
+## Variants
 
-Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines. Now with an OLED variant!
+There are 4 variants to the theme, the standard theme, an OLED variant, and Compatibility variants for each
+
+The standard theme features a consistent dark background, modeled after a focus on the editor
+
+<details>
+  <summary>Oxocarbon Dark</summary>
+  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
+</details>
+
+The OLED theme is the same as the standard theme, but optimized for OLED and MiniLED displays with a pure black background and dimmed menus
+
+<details>
+  <summary>Oxocarbon OLED</summary>
+  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
+</details>
+
+The compatibility variants provide contrast for tabs and menus to enable a more consistent experience on traditional VSCode layouts
+
+<details>
+  <summary>Oxocarbon Dark (Compatibility)</summary>
+  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
+</details>
+
+<details>
+  <summary>Oxocarbon OLED (Compatibility)</summary>
+  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
+</details>
 
 ## Features
 
@@ -50,11 +72,13 @@ Oxocarbon also provides handrolled syntax highlighting for:
 
 - C
 - Rust
+- Go
+- Lisp
+- Java
 - Haskell
 - OCaml
-- Lisp
-- TOML
 - Markdown
+- TOML
 
 ## Installation
 
