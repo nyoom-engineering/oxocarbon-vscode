@@ -33,6 +33,16 @@
         "label": "oxocarbon OLED",
         "uiTheme": "vs-dark",
         "path": "./themes/oxocarbon-oled-color-theme.json"
+      },
+      {
+        "label": "oxocarbon (compatibility)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/oxocarbon-compat-color-theme.json"
+      },
+      {
+        "label": "oxocarbon OLED (compatibility)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/oxocarbon-oled-compat-color-theme.json"
       }
     ]
   }

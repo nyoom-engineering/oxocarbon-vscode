@@ -7,7 +7,7 @@ focusBorder = "#262626"
 errorForeground = "#ee5396"
 disabledForeground = "#8d8d8d"
 
-"selection.background" = "#6F6F6F"
+"selection.background" = "#6f6f6f"
 "sash.hoverBorder" = "#525252"
 "simpleFindWidget.sashBorder" = "#262626"
 
@@ -216,6 +216,15 @@ disabledForeground = "#8d8d8d"
 "panelSection.dropBackground" = "#39393940"
 "panelTitle.activeBorder" = "#262626"
 "panelTitle.activeForeground" = "#ffffff"
+
+"notifications.background" = "#262626"
+"notificationCenterHeader.background" = "#262626"
+
+"checkbox.background" = "#262626"
+"checkbox.border" = "#262626"
+"checkbox.foreground" = "#ffffff"
+"checkbox.selectBackground" = "#393939"
+"checkbox.selectBorder" = "#525252"
 
 "notebook.cellBorderColor" = "#262626"
 "notebook.focusedCellBorder" = "#ff7eb6"

@@ -4,13 +4,15 @@ INPUT      := oxocarbon.toml
 OUTDIR     := themes
 OUTFILE    := $(OUTDIR)/oxocarbon-color-theme.json
 OLEDFILE   := $(OUTDIR)/oxocarbon-oled-color-theme.json
+COMPATFILE := $(OUTDIR)/oxocarbon-compat-color-theme.json
+COMPATOLED := $(OUTDIR)/oxocarbon-oled-compat-color-theme.json
 ASSETS     := assets
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 EXTENSIONS := $(ASSETS)/extensions.txt
 
 .PHONY: all build clean dotfiles install
 
-all: build $(OUTFILE) $(OLEDFILE)
+all: build $(OUTFILE) $(OLEDFILE) $(COMPATFILE) $(COMPATOLED)
 
 build:
 	$(CARGO) build --release
@@ -23,9 +25,17 @@ $(OLEDFILE): build $(INPUT)
 	mkdir -p $(OUTDIR)
 	$(PROG) --oled $(INPUT) > $(OLEDFILE)
 
+$(COMPATFILE): build $(INPUT)
+	mkdir -p $(OUTDIR)
+	$(PROG) --compat $(INPUT) > $(COMPATFILE)
+
+$(COMPATOLED): build $(INPUT)
+	mkdir -p $(OUTDIR)
+	$(PROG) --compat --oled $(INPUT) > $(COMPATOLED)
+
 clean:
 	$(CARGO) clean
-	rm -f $(OUTFILE) $(OLEDFILE)
+	rm -f $(OUTFILE) $(OLEDFILE) $(COMPATFILE) $(COMPATOLED)
 
 dotfiles:
 	mkdir -p $(ASSETS)
