@@ -32,39 +32,22 @@ fn main() {
     });
 
     if compat {
-        if let Some(colors) = value.get_mut("colors").and_then(|v| v.as_table_mut()) {
+        if let Some(colors) = colors_table_mut(&mut value) {
             // compatibility variants - contrast sidebars and tabs
             // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
             // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
             let (from, to) = if oled { ("#000000", "#161616") } else { ("#161616", "#262626") };
-
-            colors.insert(
-                "sideBar.background".into(),
-                toml::Value::String(midpoint_hex(from, to)),
-            );
-            colors.insert(
-                "tab.inactiveBackground".into(),
-                toml::Value::String(midpoint_hex(from, to)),
-            );
-            colors.insert(
-                "editorGroupHeader.tabsBackground".into(),
-                toml::Value::String(midpoint_hex(from, to)),
-            );
+            let mid = toml::Value::String(midpoint_hex(from, to));
+            for &key in COMPAT_BG_KEYS.iter() {
+                colors.insert(key.into(), mid.clone());
+            }
         }
     }
 
     // oled goes for darker palette
     if oled {
-        if let Some(colors) = value.get_mut("colors").and_then(|v| v.as_table_mut()) {
-            for (_k, v) in colors.iter_mut() {
-                if let Some(s) = v.as_str() {
-                    let mut out = s.to_string();
-                    for &(from, to) in &OLED_REPLACEMENTS {
-                        out = out.replace(from, to);
-                    }
-                    *v = toml::Value::String(out);
-                }
-            }
+        if let Some(colors) = colors_table_mut(&mut value) {
+            replace_color_values_in_table(colors, &OLED_REPLACEMENTS);
         }
     }
 
@@ -111,6 +94,33 @@ const OLED_REPLACEMENTS: [(&str, &str); 7] = [
     ("#393939", "#262626"),
     ("#525252", "#393939"),
 ];
+
+const COMPAT_BG_KEYS: [&str; 5] = [
+    "editorGroupHeader.tabsBackground",
+    "tab.inactiveBackground",
+    "sideBar.background",
+    "panel.background",
+    "statusBar.background",
+];
+
+fn colors_table_mut(value: &mut toml::Value) -> Option<&mut toml::value::Table> {
+    value.get_mut("colors").and_then(|v| v.as_table_mut())
+}
+
+fn replace_color_values_in_table(
+    table: &mut toml::value::Table,
+    replacements: &[(&str, &str)],
+) {
+    for (_key, val) in table.iter_mut() {
+        if let Some(s) = val.as_str() {
+            let mut out = s.to_string();
+            for &(from, to) in replacements {
+                out = out.replace(from, to);
+            }
+            *val = toml::Value::String(out);
+        }
+    }
+}
 
 fn midpoint_hex(a_hex: &str, b_hex: &str) -> String {
     let (ar, ag, ab) = (

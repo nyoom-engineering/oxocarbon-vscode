@@ -2,4 +2,5 @@ node_modules
 *.vsix
 .env
 /target
-.DS_Store
+/result
+**/.DS_Store
