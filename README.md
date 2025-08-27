@@ -1,8 +1,8 @@
-# <img src="./assets/output-3840x1330-shadow.png"> 
+# <img alt="" src="https://github.com/user-attachments/assets/24d83f8f-647f-4ad9-b68b-960f4a33d18e" />
 
 <figure>
   <img alt="" src="https://github.com/user-attachments/assets/0cb2aa5e-81ed-4b60-bfac-4bdba8249592"/>
-  <figcaption>Oxocarbon Dark</figcaption>
+  <figcaption>Oxocarbon Dark in Cursor w/ "Simple" tabs</figcaption>
 </figure>
 
 <br>
@@ -16,28 +16,28 @@ There are 4 variants to the theme, the standard theme, an OLED variant, and Comp
 
 The standard theme features a consistent dark background, modeled after a focus on the editor
 
-<details>
-  <summary>Oxocarbon Dark</summary>
-  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
-</details>
+<img alt="" src="https://github.com/user-attachments/assets/0cb2aa5e-81ed-4b60-bfac-4bdba8249592"/>
+
+<br>
+<br>
 
 The OLED theme is the same as the standard theme, but optimized for OLED and MiniLED displays with a pure black background and dimmed menus
 
-<details>
-  <summary>Oxocarbon OLED</summary>
-  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
-</details>
+<img alt="" src="https://github.com/user-attachments/assets/0ab38e83-d84a-4252-8117-aefb36be7b22"/>
+
+<br>
+<br>
 
 The compatibility variants provide contrast for tabs and menus to enable a more consistent experience on traditional VSCode layouts
 
 <details>
   <summary>Oxocarbon Dark (Compatibility)</summary>
-  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
+  <img alt="" src="https://github.com/user-attachments/assets/ba9c9220-1424-421e-addc-e8ca0d47f84d"/>
 </details>
 
 <details>
   <summary>Oxocarbon OLED (Compatibility)</summary>
-  <img alt="" src="https://github.com/user-attachments/assets/5b31e536-810e-44c1-814b-b3a99ae62bbe"/>
+  <img alt="" src="https://github.com/user-attachments/assets/0c4512e0-ddc5-4b1f-91eb-3654a34f2f6f"/>
 </details>
 
 ## Features
