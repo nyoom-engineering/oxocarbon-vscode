@@ -355,11 +355,8 @@ settings = { foreground = "#f2f4f8" }
 scope = ["variable"]
 settings = { foreground = "#ffffff" }
 
-#0dbdba for language-specific e.g.
-
-# Lisp (more below)
 [[tokenColors]]
-scope = ["support.function.f.sideeffects"]
+scope = ["support"]
 settings = { foreground = "#08bdba" }
 
 [[tokenColors]]
@@ -379,10 +376,6 @@ settings = { foreground = "#3ddbd9" }
 [[tokenColors]]
 scope = ["keyword"]
 settings = { foreground = "#78a9ff" }
-
-[[tokenColors]]
-scope = ["support"]
-settings = { foreground = "#ee5396" }
 
 [[tokenColors]]
 scope = ["storage.modifier", "keyword.other"]
@@ -428,6 +421,11 @@ settings = { foreground = "#78a9ff" }
 [[tokenColors]]
 scope = ["entity.name.import.go"]
 settings = { foreground = "#be95ff" }
+
+# Lisp
+[[tokenColors]]
+scope = ["support.function.f.sideeffects"]
+settings = { foreground = "#ee5396" }
 
 # Markdown
 [[tokenColors]]
