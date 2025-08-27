@@ -82,7 +82,7 @@ Oxocarbon also provides handrolled syntax highlighting for:
 
 ## Installation
 
-Install using your package manager of choice: [Oxocarbon Theme - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=NyoomEngineering.oxocarbon-vscode)
+Install using your package manager of choice: [Oxocarbon Theme - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=NyoomEngineering.oxocarbon-vscode), [Oxocarbon Theme - Open VSX Registry](https://open-vsx.org/extension/NyoomEngineering/oxocarbon-vscode)
 
 Alternatively, a VSIX package can be found under [releases](https://github.com/nyoom-engineering/oxocarbon-vscode/releases)
 
