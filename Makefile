@@ -1,5 +1,5 @@
 CARGO      := cargo
-PROG       := target/release/toml2json
+PROG       := target/release/oxocarbon-themec
 INPUT      := oxocarbon.toml
 OUTDIR     := themes
 OUTFILE    := $(OUTDIR)/oxocarbon-color-theme.json

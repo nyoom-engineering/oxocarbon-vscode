@@ -37,6 +37,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
+name = "oxocarbon-themec"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "toml",
+]
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -122,14 +130,6 @@ dependencies = [
  "serde_spanned",
  "toml_datetime",
  "toml_edit",
-]
-
-[[package]]
-name = "toml2json"
-version = "0.1.0"
-dependencies = [
- "serde_json",
- "toml",
 ]
 
 [[package]]
