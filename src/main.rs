@@ -1,11 +1,3 @@
-#![allow(
-    clippy::all,
-    clippy::pedantic,
-    clippy::restriction,
-    clippy::nursery,
-    clippy::cargo
-)]
-
 use std::{
     env,
     fs,
@@ -16,12 +8,24 @@ use std::{
 
 #[derive(Default)]
 struct Options {
-    pretty: bool,
-    oled: bool,
-    compat: bool,
-    monochrome: bool,
+    flags: OptionsFlags,
     mono_family: Option<String>,
     input_src: String,
+}
+
+#[derive(Clone, Copy, Default)]
+struct OptionsFlags {
+    bits: u8,
+}
+
+impl OptionsFlags {
+    const PRETTY: u8 = 1 << 0;
+    const OLED: u8 = 1 << 1;
+    const COMPAT: u8 = 1 << 2;
+    const MONOCHROME: u8 = 1 << 3;
+
+    fn set(&mut self, mask: u8) { self.bits |= mask; }
+    fn contains(self, mask: u8) -> bool { self.bits & mask != 0 }
 }
 
 impl Options {
@@ -34,10 +38,10 @@ impl Options {
 
         while let Some(arg) = args.next() {
             match arg.as_str() {
-                "-p" | "--pretty" => opts.pretty = true,
-                "--oled" => opts.oled = true,
-                "-c" | "--compat" | "--compatibility" => opts.compat = true,
-                "-m" | "--mono" | "--monochrome" => opts.monochrome = true,
+                "-p" | "--pretty" => opts.flags.set(OptionsFlags::PRETTY),
+                "--oled" => opts.flags.set(OptionsFlags::OLED),
+                "-c" | "--compat" | "--compatibility" => opts.flags.set(OptionsFlags::COMPAT),
+                "-m" | "--mono" | "--monochrome" => opts.flags.set(OptionsFlags::MONOCHROME),
                 "--mono-family" | "--monochrome-family" => {
                     if let Some(fam) = args.next() {
                         opts.mono_family = Some(fam.to_lowercase());
@@ -57,6 +61,11 @@ impl Options {
 
         opts
     }
+
+    fn is_pretty(&self) -> bool { self.flags.contains(OptionsFlags::PRETTY) }
+    fn is_oled(&self) -> bool { self.flags.contains(OptionsFlags::OLED) }
+    fn is_compat(&self) -> bool { self.flags.contains(OptionsFlags::COMPAT) }
+    fn is_monochrome(&self) -> bool { self.flags.contains(OptionsFlags::MONOCHROME) }
 }
 
 fn main() {
@@ -65,52 +74,50 @@ fn main() {
 
     // parse once, mutate, emit JSON
     let mut value: toml::Value = toml::from_str(&toml_buf).unwrap_or_else(|e| {
-        eprintln!("TOML parse error ({}): {}", opts.input_src, e);
+        eprintln!("TOML parse error ({}): {e}", opts.input_src);
         process::exit(1);
     });
 
     // apply OLED replacements first
-    if opts.oled {
-        if let Some(colors) = colors_table_mut(&mut value) {
-            apply_replacements_in_table(colors, &OLED_REPLACEMENTS);
-        }
+    if opts.is_oled() && let Some(colors) = colors_table_mut(&mut value) {
+        apply_replacements_in_table(colors, &OLED_REPLACEMENTS);
     }
 
     // monochrome transform
-    if opts.monochrome {
+    if opts.is_monochrome() {
         let family = opts.mono_family.as_deref().unwrap_or("gray");
         let ramp = select_monochrome_ramp(family);
         apply_monochrome(&mut value, &ramp);
+        // enforce style-based foregrounds for monochrome variants
+        apply_monochrome_style_overrides(&mut value);
     }
 
     // compatibility adjustments
-    if opts.compat {
-        if let Some(colors) = colors_table_mut(&mut value) {
-            // compatibility variants - contrast panels
-            // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
-            // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
-            let (from, to) = if opts.oled { ("#000000", "#161616") } else { ("#161616", "#262626") };
-            let c1 = midpoint_hex(from, to);
-            insert_value(colors, &COMPAT_BG_KEYS, toml::Value::String(c1));
-            // compatibility variants - contrast headers, borders
-            // - Standard compat: #393939
-            // - OLED compat:     #262626
-            let c2 = if opts.oled { "#262626" } else { "#393939" }.to_string();
-            insert_value(colors, &COMPAT_CONTRAST_KEYS, toml::Value::String(c2.clone()));
-            // compatibility variants - additional contrast
-            // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
-            // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
-            let base = if opts.oled { "#161616" } else { "#262626" };
-            let c3 = midpoint_hex(base, &c2);
-            insert_value(colors, &COMPAT_CONTRAST_KEYS_2, toml::Value::String(c3));
-        }
+    if opts.is_compat() && let Some(colors) = colors_table_mut(&mut value) {
+        // compatibility variants - contrast panels
+        // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
+        // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
+        let (from, to) = if opts.is_oled() { ("#000000", "#161616") } else { ("#161616", "#262626") };
+        let c1 = midpoint_hex(from, to);
+        insert_value(colors, &COMPAT_BG_KEYS, &toml::Value::String(c1));
+        // compatibility variants - contrast headers, borders
+        // - Standard compat: #393939
+        // - OLED compat:     #262626
+        let c2 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
+        insert_value(colors, &COMPAT_CONTRAST_KEYS, &toml::Value::String(c2.clone()));
+        // compatibility variants - additional contrast
+        // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
+        // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
+        let base = if opts.is_oled() { "#161616" } else { "#262626" };
+        let c3 = midpoint_hex(base, &c2);
+        insert_value(colors, &COMPAT_CONTRAST_KEYS_2, &toml::Value::String(c3));
     }
 
     // name override
     if let Some(name) = compute_theme_name(
-        opts.oled,
-        opts.compat,
-        opts.monochrome,
+        opts.is_oled(),
+        opts.is_compat(),
+        opts.is_monochrome(),
         opts.mono_family.as_deref(),
     ) {
         value
@@ -119,11 +126,11 @@ fn main() {
             .insert("name".into(), toml::Value::String(name));
     }
 
-    if let Err(e) = (if opts.pretty { serde_json::to_writer_pretty } else { serde_json::to_writer })(
+    if let Err(e) = (if opts.is_pretty() { serde_json::to_writer_pretty } else { serde_json::to_writer })(
         io::stdout().lock(),
         &value,
     ) {
-        eprintln!("Failed to write JSON: {}", e);
+        eprintln!("Failed to write JSON: {e}");
         process::exit(1);
     }
 }
@@ -132,13 +139,13 @@ fn read_input(input_src: &str) -> String {
     if input_src == "-" {
         let mut buf = String::new();
         io::stdin().read_to_string(&mut buf).unwrap_or_else(|e| {
-            eprintln!("Failed to read from stdin: {}", e);
+            eprintln!("Failed to read from stdin: {e}");
             process::exit(1);
         });
         buf
     } else {
         fs::read_to_string(input_src).unwrap_or_else(|e| {
-            eprintln!("Failed to read '{}': {}", input_src, e);
+            eprintln!("Failed to read '{input_src}': {e}");
             process::exit(1);
         })
     }
@@ -183,7 +190,7 @@ fn colors_table_mut(value: &mut toml::Value) -> Option<&mut toml::value::Table> 
     value.get_mut("colors").and_then(|v| v.as_table_mut())
 }
 
-fn insert_value(table: &mut toml::value::Table, keys: &[&str], value: toml::Value) {
+fn insert_value(table: &mut toml::value::Table, keys: &[&str], value: &toml::Value) {
     for &key in keys {
         table.insert(key.into(), value.clone());
     }
@@ -211,11 +218,16 @@ fn midpoint_hex(a_hex: &str, b_hex: &str) -> String {
         u8::from_str_radix(&b_hex[5..7], 16).unwrap(),
     );
 
-    let mr = ((ar as u16 + br as u16) / 2) as u8;
-    let mg = ((ag as u16 + bg as u16) / 2) as u8;
-    let mb = ((ab as u16 + bb as u16) / 2) as u8;
+    let mr = average_channel(ar, br);
+    let mg = average_channel(ag, bg);
+    let mb = average_channel(ab, bb);
 
-    format!("#{:02x}{:02x}{:02x}", mr, mg, mb)
+    format!("#{mr:02x}{mg:02x}{mb:02x}")
+}
+
+fn average_channel(a: u8, b: u8) -> u8 {
+    // overflow-free average: (a & b) + ((a ^ b) >> 1)
+    (a & b).wrapping_add((a ^ b) >> 1)
 }
 
 fn compute_theme_name(
@@ -231,7 +243,7 @@ fn compute_theme_name(
             _ => "Gray",
         };
         let base = if oled { "Oxocarbon OLED Monochrome" } else { "Oxocarbon Monochrome" };
-        let mut name = format!("{} ({})", base, fam);
+        let mut name = format!("{base} ({fam})");
         if compat { name.push_str(" (compatibility)"); }
         Some(name)
     } else {
@@ -356,8 +368,31 @@ fn apply_monochrome(value: &mut toml::Value, ramp_hex: &[&str]) {
     });
 }
 
+fn apply_monochrome_style_overrides(value: &mut toml::Value) {
+    // In monochrome themes:
+    // - any token with fontStyle containing 'italic' => foreground #f2f4f8
+    // - any token with fontStyle that is strictly 'bold' (pure bold) => foreground #ffffff
+    let Some(arr) = value.get_mut("tokenColors").and_then(|v| v.as_array_mut()) else { return; };
+    let italic_fg = toml::Value::String("#f2f4f8".to_string());
+    let bold_fg = toml::Value::String("#ffffff".to_string());
+    for item in arr.iter_mut() {
+        let Some(settings) = item.get_mut("settings").and_then(|v| v.as_table_mut()) else { continue; };
+        let Some(font_style) = settings.get("fontStyle").and_then(|v| v.as_str()) else { continue; };
+        let (count, has_bold, has_italic) = font_style
+            .split_whitespace()
+            .fold((0usize, false, false), |(n, b, i), t| {
+                (n + 1, b || t.eq_ignore_ascii_case("bold"), i || t.eq_ignore_ascii_case("italic"))
+            });
+        if has_italic {
+            settings.insert("foreground".into(), italic_fg.clone());
+        } else if has_bold && count == 1 {
+            settings.insert("foreground".into(), bold_fg.clone());
+        }
+    }
+}
+
 fn is_allowed_accent_hex(s: &str) -> bool {
-    if s.len() < 7 || !s.as_bytes().get(0).map_or(false, |b| *b == b'#') { return false; }
+    if s.len() < 7 || s.as_bytes().first().is_none_or(|b| *b != b'#') { return false; }
     // accept both rgb and rgba as long as rgb matches the list
     let rgb = &s[1..7];
     MONO_ALLOWED_ACCENTS.iter().any(|allowed| rgb.eq_ignore_ascii_case(allowed))
@@ -382,30 +417,31 @@ fn walk_table_strings_mut<F: FnMut(&mut String)>(t: &mut toml::value::Table, f: 
     }
 }
 
-fn parse_hex_color(s: &str) -> Option<([u8; 3], Option<u8>)> {
-    if !s.starts_with('#') { return None; }
-    match s.len() {
+fn parse_hex_color(input: &str) -> Option<([u8; 3], Option<u8>)> {
+    if !input.starts_with('#') { return None; }
+    match input.len() {
         7 => {
-            let r = u8::from_str_radix(&s[1..3], 16).ok()?;
-            let g = u8::from_str_radix(&s[3..5], 16).ok()?;
-            let b = u8::from_str_radix(&s[5..7], 16).ok()?;
-            Some(([r, g, b], None))
+            let red = u8::from_str_radix(&input[1..3], 16).ok()?;
+            let green = u8::from_str_radix(&input[3..5], 16).ok()?;
+            let blue = u8::from_str_radix(&input[5..7], 16).ok()?;
+            Some(([red, green, blue], None))
         }
         9 => {
-            let r = u8::from_str_radix(&s[1..3], 16).ok()?;
-            let g = u8::from_str_radix(&s[3..5], 16).ok()?;
-            let b = u8::from_str_radix(&s[5..7], 16).ok()?;
-            let a = u8::from_str_radix(&s[7..9], 16).ok()?;
-            Some(([r, g, b], Some(a)))
+            let red = u8::from_str_radix(&input[1..3], 16).ok()?;
+            let green = u8::from_str_radix(&input[3..5], 16).ok()?;
+            let blue = u8::from_str_radix(&input[5..7], 16).ok()?;
+            let alpha = u8::from_str_radix(&input[7..9], 16).ok()?;
+            Some(([red, green, blue], Some(alpha)))
         }
         _ => None,
     }
 }
 
 fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
+    let [r, g, b] = rgb;
     match alpha {
-        Some(a) => format!("#{:02x}{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2], a),
-        None => format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2]),
+        Some(a) => format!("#{r:02x}{g:02x}{b:02x}{a:02x}"),
+        None => format!("#{r:02x}{g:02x}{b:02x}"),
     }
 }
 
@@ -414,8 +450,8 @@ fn luminance_from_u8(r: u8, g: u8, b: u8) -> f32 {
     fn srgb_to_linear(c: f32) -> f32 {
         if c <= 0.04045 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
     }
-    let rf = srgb_to_linear(r as f32 / 255.0);
-    let gf = srgb_to_linear(g as f32 / 255.0);
-    let bf = srgb_to_linear(b as f32 / 255.0);
+    let rf = srgb_to_linear(f32::from(r) / 255.0);
+    let gf = srgb_to_linear(f32::from(g) / 255.0);
+    let bf = srgb_to_linear(f32::from(b) / 255.0);
     0.2126 * rf + 0.7152 * gf + 0.0722 * bf
 }
