@@ -43,6 +43,26 @@
         "label": "oxocarbon OLED (compatibility)",
         "uiTheme": "vs-dark",
         "path": "./themes/oxocarbon-oled-compat-color-theme.json"
+      },
+      {
+        "label": "oxocarbon monochrom",
+        "uiTheme": "vs-dark",
+        "path": "./themes/oxocarbon-mono-color-theme.json"
+      },
+      {
+        "label": "oxocarbon monochrom OLED",
+        "uiTheme": "vs-dark",
+        "path": "./themes/oxocarbon-mono-oled-color-theme.json"
+      },
+      {
+        "label": "oxocarbon monochrom (compatibility)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/oxocarbon-mono-compat-color-theme.json"
+      },
+      {
+        "label": "oxocarbon monochrom OLED (compatibility)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/oxocarbon-mono-oled-compat-color-theme.json"
       }
     ]
   }
