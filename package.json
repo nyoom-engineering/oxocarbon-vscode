@@ -63,6 +63,11 @@
         "label": "oxocarbon monochrom OLED (compatibility)",
         "uiTheme": "vs-dark",
         "path": "./themes/oxocarbon-mono-oled-compat-color-theme.json"
+      },
+      {
+        "label": "oxocarbon PRINT",
+        "uiTheme": "vs-light",
+        "path": "./themes/PRINT.json"
       }
     ]
   }

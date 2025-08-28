@@ -445,6 +445,15 @@ fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
     }
 }
 
+fn invert_all_hex_colors(value: &mut toml::Value) {
+    walk_value_strings_mut(value, &mut |s: &mut String| {
+        if let Some((rgb, a)) = parse_hex_color(s) {
+            let inv = [255u8 - rgb[0], 255u8 - rgb[1], 255u8 - rgb[2]];
+            *s = format_hex_color(inv, a);
+        }
+    });
+}
+
 fn luminance_from_u8(r: u8, g: u8, b: u8) -> f32 {
     // convert to linear sRGB, then compute relative luminance (WCAG / Rec. 709)
     fn srgb_to_linear(c: f32) -> f32 {
