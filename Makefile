@@ -16,6 +16,7 @@ MONOFILE        := $(OUTDIR)/oxocarbon-mono-color-theme.json
 MONOOLED        := $(OUTDIR)/oxocarbon-mono-oled-color-theme.json
 MONOCOMPAT      := $(OUTDIR)/oxocarbon-mono-compat-color-theme.json
 MONOCOMPATOLED  := $(OUTDIR)/oxocarbon-mono-oled-compat-color-theme.json
+PRINTFILE       := $(OUTDIR)/PRINT.json
 
 # Optional monochrome families (Cool Gray, Warm Gray)
 MONO_COOL           := $(OUTDIR)/oxocarbon-mono-coolgray-color-theme.json
@@ -41,7 +42,8 @@ all: build \
     $(MONOFILE) \
     $(MONOOLED) \
     $(MONOCOMPAT) \
-    $(MONOCOMPATOLED)
+    $(MONOCOMPATOLED) \
+    $(PRINTFILE)
 
 build:
 	$(CARGO) build --release
@@ -63,6 +65,11 @@ $(MONOFILE): build $(INPUT) | $(OUTDIR)
 
 $(MONOOLED): build $(INPUT) | $(OUTDIR)
 	$(PROG) --monochrome --oled $(INPUT) > $(MONOOLED)
+
+$(PRINTFILE): build $(INPUT) | $(OUTDIR)
+	$(PROG) --monochrome --oled --print $(INPUT) > $(PRINTFILE)
+
+PRINT: $(PRINTFILE)
 
 $(MONOCOMPAT): build $(INPUT) | $(OUTDIR)
 	$(PROG) --monochrome --compat $(INPUT) > $(MONOCOMPAT)
@@ -106,7 +113,7 @@ $(OUTDIR):
 clean:
 	$(CARGO) clean
 	rm -f $(OUTFILE) $(OLEDFILE) $(COMPATFILE) $(COMPATOLED) \
-		$(MONOFILE) $(MONOOLED) $(MONOCOMPAT) $(MONOCOMPATOLED) \
+		$(MONOFILE) $(MONOOLED) $(MONOCOMPAT) $(MONOCOMPATOLED) $(PRINTFILE) \
 		$(MONO_COOL) $(MONO_COOL_OLED) $(MONO_COOL_COMPAT) $(MONO_COOL_COMPATOLED) \
 		$(MONO_WARM) $(MONO_WARM_OLED) $(MONO_WARM_COMPAT) $(MONO_WARM_COMPATOLED)
 

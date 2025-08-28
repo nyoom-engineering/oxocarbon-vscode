@@ -23,6 +23,7 @@ impl OptionsFlags {
     const OLED: u8 = 1 << 1;
     const COMPAT: u8 = 1 << 2;
     const MONOCHROME: u8 = 1 << 3;
+    const PRINT: u8 = 1 << 4;
 
     fn set(&mut self, mask: u8) { self.bits |= mask; }
     fn contains(self, mask: u8) -> bool { self.bits & mask != 0 }
@@ -42,6 +43,7 @@ impl Options {
                 "--oled" => opts.flags.set(OptionsFlags::OLED),
                 "-c" | "--compat" | "--compatibility" => opts.flags.set(OptionsFlags::COMPAT),
                 "-m" | "--mono" | "--monochrome" => opts.flags.set(OptionsFlags::MONOCHROME),
+                "--print" => opts.flags.set(OptionsFlags::PRINT),
                 "--mono-family" | "--monochrome-family" => {
                     if let Some(fam) = args.next() {
                         opts.mono_family = Some(fam.to_lowercase());
@@ -66,6 +68,7 @@ impl Options {
     fn is_oled(&self) -> bool { self.flags.contains(OptionsFlags::OLED) }
     fn is_compat(&self) -> bool { self.flags.contains(OptionsFlags::COMPAT) }
     fn is_monochrome(&self) -> bool { self.flags.contains(OptionsFlags::MONOCHROME) }
+    fn is_print(&self) -> bool { self.flags.contains(OptionsFlags::PRINT) }
 }
 
 fn main() {
@@ -124,6 +127,14 @@ fn main() {
             .as_table_mut()
             .expect("root must be a table")
             .insert("name".into(), toml::Value::String(name));
+    }
+
+    // print variant: invert all hex colors and force light type
+    if opts.is_print() {
+        invert_all_hex_colors(&mut value);
+        if let Some(root) = value.as_table_mut() {
+            root.insert("type".into(), toml::Value::String("light".into()));
+        }
     }
 
     if let Err(e) = (if opts.is_pretty() { serde_json::to_writer_pretty } else { serde_json::to_writer })(
@@ -446,10 +457,10 @@ fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
 }
 
 fn invert_all_hex_colors(value: &mut toml::Value) {
-    walk_value_strings_mut(value, &mut |s: &mut String| {
-        if let Some((rgb, a)) = parse_hex_color(s) {
-            let inv = [255u8 - rgb[0], 255u8 - rgb[1], 255u8 - rgb[2]];
-            *s = format_hex_color(inv, a);
+    walk_value_strings_mut(value, &mut |s| {
+        if let Some((mut rgb, a)) = parse_hex_color(s) {
+            rgb.iter_mut().for_each(|c| *c ^= 0xFF);
+            *s = format_hex_color(rgb, a);
         }
     });
 }
