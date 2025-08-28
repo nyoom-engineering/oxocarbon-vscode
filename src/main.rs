@@ -1,91 +1,128 @@
+#![allow(
+    clippy::all,
+    clippy::pedantic,
+    clippy::restriction,
+    clippy::nursery,
+    clippy::cargo
+)]
+
 use std::{
     env,
     fs,
     io::{self, Read},
     process,
+    borrow::Cow
 };
 
-fn main() {
-    let mut args = env::args().skip(1);
-    let mut pretty = false;
-    let mut oled = false;
-    let mut compat = false;
-    let mut monochrome = false;
-    let mut mono_family: Option<String> = None;
-    let mut input_src: Option<String> = None;
+#[derive(Default)]
+struct Options {
+    pretty: bool,
+    oled: bool,
+    compat: bool,
+    monochrome: bool,
+    mono_family: Option<String>,
+    input_src: String,
+}
 
-    while let Some(arg) = args.next() {
-        match arg.as_str() {
-            "-p" | "--pretty" => pretty = true,
-            "--oled" => oled = true,
-            "-c" | "--compat" | "--compatibility" => compat = true,
-            "-m" | "--mono" | "--monochrome" => monochrome = true,
-            "--mono-family" | "--monochrome-family" => {
-                if let Some(fam) = args.next() {
-                    mono_family = Some(fam.to_lowercase());
-                } else {
-                    eprintln!("Expected a value after --mono-family, e.g. gray|coolgray|warmgray");
-                    process::exit(2);
+impl Options {
+    fn from_env_args() -> Self {
+        let mut args = env::args().skip(1);
+        let mut opts = Options {
+            input_src: "-".into(),
+            ..Default::default()
+        };
+
+        while let Some(arg) = args.next() {
+            match arg.as_str() {
+                "-p" | "--pretty" => opts.pretty = true,
+                "--oled" => opts.oled = true,
+                "-c" | "--compat" | "--compatibility" => opts.compat = true,
+                "-m" | "--mono" | "--monochrome" => opts.monochrome = true,
+                "--mono-family" | "--monochrome-family" => {
+                    if let Some(fam) = args.next() {
+                        opts.mono_family = Some(fam.to_lowercase());
+                    } else {
+                        eprintln!(
+                            "Expected a value after --mono-family, e.g. gray|coolgray|warmgray"
+                        );
+                        process::exit(2);
+                    }
                 }
+                other if opts.input_src == "-" => {
+                    opts.input_src = other.to_string();
+                }
+                _ => {}
             }
-            other if input_src.is_none() => input_src = Some(other.to_string()),
-            _ => {}
         }
-    }
 
-    let input_src = input_src.unwrap_or_else(|| "-".into());
-    let toml_buf = read_input(&input_src);
+        opts
+    }
+}
+
+fn main() {
+    let opts = Options::from_env_args();
+    let toml_buf = read_input(&opts.input_src);
 
     // parse once, mutate, emit JSON
     let mut value: toml::Value = toml::from_str(&toml_buf).unwrap_or_else(|e| {
-        eprintln!("TOML parse error ({}): {}", input_src, e);
+        eprintln!("TOML parse error ({}): {}", opts.input_src, e);
         process::exit(1);
     });
 
     // apply OLED replacements first
-    if oled {
-        if let Some(colors) = colors_table_mut(&mut value) { apply_replacements_in_table(colors, &OLED_REPLACEMENTS); }
+    if opts.oled {
+        if let Some(colors) = colors_table_mut(&mut value) {
+            apply_replacements_in_table(colors, &OLED_REPLACEMENTS);
+        }
     }
 
     // monochrome transform
-    if monochrome {
-        let family = mono_family.as_deref().unwrap_or("gray");
+    if opts.monochrome {
+        let family = opts.mono_family.as_deref().unwrap_or("gray");
         let ramp = select_monochrome_ramp(family);
-        apply_monochrome(&mut value, ramp);
+        apply_monochrome(&mut value, &ramp);
     }
 
     // compatibility adjustments
-    if compat {
+    if opts.compat {
         if let Some(colors) = colors_table_mut(&mut value) {
             // compatibility variants - contrast panels
             // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
             // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
-            let (from, to) = if oled { ("#000000", "#161616") } else { ("#161616", "#262626") };
+            let (from, to) = if opts.oled { ("#000000", "#161616") } else { ("#161616", "#262626") };
             let c1 = midpoint_hex(from, to);
             insert_value(colors, &COMPAT_BG_KEYS, toml::Value::String(c1));
             // compatibility variants - contrast headers, borders
             // - Standard compat: #393939
             // - OLED compat:     #262626
-            let c2 = if oled { "#262626" } else { "#393939" }.to_string();
+            let c2 = if opts.oled { "#262626" } else { "#393939" }.to_string();
             insert_value(colors, &COMPAT_CONTRAST_KEYS, toml::Value::String(c2.clone()));
             // compatibility variants - additional contrast
             // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
             // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
-            let base = if oled { "#161616" } else { "#262626" };
+            let base = if opts.oled { "#161616" } else { "#262626" };
             let c3 = midpoint_hex(base, &c2);
             insert_value(colors, &COMPAT_CONTRAST_KEYS_2, toml::Value::String(c3));
         }
     }
 
     // name override
-    if let Some(name) = compute_theme_name(oled, compat, monochrome, mono_family.as_deref()) {
+    if let Some(name) = compute_theme_name(
+        opts.oled,
+        opts.compat,
+        opts.monochrome,
+        opts.mono_family.as_deref(),
+    ) {
         value
             .as_table_mut()
             .expect("root must be a table")
             .insert("name".into(), toml::Value::String(name));
     }
 
-    if let Err(e) = (if pretty { serde_json::to_writer_pretty } else { serde_json::to_writer })(io::stdout().lock(), &value) {
+    if let Err(e) = (if opts.pretty { serde_json::to_writer_pretty } else { serde_json::to_writer })(
+        io::stdout().lock(),
+        &value,
+    ) {
         eprintln!("Failed to write JSON: {}", e);
         process::exit(1);
     }
@@ -146,12 +183,19 @@ fn colors_table_mut(value: &mut toml::Value) -> Option<&mut toml::value::Table> 
     value.get_mut("colors").and_then(|v| v.as_table_mut())
 }
 
-fn insert_value(table: &mut toml::value::Table, keys: &[&str], value: toml::Value) { for &key in keys { table.insert(key.into(), value.clone()); } }
+fn insert_value(table: &mut toml::value::Table, keys: &[&str], value: toml::Value) {
+    for &key in keys {
+        table.insert(key.into(), value.clone());
+    }
+}
 
 fn apply_replacements_in_table(table: &mut toml::value::Table, replacements: &[(&str, &str)]) {
     walk_table_strings_mut(table, &mut |s: &mut String| {
-        let out = replacements.iter().fold(std::mem::take(s), |acc, (from, to)| acc.replace(from, to));
-        if out != *s { *s = out; }
+        let mut cur: Cow<str> = Cow::Borrowed(s);
+        for (from, to) in replacements {
+            if cur.contains(from) { cur = Cow::Owned(cur.replace(from, to)); }
+        }
+        if let std::borrow::Cow::Owned(new) = cur { *s = new; }
     });
 }
 
@@ -258,7 +302,7 @@ const MONO_RAMP_EXTRAS: [&str; 13] = [
 ];
 
 // allowed accents
-const MONO_ALLOWED_ACCENTS: [&str; 11] = [
+const MONO_ALLOWED_ACCENTS: [&str; 10] = [
     "08bdba",
     "3ddbd9",
     "78a9ff",
@@ -268,47 +312,43 @@ const MONO_ALLOWED_ACCENTS: [&str; 11] = [
     "42be65",
     "be95ff",
     "82cfff",
-    "0f62fe",
     "a6c8ff",
 ];
 
-fn select_monochrome_ramp(family: &str) -> Vec<String> {
+fn select_monochrome_ramp(family: &str) -> Vec<&'static str> {
     let base: &[&str] = match family {
         "coolgray" | "cool-gray" | "cool" => &COOL_GRAY_RAMP,
         "warmgray" | "warm-gray" | "warm" => &WARM_GRAY_RAMP,
         _ => &GRAY_RAMP,
     };
-    let mut ramp: Vec<String> = MONO_RAMP_EXTRAS
-        .iter()
-        .chain(base.iter())
-        .map(|s| s.to_string())
-        .collect();
-    let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
-    ramp.retain(|h| seen.insert(h.clone()));
+    let mut seen: std::collections::HashSet<&'static str> = std::collections::HashSet::new();
+    let mut ramp: Vec<&'static str> = Vec::with_capacity(MONO_RAMP_EXTRAS.len() + base.len());
+    for &h in MONO_RAMP_EXTRAS.iter().chain(base.iter()) {
+        if seen.insert(h) { ramp.push(h); }
+    }
     ramp
 }
 
-fn apply_monochrome(value: &mut toml::Value, ramp_hex: Vec<String>) {
+fn apply_monochrome(value: &mut toml::Value, ramp_hex: &[&str]) {
     // pre-sort ramp by luminance for nearest-neighbor lookup
     let mut ramp: Vec<(f32, [u8; 3])> = ramp_hex
-        .into_iter()
-        .filter_map(|h| parse_hex_color(&h).map(|(rgb, _)| (luminance_from_u8(rgb[0], rgb[1], rgb[2]), rgb)))
+        .iter()
+        .filter_map(|h| parse_hex_color(h).map(|(rgb, _)| (luminance_from_u8(rgb[0], rgb[1], rgb[2]), rgb)))
         .collect();
     ramp.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
     walk_value_strings_mut(value, &mut |s: &mut String| {
-        if !s.starts_with('#') { return; }
         if !is_allowed_accent_hex(s) { return; }
         if let Some((rgb, a)) = parse_hex_color(s) {
             let y = luminance_from_u8(rgb[0], rgb[1], rgb[2]);
-            let i = ramp.partition_point(|(ry, _)| *ry < y);
+            let i = ramp.partition_point(|&(ry, _)| ry < y);
             let pick = match (i.checked_sub(1), ramp.get(i)) {
-                (Some(li), Some((_ry2, rgb2))) => {
+                (Some(li), Some(&(_ry2, rgb2))) => {
                     let (yl, yr) = (ramp[li].0, ramp[i].0);
-                    if (y - yl) <= (yr - y) { ramp[li].1 } else { *rgb2 }
+                    if (y - yl) <= (yr - y) { ramp[li].1 } else { rgb2 }
                 }
                 (Some(li), None) => ramp[li].1,
-                (None, Some((_ry2, rgb2))) => *rgb2,
+                (None, Some(&(_ry2, rgb2))) => rgb2,
                 (None, None) => rgb,
             };
             *s = format_hex_color(pick, a);
@@ -317,27 +357,34 @@ fn apply_monochrome(value: &mut toml::Value, ramp_hex: Vec<String>) {
 }
 
 fn is_allowed_accent_hex(s: &str) -> bool {
-    let h = &s[1..].to_ascii_lowercase();
+    if s.len() < 7 || !s.as_bytes().get(0).map_or(false, |b| *b == b'#') { return false; }
     // accept both rgb and rgba as long as rgb matches the list
-    let rgb = &h[0..6];
-    MONO_ALLOWED_ACCENTS.iter().any(|allowed| *allowed == rgb)
+    let rgb = &s[1..7];
+    MONO_ALLOWED_ACCENTS.iter().any(|allowed| rgb.eq_ignore_ascii_case(allowed))
 }
 
 fn walk_value_strings_mut<F: FnMut(&mut String)>(v: &mut toml::Value, f: &mut F) {
     match v {
         toml::Value::String(s) => f(s),
-        toml::Value::Array(a) => a.iter_mut().for_each(|x| walk_value_strings_mut(x, f)),
-        toml::Value::Table(t) => t.iter_mut().for_each(|(_k, x)| walk_value_strings_mut(x, f)),
+        toml::Value::Array(a) => a
+            .iter_mut()
+            .for_each(|x| walk_value_strings_mut(x, f)),
+        toml::Value::Table(t) => t
+            .iter_mut()
+            .for_each(|(_k, x)| walk_value_strings_mut(x, f)),
         _ => {}
     }
 }
 
-fn walk_table_strings_mut<F: FnMut(&mut String)>(t: &mut toml::value::Table, f: &mut F) { for (_k, v) in t.iter_mut() { walk_value_strings_mut(v, f) } }
+fn walk_table_strings_mut<F: FnMut(&mut String)>(t: &mut toml::value::Table, f: &mut F) {
+    for (_k, v) in t.iter_mut() {
+        walk_value_strings_mut(v, f);
+    }
+}
 
 fn parse_hex_color(s: &str) -> Option<([u8; 3], Option<u8>)> {
     if !s.starts_with('#') { return None; }
-    let bytes = s.as_bytes();
-    match bytes.len() {
+    match s.len() {
         7 => {
             let r = u8::from_str_radix(&s[1..3], 16).ok()?;
             let g = u8::from_str_radix(&s[3..5], 16).ok()?;
