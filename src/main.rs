@@ -31,23 +31,32 @@ fn main() {
         process::exit(1);
     });
 
-    if compat {
+    if compat || oled {
         if let Some(colors) = colors_table_mut(&mut value) {
-            // compatibility variants - contrast sidebars and tabs
-            // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
-            // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
-            let (from, to) = if oled { ("#000000", "#161616") } else { ("#161616", "#262626") };
-            let mid = toml::Value::String(midpoint_hex(from, to));
-            for &key in COMPAT_BG_KEYS.iter() {
-                colors.insert(key.into(), mid.clone());
-            }
-        }
-    }
+            if compat {
+                // compatibility variants - contrast panels
+                // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
+                // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
+                let (from, to) = if oled { ("#000000", "#161616") } else { ("#161616", "#262626") };
+                let c1 = midpoint_hex(from, to);
+                insert_value(colors, &COMPAT_BG_KEYS, toml::Value::String(c1));
 
-    // oled goes for darker palette
-    if oled {
-        if let Some(colors) = colors_table_mut(&mut value) {
-            replace_color_values_in_table(colors, &OLED_REPLACEMENTS);
+                // compatibility variants - contrast headers, borders
+                // - Standard compat: #393939
+                // - OLED compat: #262626
+                let c2 = if oled { "#262626" } else { "#393939" }.to_string();
+                insert_value(colors, &COMPAT_CONTRAST_KEYS, toml::Value::String(c2.clone()));
+
+                // compatibility variants - additional contrast
+                // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
+                // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
+                let base = if oled { "#161616" } else { "#262626" };
+                let c3 = midpoint_hex(base, &c2);
+                insert_value(colors, &COMPAT_CONTRAST_KEYS_2, toml::Value::String(c3));
+            }
+            if oled {
+                replace_color_values_in_table(colors, &OLED_REPLACEMENTS);
+            }
         }
     }
 
@@ -59,11 +68,7 @@ fn main() {
             .insert("name".into(), toml::Value::String(name));
     }
 
-    let stdout = io::stdout();
-    let handle = stdout.lock();
-    let result = if pretty { serde_json::to_writer_pretty(handle, &value) } else { serde_json::to_writer(handle, &value) };
-
-    if let Err(e) = result {
+    if let Err(e) = (if pretty { serde_json::to_writer_pretty } else { serde_json::to_writer })(io::stdout().lock(), &value) {
         eprintln!("Failed to write JSON: {}", e);
         process::exit(1);
     }
@@ -95,29 +100,44 @@ const OLED_REPLACEMENTS: [(&str, &str); 7] = [
     ("#525252", "#393939"),
 ];
 
-const COMPAT_BG_KEYS: [&str; 5] = [
+const COMPAT_BG_KEYS: [&str; 6] = [
+    "titleBar.activeBackground",
     "editorGroupHeader.tabsBackground",
-    "tab.inactiveBackground",
+    "activityBar.background",
     "sideBar.background",
     "panel.background",
-    "statusBar.background",
+    "statusBar.background"
+];
+
+const COMPAT_CONTRAST_KEYS: [&str; 6] = [
+    // borders
+    "titleBar.border",
+    "tab.border",
+    "activityBar.border",
+    "statusBar.border",
+    // additional contrast for readability
+    "titleBar.activeBackground",
+    "list.hoverBackground"
+];
+
+const COMPAT_CONTRAST_KEYS_2: [&str; 2] = [
+    "sideBar.border",
+    "panel.border",
 ];
 
 fn colors_table_mut(value: &mut toml::Value) -> Option<&mut toml::value::Table> {
     value.get_mut("colors").and_then(|v| v.as_table_mut())
 }
 
-fn replace_color_values_in_table(
-    table: &mut toml::value::Table,
-    replacements: &[(&str, &str)],
-) {
-    for (_key, val) in table.iter_mut() {
+fn insert_value(table: &mut toml::value::Table, keys: &[&str], value: toml::Value) {
+    for &key in keys { table.insert(key.into(), value.clone()); }
+}
+
+fn replace_color_values_in_table(table: &mut toml::value::Table, replacements: &[(&str, &str)]) {
+    for (_k, val) in table.iter_mut() {
         if let Some(s) = val.as_str() {
-            let mut out = s.to_string();
-            for &(from, to) in replacements {
-                out = out.replace(from, to);
-            }
-            *val = toml::Value::String(out);
+            let out = replacements.iter().fold(s.to_owned(), |acc, (from, to)| acc.replace(from, to));
+            if out != s { *val = toml::Value::String(out); }
         }
     }
 }
