@@ -8,6 +8,8 @@ dbaeumer.vscode-eslint
 eduarddyckman.vscode-parinfer
 github.vscode-pull-request-github
 haskell.haskell
+iocave.customize-ui
+iocave.monkey-patch
 jnoortheen.nix-ide
 justusadam.language-haskell
 llvm-vs-code-extensions.vscode-clangd

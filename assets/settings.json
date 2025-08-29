@@ -1,4 +1,16 @@
 {
+  "editor.fontFamily": "Berkeley Mono",
+  "customizeUI.font.regular": "Univers",
+  "customizeUI.font.monospace": "Berkeley Mono",
+
+  //  "editor.fontFamily": "Liga SFMono Nerd Font",
+  //  "customizeUI.font.regular": "SF Pro",
+  //  "customizeUI.font.monospace": "SF Mono",
+
+  //  "editor.fontFamily": "IBM Plex Mono",
+  //  "customizeUI.font.regular": "IBM Plex Sans",
+  //  "customizeUI.font.monospace": "IBM Plex Mono",
+
   "cursor.composer.textSizeScale": 1.15,
   "cursor.general.enableShadowWorkspace": true,
   "cursor.terminal.usePreviewBox": true,
@@ -9,7 +21,6 @@
   "extensions.experimental.affinity": {
     "vscodevim.vim": 1
   },
-  "editor.fontFamily": "Berkeley Mono, monospace",
   "editor.fontLigatures": true,
   "editor.fontSize": 14,
   "editor.smoothScrolling": true,
@@ -29,7 +40,7 @@
   "editor.cursorSurroundingLines": 4,
   "editor.formatOnPaste": true,
   "workbench.colorTheme": "oxocarbon",
-  "workbench.preferredDarkColorTheme": "oxocarbon",
+  "workbench.preferredDarkColorTheme": "oxocarbon monochrom (compatibility)",
   "workbench.productIconTheme": "icons-carbon",
   "workbench.experimental.share.enabled": true,
   "workbench.editor.showTabs": "single",
@@ -74,5 +85,5 @@
   "terminal.integrated.commandsToSkipShell": [
     "language-julia.interrupt"
   ],
-  "update.releaseTrack": "prerelease"
+  "update.releaseTrack": "prerelease",
 }
