@@ -103,6 +103,7 @@ Oxocarbon also provides handrolled syntax highlighting for:
 - Java
 - Haskell
 - OCaml
+- Verilog
 - Markdown
 - TOML
 

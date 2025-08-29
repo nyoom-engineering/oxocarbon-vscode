@@ -1,4 +1,6 @@
 {
+  "update.releaseTrack": "prerelease",
+
   "editor.fontFamily": "Berkeley Mono",
   "customizeUI.font.regular": "Univers",
   "customizeUI.font.monospace": "Berkeley Mono",
@@ -11,16 +13,33 @@
   //  "customizeUI.font.regular": "IBM Plex Sans",
   //  "customizeUI.font.monospace": "IBM Plex Mono",
 
+  "telemetry.enableCrashReporter": false,
+  "telemetry.enableTelemetry": false,
+
   "cursor.composer.textSizeScale": 1.15,
   "cursor.general.enableShadowWorkspace": true,
   "cursor.terminal.usePreviewBox": true,
+
   "editor.experimental.treeSitterTelemetry": true,
   "editor.experimentalEditContextEnabled": true,
+  "diffEditor.experimental.showMoves": true,
+  "diffEditor.experimental.useTrueInlineView": true,
+  "notebook.diff.experimental.toggleInline": true,
+  "workbench.experimental.share.enabled": true,
+  "workbench.commandPalette.experimental.suggestCommands": true,
+  "http.experimental.systemCertificatesV2": true,
+  "notebook.variablesView": true, 
   "ipynb.experimental.serialization": true,
   "search.experimental.closedNotebookRichContentResults": true,
+  "extensions.experimental.deferredStartupFinishedActivation": true,
   "extensions.experimental.affinity": {
-    "vscodevim.vim": 1
+    "vscodevim.vim": 1,
+    "asvetliakov.vscode-neovim": 1
   },
+
+  // technically experimental
+  "debug.toolBarLocation": "docked",
+
   "editor.fontLigatures": true,
   "editor.fontSize": 14,
   "editor.smoothScrolling": true,
@@ -39,10 +58,10 @@
   "editor.semanticHighlighting.enabled": true,
   "editor.cursorSurroundingLines": 4,
   "editor.formatOnPaste": true,
+  
   "workbench.colorTheme": "oxocarbon",
-  "workbench.preferredDarkColorTheme": "oxocarbon monochrom (compatibility)",
+  "workbench.preferredDarkColorTheme": "oxocarbon OLED (compatibility)",
   "workbench.productIconTheme": "icons-carbon",
-  "workbench.experimental.share.enabled": true,
   "workbench.editor.showTabs": "single",
   "workbench.iconTheme": null,
   "workbench.list.smoothScrolling": true,
@@ -51,28 +70,75 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultKeybindings": true,
   "workbench.settings.openDefaultSettings": true,
+
   "breadcrumbs.enabled": false,
+
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
-  "diffEditor.experimental.showMoves": true,
-  "diffEditor.experimental.useTrueInlineView": true,
+
   "zenMode.showTabs": "none",
   "zenMode.centerLayout": false,
   "zenMode.silentNotifications": false,
+
   "terminal.integrated.smoothScrolling": true,
   "terminal.integrated.cursorBlinking": true,
   "terminal.integrated.enableVisualBell": true,
+
   "files.autoGuessEncoding": true,
   "files.hotExit": "off",
+
   "window.customTitleBarVisibility": "windowed",
   "window.autoDetectColorScheme": true,
+
   "search.globalFindClipboard": true,
   "search.decorations.badges": false,
+
   "extensions.gallery.serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
   "extensions.autoCheckUpdates": false,
   "extensions.autoUpdate": false,
-  "extensions.experimental.deferredStartupFinishedActivation": true,
   "extensions.ignoreRecommendations": true,
+
+  "vim.statusBarColorControl": false,
+  "vim.statusBarColors.commandlineinprogress": [
+    "#0f62fe",
+    "#ffffff"
+  ],
+  // Status bar color when in Insert mode.
+  "vim.statusBarColors.insert": [
+    "#161616",
+    "#ffffff"
+  ],
+  // Status bar color when in Normal mode.
+  "vim.statusBarColors.normal": [
+    "#000000",
+    "#ffffff"
+  ],
+  // Status bar color when in Replace mode.
+  "vim.statusBarColors.replace": [
+    "#0f62fe",
+    "#ffffff"
+  ],
+  // Status bar color when in SearchInProgress mode.
+  "vim.statusBarColors.searchinprogressmode": [
+    "#0f62fe",
+    "#ffffff"
+  ],
+  // Status bar color when in SurroundInput mode.
+  "vim.statusBarColors.surroundinputmode": [
+    "#0f62fe",
+    "#ffffff"
+  ],
+  // Status bar color when in Visual mode.
+  "vim.statusBarColors.visual": [
+    "#0f62fe",
+    "#ffffff"
+  ],
+  // Status bar color when in VisualBlock mode.
+  "vim.statusBarColors.visualblock": [
+    "#0f62fe",
+    "#ffffff"
+  ],
+
   "[commonlisp]": {
     "editor.bracketPairColorization.enabled": true
   },
@@ -84,6 +150,5 @@
   },
   "terminal.integrated.commandsToSkipShell": [
     "language-julia.interrupt"
-  ],
-  "update.releaseTrack": "prerelease",
+  ]
 }

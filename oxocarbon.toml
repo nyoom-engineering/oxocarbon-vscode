@@ -494,6 +494,19 @@ settings = { foreground = "#be95ff" }
 scope = ["support.function.f.sideeffects"]
 settings = { foreground = "#ee5396" }
 
+# Verilog
+[[tokenColors]]
+scope = ["entity.name.type.module.verilog"]
+settings = { foreground = "#ee5396" }
+
+[[tokenColors]]
+scope = ["entity.name.tag.module.identifier"]
+settings = { foreground = "#08bdba" }
+
+[[tokenColors]]
+scope = ["entity.name.tag.module.reference"]
+settings = { foreground = "#ff7eb6", fontStyle = "bold" }
+
 # Markdown
 [[tokenColors]]
 scope = ["entity.name.section.markdown", "markup.inline.raw.string.markdown"]

@@ -219,7 +219,7 @@ fn apply_replacements_in_table(table: &mut toml::value::Table, replacements: &[(
         for (from, to) in replacements {
             if cur.contains(from) { cur = Cow::Owned(cur.replace(from, to)); }
         }
-        if let std::borrow::Cow::Owned(new) = cur { *s = new; }
+        if let Cow::Owned(new) = cur { *s = new; }
     });
 }
 
