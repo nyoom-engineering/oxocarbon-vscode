@@ -1,9 +1,11 @@
 # <img alt="" src="https://github.com/user-attachments/assets/24d83f8f-647f-4ad9-b68b-960f4a33d18e" />
 
-<figure>
-  <img alt="" src="https://github.com/user-attachments/assets/0cb2aa5e-81ed-4b60-bfac-4bdba8249592"/>
-  <figcaption>Oxocarbon Dark in Cursor w/ "Simple" tabs</figcaption>
-</figure>
+<img alt="" src="https://github.com/user-attachments/assets/0cb2aa5e-81ed-4b60-bfac-4bdba8249592"/>
+
+<br>
+<br>
+
+<img alt="" src="https://github.com/user-attachments/assets/9625ef62-d073-4c56-81a5-3719dea25de0" />
 
 <br>
 <br>
@@ -12,7 +14,7 @@ Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It d
 
 ## Variants
 
-There are 4 variants to the theme, the standard theme, an OLED variant, and Compatibility variants for each
+There are 9 variants to the theme, the standard theme, an OLED variant, Compatibility variants for both, Monochrom variants for each of those, and a PRINT variant
 
 The standard theme features a consistent dark background, modeled after a focus on the editor
 
@@ -25,8 +27,7 @@ The OLED theme is the same as the standard theme, but optimized for OLED and Min
 
 <img alt="" src="https://github.com/user-attachments/assets/0ab38e83-d84a-4252-8117-aefb36be7b22"/>
 
-<br>
-<br>
+### Compatibility
 
 The compatibility variants provide contrast for tabs and menus to enable a more consistent experience on traditional VSCode layouts
 
@@ -40,10 +41,34 @@ The compatibility variants provide contrast for tabs and menus to enable a more 
   <img alt="" src="https://github.com/user-attachments/assets/0c4512e0-ddc5-4b1f-91eb-3654a34f2f6f"/>
 </details>
 
+### Monochrom
+
+A hallmark of oxocarbon is the attention to font styling alongside color, this is highlighted in the monochrom variants
+
+<details>
+  <summary>Oxocarbon Monochrom </summary>
+  <img alt="" src="https://github.com/user-attachments/assets/f162ed57-01ec-40c5-b6a4-3c4ff5fa693a" />
+</details>
+
+<details>
+  <summary>Oxocarbon OLED Monochrom (Compatibility)</summary>
+  <img alt="" src="https://github.com/user-attachments/assets/722d75be-08c9-458b-a871-1b40da3d4643" />
+</details>
+
+### PRINT
+
+The PRINT variant inverts Oxocarbon OLED Monochrom to create a paper-friendly light theme for printing and e-ink displays
+
+<details>
+  <summary>Oxocarbon PRINT</summary>
+  <img alt="" src="https://github.com/user-attachments/assets/0ca9c923-a001-4b88-b526-95e98649c4f4" />
+</details>
+
 ## Features
 
 - Comprehensive semantic highlighting
 - Carefully crafted color palette for maximum contrast and readability
+- Monochrome and Compatibility variants for a more traditional feel
 - Support for various editor features:
   - Semantic tokens
   - Git decorations
@@ -55,6 +80,7 @@ The compatibility variants provide contrast for tabs and menus to enable a more 
   - Remote Development
   - Inlay hints
   - Peek view
+  - Printing
   - Diff editor
   - Jupyter Notebook support
   - Quick input
