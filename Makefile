@@ -13,21 +13,21 @@ COMPATOLED := $(OUTDIR)/oxocarbon-oled-compat-color-theme.json
 
 # Monochrome (default family: Gray)
 MONOFILE        := $(OUTDIR)/oxocarbon-mono-color-theme.json
-MONOOLED        := $(OUTDIR)/oxocarbon-mono-oled-color-theme.json
+MONOOLED        := $(OUTDIR)/oxocarbon-oled-mono-color-theme.json
 MONOCOMPAT      := $(OUTDIR)/oxocarbon-mono-compat-color-theme.json
-MONOCOMPATOLED  := $(OUTDIR)/oxocarbon-mono-oled-compat-color-theme.json
+MONOCOMPATOLED  := $(OUTDIR)/oxocarbon-oled-mono-compat-color-theme.json
 PRINTFILE       := $(OUTDIR)/PRINT.json
 
 # Optional monochrome families (Cool Gray, Warm Gray)
 MONO_COOL           := $(OUTDIR)/oxocarbon-mono-coolgray-color-theme.json
-MONO_COOL_OLED      := $(OUTDIR)/oxocarbon-mono-coolgray-oled-color-theme.json
+MONO_COOL_OLED      := $(OUTDIR)/oxocarbon-oled-mono-coolgray-color-theme.json
 MONO_COOL_COMPAT    := $(OUTDIR)/oxocarbon-mono-coolgray-compat-color-theme.json
-MONO_COOL_COMPATOLED:= $(OUTDIR)/oxocarbon-mono-coolgray-oled-compat-color-theme.json
+MONO_COOL_COMPATOLED:= $(OUTDIR)/oxocarbon-oled-mono-coolgray-compat-color-theme.json
 
 MONO_WARM           := $(OUTDIR)/oxocarbon-mono-warmgray-color-theme.json
-MONO_WARM_OLED      := $(OUTDIR)/oxocarbon-mono-warmgray-oled-color-theme.json
+MONO_WARM_OLED      := $(OUTDIR)/oxocarbon-oled-mono-warmgray-color-theme.json
 MONO_WARM_COMPAT    := $(OUTDIR)/oxocarbon-mono-warmgray-compat-color-theme.json
-MONO_WARM_COMPATOLED:= $(OUTDIR)/oxocarbon-mono-warmgray-oled-compat-color-theme.json
+MONO_WARM_COMPATOLED:= $(OUTDIR)/oxocarbon-oled-mono-warmgray-compat-color-theme.json
 ASSETS     := assets
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 EXTENSIONS := $(ASSETS)/extensions.txt

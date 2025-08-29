@@ -1,3 +1,9 @@
+// oxocarbon-vscode
+// Copyright (c) 2025 Nyoom Engineering
+// SPDX-License-Identifier: MIT
+
+#![warn(clippy::pedantic)]
+
 use std::{
     env,
     fs,
@@ -21,8 +27,8 @@ struct OptionsFlags {
 impl OptionsFlags {
     const PRETTY: u8 = 1 << 0;
     const OLED: u8 = 1 << 1;
-    const COMPAT: u8 = 1 << 2;
     const MONOCHROME: u8 = 1 << 3;
+    const COMPAT: u8 = 1 << 2;
     const PRINT: u8 = 1 << 4;
 
     fn set(&mut self, mask: u8) { self.bits |= mask; }
@@ -41,8 +47,8 @@ impl Options {
             match arg.as_str() {
                 "-p" | "--pretty" => opts.flags.set(OptionsFlags::PRETTY),
                 "--oled" => opts.flags.set(OptionsFlags::OLED),
-                "-c" | "--compat" | "--compatibility" => opts.flags.set(OptionsFlags::COMPAT),
                 "-m" | "--mono" | "--monochrome" => opts.flags.set(OptionsFlags::MONOCHROME),
+                "-c" | "--compat" | "--compatibility" => opts.flags.set(OptionsFlags::COMPAT),
                 "--print" => opts.flags.set(OptionsFlags::PRINT),
                 "--mono-family" | "--monochrome-family" => {
                     if let Some(fam) = args.next() {
@@ -90,7 +96,7 @@ fn main() {
     if opts.is_monochrome() {
         let family = opts.mono_family.as_deref().unwrap_or("gray");
         let ramp = select_monochrome_ramp(family);
-        apply_monochrome(&mut value, &ramp);
+        apply_monochrome(&mut value, &ramp, opts.is_print());
         // enforce style-based foregrounds for monochrome variants
         apply_monochrome_style_overrides(&mut value);
     }
@@ -253,7 +259,7 @@ fn compute_theme_name(
             "warmgray" | "warm-gray" | "warm" => "Warm Gray",
             _ => "Gray",
         };
-        let base = if oled { "Oxocarbon OLED Monochrome" } else { "Oxocarbon Monochrome" };
+        let base = if oled { "Oxocarbon OLED Monochrom" } else { "Oxocarbon Monochrom" };
         let mut name = format!("{base} ({fam})");
         if compat { name.push_str(" (compatibility)"); }
         Some(name)
@@ -338,6 +344,11 @@ const MONO_ALLOWED_ACCENTS: [&str; 10] = [
     "a6c8ff",
 ];
 
+// accents only allowed when building print variant
+const MONO_PRINT_EXTRA_ACCENTS: [&str; 1] = [
+    "0f62fe",
+];
+
 fn select_monochrome_ramp(family: &str) -> Vec<&'static str> {
     let base: &[&str] = match family {
         "coolgray" | "cool-gray" | "cool" => &COOL_GRAY_RAMP,
@@ -352,7 +363,7 @@ fn select_monochrome_ramp(family: &str) -> Vec<&'static str> {
     ramp
 }
 
-fn apply_monochrome(value: &mut toml::Value, ramp_hex: &[&str]) {
+fn apply_monochrome(value: &mut toml::Value, ramp_hex: &[&str], is_print: bool) {
     // pre-sort ramp by luminance for nearest-neighbor lookup
     let mut ramp: Vec<(f32, [u8; 3])> = ramp_hex
         .iter()
@@ -361,7 +372,7 @@ fn apply_monochrome(value: &mut toml::Value, ramp_hex: &[&str]) {
     ramp.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
     walk_value_strings_mut(value, &mut |s: &mut String| {
-        if !is_allowed_accent_hex(s) { return; }
+        if !is_allowed_accent_hex(s, is_print) { return; }
         if let Some((rgb, a)) = parse_hex_color(s) {
             let y = luminance_from_u8(rgb[0], rgb[1], rgb[2]);
             let i = ramp.partition_point(|&(ry, _)| ry < y);
@@ -402,11 +413,12 @@ fn apply_monochrome_style_overrides(value: &mut toml::Value) {
     }
 }
 
-fn is_allowed_accent_hex(s: &str) -> bool {
+fn is_allowed_accent_hex(s: &str, is_print: bool) -> bool {
     if s.len() < 7 || s.as_bytes().first().is_none_or(|b| *b != b'#') { return false; }
     // accept both rgb and rgba as long as rgb matches the list
     let rgb = &s[1..7];
     MONO_ALLOWED_ACCENTS.iter().any(|allowed| rgb.eq_ignore_ascii_case(allowed))
+        || (is_print && MONO_PRINT_EXTRA_ACCENTS.iter().any(|allowed| rgb.eq_ignore_ascii_case(allowed)))
 }
 
 fn walk_value_strings_mut<F: FnMut(&mut String)>(v: &mut toml::Value, f: &mut F) {
@@ -459,7 +471,7 @@ fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
 fn invert_all_hex_colors(value: &mut toml::Value) {
     walk_value_strings_mut(value, &mut |s| {
         if let Some((mut rgb, a)) = parse_hex_color(s) {
-            rgb.iter_mut().for_each(|c| *c ^= 0xFF);
+            rgb = rgb.map(|c| !c);
             *s = format_hex_color(rgb, a);
         }
     });

@@ -2,7 +2,7 @@
   "name": "oxocarbon-vscode",
   "displayName": "Oxocarbon Theme",
   "description": "Oxocarbon theme for VSCode",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "publisher": "NyoomEngineering",
 	"license": "MIT",
   "icon": "icon.png",
@@ -50,9 +50,9 @@
         "path": "./themes/oxocarbon-mono-color-theme.json"
       },
       {
-        "label": "oxocarbon monochrom OLED",
+        "label": "oxocarbon OLED monochrom ",
         "uiTheme": "vs-dark",
-        "path": "./themes/oxocarbon-mono-oled-color-theme.json"
+        "path": "./themes/oxocarbon-oled-mono-color-theme.json"
       },
       {
         "label": "oxocarbon monochrom (compatibility)",
@@ -60,9 +60,9 @@
         "path": "./themes/oxocarbon-mono-compat-color-theme.json"
       },
       {
-        "label": "oxocarbon monochrom OLED (compatibility)",
+        "label": "oxocarbon OLED monochrom (compatibility)",
         "uiTheme": "vs-dark",
-        "path": "./themes/oxocarbon-mono-oled-compat-color-theme.json"
+        "path": "./themes/oxocarbon-oled-mono-compat-color-theme.json"
       },
       {
         "label": "oxocarbon PRINT",
