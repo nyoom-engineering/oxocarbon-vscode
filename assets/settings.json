@@ -1,9 +1,9 @@
 {
   "update.releaseTrack": "prerelease",
 
-  "editor.fontFamily": "Berkeley Mono",
+  "editor.fontFamily": "Berkeley Mono Retina",
   "customizeUI.font.regular": "Univers",
-  "customizeUI.font.monospace": "Berkeley Mono",
+  "customizeUI.font.monospace": "Berkeley Mono Retina",
 
   //  "editor.fontFamily": "Liga SFMono Nerd Font",
   //  "customizeUI.font.regular": "SF Pro",
@@ -60,7 +60,7 @@
   "editor.formatOnPaste": true,
   
   "workbench.colorTheme": "oxocarbon",
-  "workbench.preferredDarkColorTheme": "oxocarbon OLED (compatibility)",
+  "workbench.preferredDarkColorTheme": "oxocarbon",
   "workbench.productIconTheme": "icons-carbon",
   "workbench.editor.showTabs": "single",
   "workbench.iconTheme": null,
@@ -150,5 +150,5 @@
   },
   "terminal.integrated.commandsToSkipShell": [
     "language-julia.interrupt"
-  ]
+  ],
 }
