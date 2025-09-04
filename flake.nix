@@ -29,12 +29,19 @@
 
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
+            # make
+            gnumake
+            # toml->json, json->tm
             cargo
             rustc
             rust-analyzer
-            gnumake
+            # vsc extension gen
             nodejs_24
             vsce
+            # zed patching
+            jq
+            # intellij/icls gen
+            python3
           ];
         };
       }

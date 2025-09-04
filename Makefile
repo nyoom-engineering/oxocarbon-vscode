@@ -1,121 +1,176 @@
-CARGO      := cargo
-PROG       := target/release/oxocarbon-themec
-INPUT      := oxocarbon.toml
-OUTDIR     := themes
+PROG := target/release/oxocarbon-themec
+INPUT := oxocarbon.toml
+OUTDIR := out
+THEMESDIR := themes
+ASSETS := assets
 
-# Oled
-OUTFILE    := $(OUTDIR)/oxocarbon-color-theme.json
-OLEDFILE   := $(OUTDIR)/oxocarbon-oled-color-theme.json
-
-# Compatibility
-COMPATFILE := $(OUTDIR)/oxocarbon-compat-color-theme.json
-COMPATOLED := $(OUTDIR)/oxocarbon-oled-compat-color-theme.json
-
-# Monochrome (default family: Gray)
-MONOFILE        := $(OUTDIR)/oxocarbon-mono-color-theme.json
-MONOOLED        := $(OUTDIR)/oxocarbon-oled-mono-color-theme.json
-MONOCOMPAT      := $(OUTDIR)/oxocarbon-mono-compat-color-theme.json
-MONOCOMPATOLED  := $(OUTDIR)/oxocarbon-oled-mono-compat-color-theme.json
-PRINTFILE       := $(OUTDIR)/PRINT.json
-
-# Optional monochrome families (Cool Gray, Warm Gray)
-MONO_COOL           := $(OUTDIR)/oxocarbon-mono-coolgray-color-theme.json
-MONO_COOL_OLED      := $(OUTDIR)/oxocarbon-oled-mono-coolgray-color-theme.json
-MONO_COOL_COMPAT    := $(OUTDIR)/oxocarbon-mono-coolgray-compat-color-theme.json
-MONO_COOL_COMPATOLED:= $(OUTDIR)/oxocarbon-oled-mono-coolgray-compat-color-theme.json
-
-MONO_WARM           := $(OUTDIR)/oxocarbon-mono-warmgray-color-theme.json
-MONO_WARM_OLED      := $(OUTDIR)/oxocarbon-oled-mono-warmgray-color-theme.json
-MONO_WARM_COMPAT    := $(OUTDIR)/oxocarbon-mono-warmgray-compat-color-theme.json
-MONO_WARM_COMPATOLED:= $(OUTDIR)/oxocarbon-oled-mono-warmgray-compat-color-theme.json
-ASSETS     := assets
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
+ZED_CFG := ~/.config/zed
 EXTENSIONS := $(ASSETS)/extensions.txt
 
-.PHONY: all build clean dotfiles install mono-coolgray mono-warmgray
+ZED_REPO_URL := https://github.com/zed-industries/zed.git
+ZED_SRC_DIR := target/zed
+ZEDDIR := zed
+ZED_BUNDLE := $(ZEDDIR)/oxocarbon.json
+ZED_IMPORTER := $(ZED_SRC_DIR)/target/release/theme_importer
 
-all: build \
-    $(OUTFILE) \
-    $(OLEDFILE) \
-    $(COMPATFILE) \
-    $(COMPATOLED) \
-    $(MONOFILE) \
-    $(MONOOLED) \
-    $(MONOCOMPAT) \
-    $(MONOCOMPATOLED) \
-    $(PRINTFILE)
+TMDIR := textmate
+TM_CONVERTER := json2tm/target/release/json2tm
+TM_USER := ~/Library/Application\ Support/TextMate/Themes
+SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
+
+JB_REPO_URL := https://github.com/JetBrains/colorSchemeTool
+JB_SRC_DIR := target/colorSchemeTool
+INTELLIJDIR := intellij
+INTELLIJ_CONVERTER := $(JB_SRC_DIR)/colorSchemeTool.py
+
+DEFAULT_THEMES := \
+	$(THEMESDIR)/oxocarbon-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-color-theme.json \
+	$(THEMESDIR)/oxocarbon-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-mono-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-color-theme.json \
+	$(THEMESDIR)/oxocarbon-mono-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-compat-color-theme.json \
+	$(THEMESDIR)/PRINT.json
+
+.PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray PRINT \
+	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
+	install-zed install-sublime install-textmate textmate
+
+all: $(DEFAULT_THEMES)
 
 build:
-	$(CARGO) build --release
+	cargo build --release
 
-$(OUTFILE): build $(INPUT) | $(OUTDIR)
-	$(PROG) $(INPUT) > $(OUTFILE)
+THEME_FLAGS = $(strip \
+	$(if $(findstring oled,$@),--oled,) \
+	$(if $(findstring compat,$@),--compat,) \
+	$(if $(findstring -mono-,$@),--monochrome,) \
+	$(if $(findstring -coolgray-,$@),--monochrome-family coolgray,) \
+	$(if $(findstring -warmgray-,$@),--monochrome-family warmgray,))
 
-$(OLEDFILE): build $(INPUT) | $(OUTDIR)
-	$(PROG) --oled $(INPUT) > $(OLEDFILE)
+$(THEMESDIR)/%.json: build $(INPUT) | $(THEMESDIR)
+	$(PROG) $(THEME_FLAGS) $(INPUT) > $@
 
-$(COMPATFILE): build $(INPUT) | $(OUTDIR)
-	$(PROG) --compat $(INPUT) > $(COMPATFILE)
+$(THEMESDIR)/PRINT.json: build $(INPUT) | $(THEMESDIR)
+	$(PROG) --monochrome --oled --print $(INPUT) > $@
 
-$(COMPATOLED): build $(INPUT) | $(OUTDIR)
-	$(PROG) --compat --oled $(INPUT) > $(COMPATOLED)
+PRINT: $(THEMESDIR)/PRINT.json
 
-$(MONOFILE): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome $(INPUT) > $(MONOFILE)
+mono-%: \
+	$(THEMESDIR)/oxocarbon-mono-%-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-%-color-theme.json \
+	$(THEMESDIR)/oxocarbon-mono-%-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-%-compat-color-theme.json
+	@:
 
-$(MONOOLED): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --oled $(INPUT) > $(MONOOLED)
+mono-coolgray: \
+	$(THEMESDIR)/oxocarbon-mono-coolgray-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-coolgray-color-theme.json \
+	$(THEMESDIR)/oxocarbon-mono-coolgray-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-coolgray-compat-color-theme.json
 
-$(PRINTFILE): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --oled --print $(INPUT) > $(PRINTFILE)
+mono-warmgray: \
+	$(THEMESDIR)/oxocarbon-mono-warmgray-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-warmgray-color-theme.json \
+	$(THEMESDIR)/oxocarbon-mono-warmgray-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-warmgray-compat-color-theme.json
 
-PRINT: $(PRINTFILE)
+$(OUTDIR) $(THEMESDIR):
+	mkdir -p $@
 
-$(MONOCOMPAT): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --compat $(INPUT) > $(MONOCOMPAT)
+check-xcode:
+	@xcodebuild -version >/dev/null 2>&1 && \
+		xcrun -f metal >/dev/null 2>&1 && \
+		xcrun -f metallib >/dev/null 2>&1 || { \
+		echo "Error: Xcode/Metal toolchain required"; \
+		exit 1; \
+	}
 
-$(MONOCOMPATOLED): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --compat --oled $(INPUT) > $(MONOCOMPATOLED)
+check-jq:
+	@command -v jq >/dev/null 2>&1 || { \
+		echo "Error: jq required"; \
+		exit 1; \
+	}
 
-# Monochrome (Cool Gray)
-mono-coolgray: $(MONO_COOL) $(MONO_COOL_OLED) $(MONO_COOL_COMPAT) $(MONO_COOL_COMPATOLED)
+check-python:
+	@PY=$$(command -v python2.7 >/dev/null 2>&1 && echo python2.7 || (command -v python3 >/dev/null 2>&1 && echo python3 || (command -v python >/dev/null 2>&1 && echo python || echo ""))); \
+	if [ -z "$$PY" ]; then echo "Error: python3 or python required"; exit 1; fi
 
-$(MONO_COOL): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family coolgray $(INPUT) > $(MONO_COOL)
+setup-zed: check-xcode $(ZED_SRC_DIR)
+zed: $(ZED_BUNDLE)
 
-$(MONO_COOL_OLED): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family coolgray --oled $(INPUT) > $(MONO_COOL_OLED)
+$(ZED_SRC_DIR): | check-xcode
+	@[ -d "$(ZED_SRC_DIR)/.git" ] || \
+		git clone --depth 1 $(ZED_REPO_URL) $(ZED_SRC_DIR); \
+		git -C $(ZED_SRC_DIR) fetch --depth 1 origin main >/dev/null 2>&1 && \
+		git -C $(ZED_SRC_DIR) reset --hard FETCH_HEAD >/dev/null 2>&1
 
-$(MONO_COOL_COMPAT): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family coolgray --compat $(INPUT) > $(MONO_COOL_COMPAT)
+$(ZED_IMPORTER): | setup-zed
+	cargo build --release -p theme_importer \
+		--manifest-path $(ZED_SRC_DIR)/Cargo.toml
 
-$(MONO_COOL_COMPATOLED): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family coolgray --compat --oled $(INPUT) > $(MONO_COOL_COMPATOLED)
+$(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
+	@mkdir -p $(dir $(ZED_BUNDLE))
+	@echo "Converting themes for Zed..."
+	@for f in $(filter-out $(THEMESDIR)/PRINT.json,$(wildcard $(THEMESDIR)/*.json)); do \
+		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
+	done; \
+	jq -s 'def set_accent_and_players: \
+		(.name | ascii_downcase | contains("monochrom")) as $$mono \
+		| (.name | ascii_downcase | contains("compatibility")) as $$compat \
+		| .style["text.accent"] = (if $$mono then "#ffffff" else "#ff7eb6" end) \
+		| .style["text.muted"] = (if $$compat then "#8d8d8d" else "#f2f4f8" end) \
+		| .style["panel.focused_border"] = "#6f6f6f" \
+		| .style["editor.document_highlight.bracket_background"] = "#393939" \
+		| .style["panel.focused_border"] = "#6f6f6f" \
+		| .style.syntax.function.font_weight = 700 \
+		| .style.syntax.constructor.font_weight = 600 \
+		| .style.syntax.emphasis.font_weight = 500 \
+		| .style.syntax["emphasis.strong"].font_weight = 700 \
+		| .style.syntax.link_text = { "color": "#be95ff", "font_style": null, "font_weight": null } \
+		| .style.syntax.selector = { "color": "#f2f4f8", "font_style": null, "font_weight": null } \
+		| .style.syntax["selector.pseudo"] = { "color": "#dde1e6", "font_style": null, "font_weight": null } \
+		| .style.syntax.namespace = { "color": "#ffffff", "font_style": null, "font_weight": null } \
+		| .style.syntax["function.builtin"] = { "color": (if $$mono then "#ffffff" else "#ff7eb6" end), "font_style": null, "font_weight": 500 } \
+		| .style.players = [ { "cursor":"#ffffffff", "background":"#ffffffff", "selection":"#52525290" } ]; \
+		{ "$$schema":"https://zed.dev/schema/themes/v0.2.0.json", \
+		  "name":"Oxocarbon", \
+		  "author":"Nyoom Engineering", \
+		  "themes":[ .[] | (.themes // .) | (if type=="array" then .[] else . end) | set_accent_and_players ] }' \
+		$(OUTDIR)/zed-*.json > $(ZED_BUNDLE)
+	@echo "Zed theme bundle created: $(ZED_BUNDLE)"
 
-# Monochrome (Warm Gray)
-mono-warmgray: $(MONO_WARM) $(MONO_WARM_OLED) $(MONO_WARM_COMPAT) $(MONO_WARM_COMPATOLED)
+textmate: $(foreach f,$(sort $(DEFAULT_THEMES) $(wildcard $(THEMESDIR)/*.json)),$(if $(findstring compat,$(notdir $(f))),,$(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(f))))
 
-$(MONO_WARM): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family warmgray $(INPUT) > $(MONO_WARM)
+$(TM_CONVERTER):
+	cargo build --release --manifest-path json2tm/Cargo.toml
 
-$(MONO_WARM_OLED): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family warmgray --oled $(INPUT) > $(MONO_WARM_OLED)
+$(TMDIR)/%.tmTheme: $(THEMESDIR)/%.json $(TM_CONVERTER)
+	@mkdir -p $(dir $@)
+	$(TM_CONVERTER) $< $@
 
-$(MONO_WARM_COMPAT): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family warmgray --compat $(INPUT) > $(MONO_WARM_COMPAT)
+setup-intellij: check-python $(JB_SRC_DIR)
+intellij: $(patsubst $(THEMESDIR)/%.json,$(INTELLIJDIR)/%.icls,$(wildcard $(THEMESDIR)/*.json))
+	@echo "IntelliJ schemes written to $(INTELLIJDIR)"
 
-$(MONO_WARM_COMPATOLED): build $(INPUT) | $(OUTDIR)
-	$(PROG) --monochrome --monochrome-family warmgray --compat --oled $(INPUT) > $(MONO_WARM_COMPATOLED)
+$(JB_SRC_DIR):
+	@[ -d "$(JB_SRC_DIR)/.git" ] || \
+		git clone --depth 1 $(JB_REPO_URL) $(JB_SRC_DIR); \
+		git -C $(JB_SRC_DIR) fetch --depth 1 origin master >/dev/null 2>&1 && \
+		git -C $(JB_SRC_DIR) reset --hard FETCH_HEAD >/dev/null 2>&1
 
-$(OUTDIR):
-	mkdir -p $(OUTDIR)
+$(INTELLIJ_CONVERTER): | setup-intellij
+	@test -f $@ || { echo "Error: converter not found: $@"; exit 1; }
 
-clean:
-	$(CARGO) clean
-	rm -f $(OUTFILE) $(OLEDFILE) $(COMPATFILE) $(COMPATOLED) \
-		$(MONOFILE) $(MONOOLED) $(MONOCOMPAT) $(MONOCOMPATOLED) $(PRINTFILE) \
-		$(MONO_COOL) $(MONO_COOL_OLED) $(MONO_COOL_COMPAT) $(MONO_COOL_COMPATOLED) \
-		$(MONO_WARM) $(MONO_WARM_OLED) $(MONO_WARM_COMPAT) $(MONO_WARM_COMPATOLED)
+$(INTELLIJDIR)/%.icls: $(THEMESDIR)/%.json | setup-intellij $(INTELLIJ_CONVERTER)
+	@mkdir -p $(dir $@)
+	@set -e; \
+	PY=$$(command -v python2.7 >/dev/null 2>&1 && echo python2.7 || (command -v python3 >/dev/null 2>&1 && echo python3 || (command -v python >/dev/null 2>&1 && echo python || echo ""))); \
+	if [ -z "$$PY" ]; then echo "Error: python3 or python required"; exit 1; fi; \
+		( cd $(JB_SRC_DIR) && $$PY colorSchemeTool.py ../..//$< ../..//$@ )
 
 dotfiles:
 	mkdir -p $(ASSETS)
@@ -123,8 +178,33 @@ dotfiles:
 	cp $(CURSOR_CFG)/settings.json $(ASSETS)/settings.json
 	cp $(CURSOR_CFG)/keybindings.json $(ASSETS)/keybindings.json
 
+dotfiles-zed:
+	mkdir -p $(ASSETS)
+	cp $(ZED_CFG)/settings.json $(ASSETS)/settings-zed.json
+
+dotfiles-sublime:
+	mkdir -p $(ASSETS)
+	cp $(SUBLIME_USER)/Preferences.sublime-settings $(ASSETS)/Preferences.sublime-settings
+
 install: dotfiles
-	cat $(EXTENSIONS) | xargs -I {} cursor --install-extension {}
+	xargs -I {} cursor --install-extension {} < $(EXTENSIONS)
 	mkdir -p $(CURSOR_CFG)
 	cp $(ASSETS)/settings.json $(CURSOR_CFG)/
 	cp $(ASSETS)/keybindings.json $(CURSOR_CFG)/
+
+install-zed: zed
+	mkdir -p $(ZED_CFG)/themes
+	if [ -f $(ZED_BUNDLE) ]; then cp -f $(ZED_BUNDLE) $(ZED_CFG)/themes/oxocarbon.json; fi
+	if [ -f $(ASSETS)/settings-zed.json ]; then cp -f $(ASSETS)/settings-zed.json $(ZED_CFG)/settings.json; fi
+
+install-sublime: textmate
+	mkdir -p $(SUBLIME_USER)
+	cp $(wildcard $(THEMESDIR)/*.json) $(SUBLIME_USER)/
+	cp $(ASSETS)/Preferences.sublime-settings $(SUBLIME_USER)/Preferences.sublime-settings
+
+install-textmate: textmate
+	mkdir -p $(TM_USER)
+	cp $(filter-out %compat%.tmTheme,$(wildcard $(TMDIR)/*.tmTheme)) $(TM_USER)/
+
+clean:
+	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls

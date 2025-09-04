@@ -208,3 +208,79 @@ Before contributing, its recommended to read through the [style guide](https://g
 ## License
 
 The project is vendored under the MIT license
+
+# Converters (Beta)
+
+Preliminary support for autogenerating themes from VSCode implementation(s)
+
+Note, these are provided as-is under nightly releases
+
+## Zed
+
+Uses the Zed Team's `theme_importer` crate
+
+Depends on `gpui` for the time being, so ensure dependencies
+
+E.g. on macOS (make sure full Xcode is installed, not just command-line-tools)
+
+```sh
+# need cmake
+nix shell nixpkgs#cmake nixpkgs#jq
+
+# use app toolchain
+sudo xcode-select -s /Applications/Xcode.app
+
+# install metal toolchain
+xcodebuild -downloadComponent MetalToolchain
+
+# build gpui, translate themes, bundle
+make zed
+
+# install theme + dotfiles
+make install-zed
+
+# run zed
+zed
+```
+
+## Textmate
+
+Uses in-house `json2tm` crate, works with Textmate-compatible editors
+
+```sh
+# translate themes
+make textmate
+
+# (optional) install to Sublime user folder (macOS only)
+make install-sublime
+
+# (optional) install to Textmate (macOS only)
+make install-textmate
+```
+
+Tested with; including but not limited to
+
+- Textmate
+- Sublime Text
+- Atom (deprecated)
+- RStudio
+
+As the Textmate themes only affect the code window, compatibility variants are not generated
+
+## Intellij 
+
+(not recommended)
+
+Uses Jetbrain's colorSchemeTool
+
+```sh
+# translate themes
+make intellij
+
+# settings -> color theme -> cog -> manual import
+```
+
+### Visual Studio 
+
+Use Microsoft's [Theme Converter for Visual Studio](https://github.com/microsoft/theme-converter-for-vs), requires .NET Desktop & the Visual Studio extension development enviornment. JSON files are in `themes`
+

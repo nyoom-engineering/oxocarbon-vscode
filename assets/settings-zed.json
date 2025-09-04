@@ -1,0 +1,179 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "vim_mode": true,
+
+  "ui_font_family": "SF Pro",
+  "buffer_font_family": "Berkeley Mono",
+  "ui_font_size": 16,
+  "buffer_font_size": 14,
+
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Oxocarbon (compatibility)"
+  },
+
+  // enable ligatures
+  "buffer_font_features": {
+    "calt": true,
+    "ss01": true,
+    "ss04": true,
+    "ss05": true,
+    "ss06": true
+  },
+
+  // "buffer_font_weight": 260, // should be retina but font rendering needs work
+  "buffer_font_fallbacks": ["SF Mono"],
+  "buffer_line_height": { "custom": 1.4 },
+
+  "gutter": {
+    "line_numbers": false
+  },
+
+  // "tab_bar": {
+  //   "show": false
+  // }
+
+  "toolbar": {
+    "breadcrumbs": false,
+    "quick_actions": false,
+    "selections_menu": false,
+    "agent_review": false,
+    "code_actions": false
+  },
+
+  // "use_system_window_tabs": true // broken ??
+
+  "diagnostics": {
+    "inline": {
+      "enabled": true
+    }
+  },
+
+  "git": {
+    "inline_blame": {
+      "enabled": false
+    }
+  },
+
+  "indent_guides": {
+    "enabled": false
+  },
+
+  "icon_theme": {
+    "mode": "system",
+    "dark": "Zed (Default)",
+    "light": "Zed (Default)"
+  },
+
+  "inlay_hints": {
+    "enabled": false,
+    "toggle_on_modifiers_press": {
+      "control": true,
+      "alt": true
+    }
+  },
+
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": true
+  },
+
+  "terminal": {
+    "font_size": 12,
+    "font_family": "Berkeley Mono"
+  },
+
+  "project_panel": {
+    "entry_spacing": "standard",
+    "file_icons": false,
+    "folder_icons": false,
+    "indent_guides": {
+      "show": "never"
+    }
+  },
+
+  "outline_panel": {
+    "file_icons": false,
+    "folder_icons": false,
+    "indent_guides": {
+      "show": "never"
+    }
+  },
+
+  "agent": {
+    "default_profile": "write",
+    "default_model": {
+      "provider": "Cerebras",
+      "model": "qwen-3-coder-480b"
+    }
+  },
+  "language_models": {
+    "openai_compatible": {
+      "Cerebras": {
+        "api_url": "https://api.cerebras.ai/v1",
+        "available_models": [
+          {
+            "name": "qwen-3-coder-480b",
+            "display_name": null,
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
+          },
+          {
+            "name": "qwen-3-235b-a22b-thinking-2507",
+            "display_name": null,
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
+          },
+          {
+            "name": "qwen-3-235b-a22b-instruct-2507",
+            "display_name": null,
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
+          },
+          {
+            "name": "gpt-oss-120b",
+            "display_name": null,
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
+          }
+        ]
+      }
+    }
+  }
+}

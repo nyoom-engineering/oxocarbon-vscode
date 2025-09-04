@@ -1,6 +1,12 @@
 name = "Oxocarbon Dark"
 type = "dark"
 
+# zed manual compat triggered w/ jq
+
+# bold -> weight 600, supposed to be 635 but unsupported
+# editor_gutter_background: vscode_editor_background, -> should be editor gutter background
+# | .style.syntax.type = { "color":"#3ddbd9", "font_style":"italic", "font_weight":null } \
+
 [colors]
 foreground = "#f2f4f8"
 focusBorder = "#262626"
@@ -12,7 +18,18 @@ disabledForeground = "#8d8d8d"
 "simpleFindWidget.sashBorder" = "#262626"
 
 "button.background" = "#393939"
+"button.foreground" = "#f2f4f8"
 "button.hoverBackground" = "#525252"
+"button.secondaryForeground" = "#dde1e6"
+
+# MATCH
+"menu.border" = "#393939"
+"dropdown.border" = "#393939"
+"menu.separatorBackground" = "#393939"
+"menubar.selectionBorder" = "#393939"
+
+"dropdown.background" = "#262626"
+"dropdown.foreground" = "#f2f4f8"
 
 "welcomePage.progress.background" = "#393939"
 "welcomePage.progress.foreground" = "#525252"
@@ -21,9 +38,9 @@ disabledForeground = "#8d8d8d"
 
 "editor.background" = "#161616"
 "editor.foreground" = "#f2f4f8"
-"editor.inactiveSelectionBackground" = "#39393920"
 "editor.selectionBackground" = "#393939"
 "editor.selectionHighlightBackground" = "#52525290"
+"editor.inactiveSelectionBackground" = "#39393920"
 "editor.findMatchBackground" = "#3ddbd999"
 "editor.findMatchForeground" = "#ffffff"
 "editor.findMatchHighlightBackground" = "#39393999"
@@ -34,12 +51,12 @@ disabledForeground = "#8d8d8d"
 
 "editorCursor.foreground" = "#ffffff"
 "editorLink.activeForeground" = "#ff7eb6"
-"editorInlayHint.foreground" = "#878d96"
-"editorInlayHint.background" = "#00000000"
+"editorInlayHint.foreground" = "#ada8a8" # warm
+"editorInlayHint.background" = "#262626ff"
 "editorGroup.border" = "#262626"
 "editorGroup.dropBackground" = "#39393940"
 "editorGroupHeader.tabsBorder" = "#262626"
-"editorGroupHeader.tabsBackground" = "#262626"
+"editorGroupHeader.tabsBackground" = "#161616"
 "editorRuler.foreground" = "#262626"
 
 "editorError.foreground" = "#ee5396"
@@ -48,9 +65,23 @@ disabledForeground = "#8d8d8d"
 "editorHint.foreground" = "#dde1e6"
 "editorLightBulb.foreground" = "#ffffff"
 
+"notificationsErrorIcon.foreground" = "#ee5396"
+"notificationsWarningIcon.foreground" = "#ff7eb6"
+"notificationsInfoIcon.foreground" = "#ff7eb6"
+
+# for zed export -> error, warning, info, hint background
+"editorError.background" = "#00000000"
+"editorWarning.background" = "#00000000"
+"editorInfo.background" = "#00000000"
+
+"editorGutter.background" = "#161616"
 "editorGutter.addedBackground" = "#42be65"
 "editorGutter.modifiedBackground" = "#08bdba"
 "editorGutter.deletedBackground" = "#ee5396"
+"editorGutter.foldingControlForeground" = "#525252"
+
+"editorLineNumber.foreground" = "#525252"
+"editorLineNumber.activeForeground" = "#dde1e6"
 
 "editorOverviewRuler.background" = "#00000000"
 "editorOverviewRuler.border" = "#262626"
@@ -62,7 +93,7 @@ disabledForeground = "#8d8d8d"
 "editorOverviewRuler.deletedForeground" = "#ee5396"
 "editorOverviewRuler.errorForeground" = "#ee5396"
 "editorOverviewRuler.warningForeground" = "#ff7eb6"
-"editorOverviewRuler.infoForeground" = "#dde1e6"
+"editorOverviewRuler.infoForeground" = "#ff7eb6"
 "editorOverviewRuler.bracketMatchForeground" = "#6f6f6f"
 "editorOverviewRuler.inlineChatInserted" = "#42be65"
 "editorOverviewRuler.inlineChatRemoved" = "#ee5396"
@@ -100,10 +131,11 @@ disabledForeground = "#8d8d8d"
 
 "widget.border" = "#262626"
 "widget.shadow" = "#00000080"
-"editorWidget.foreground" = "#dde1e6"
-"editorWidget.background" = "#1b1b1b"
+
 "editorWidget.border" = "#262626"
-"editorWidget.resizeBorder" = "#525252"
+"editorWidget.foreground" = "#f2f4f8"
+"editorWidget.background" = "#161616"
+"editorWidget.resizeBorder" = "#161616"
 
 "editorSuggestWidget.background" = "#1b1b1b"
 "editorSuggestWidget.border" = "#00000000"
@@ -128,6 +160,9 @@ disabledForeground = "#8d8d8d"
 
 "editor.wordHighlightBackground" = "#26262630"
 "editor.wordHighlightBorder" = "#00000000"
+
+# for zed export -> bracket match background
+"editorBracketMatch.background" = "#00000000"
 
 "editorBracketHighlight.foreground1" = "#8d8d8d"
 "editorBracketHighlight.foreground2" = "#6f6f6f"
@@ -179,14 +214,18 @@ disabledForeground = "#8d8d8d"
 "inputOption.activeBorder" = "#525252"
 "inputOption.activeForeground" = "#ffffff"
 
+"icon.foreground" = "#f2f4f8"
+
 "titleBar.border" = "#262626"
+"titleBar.activeForeground" = "#ffffff"
+"titleBar.inactiveForeground" = "#8d8d8d"
 "titleBar.activeBackground" = "#161616"
 "titleBar.inactiveBackground" = "#262626"
 
 "tab.hoverBackground" = "#262626"
 "tab.activeBackground" = "#161616"
 "tab.activeForeground" = "#ffffff"
-"tab.inactiveBackground" = "#262626"
+"tab.inactiveBackground" = "#161616"
 "tab.inactiveForeground" = "#8d8d8d"
 "tab.unfocusedInactiveForeground" = "#8d8d8d"
 
@@ -270,7 +309,7 @@ disabledForeground = "#8d8d8d"
 "notifications.background" = "#262626"
 "notificationCenterHeader.background" = "#262626"
 
-"checkbox.background" = "#262626"
+"checkbox.background" = "#161616"
 "checkbox.border" = "#262626"
 "checkbox.foreground" = "#ffffff"
 "checkbox.selectBackground" = "#393939"
@@ -318,6 +357,11 @@ disabledForeground = "#8d8d8d"
 "gauge.errorBackground" = "#262626"
 "gauge.errorForeground" = "#ee5396"
 
+# for zed export -> minimap "thumb" background, hover, active
+"minimapSlider.background" = "#52525233"
+"minimapSlider.hoverBackground" = "#52525244"
+"minimapSlider.activeBackground" = "#52525255"
+
 "minimap.findMatchHighlight" = "#ee539650"
 "minimap.selectionHighlight" = "#39393950"
 "minimap.errorHighlight" = "#ee539650"
@@ -347,8 +391,9 @@ disabledForeground = "#8d8d8d"
 "menu.foreground" = "#dde1e6"
 "menu.selectionBackground" = "#393939"
 "menu.selectionForeground" = "#ffffff"
-"menu.separatorBackground" = "#525252"
-"menu.border" = "#262626"
+
+"menubar.selectionBackground" = "#39393940"
+"menubar.selectionForeground" = "#ffffff"
 
 "settings.modifiedItemIndicator" = "#ff7eb6"
 
@@ -449,11 +494,16 @@ scope = ["storage.modifier", "keyword.other"]
 settings = { foreground = "#33b1ff" }
 
 [[tokenColors]]
-scope = ["entity.name.function", "storage.type.function.m.nosideeffects"]
+scope = [
+    "entity.name.command",
+    "entity.name.function",
+    "support.function",
+    "storage.type.function.m.nosideeffects"
+]
 settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
-scope = ["string"]
+scope = ["string", "punctuation.definition.string"]
 settings = { foreground = "#be95ff" }
 
 [[tokenColors]]
@@ -476,7 +526,7 @@ settings = { fontStyle = "italic" }
 
 # C
 [[tokenColors]]
-scope = ["keyword.control.directive"]
+scope = ["keyword.control.directive", "punctuation.definition.directive"]
 settings = { foreground = "#08bdba" }
 
 # Rust
@@ -518,7 +568,68 @@ settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
 scope = [
-    "punctuation.definition.raw.markdown", 
+    "punctuation.definition.raw.markdown",
     "punctuation.definition.markdown"
 ]
 settings = { foreground = "#08bdba" }
+
+# for zed export
+[[tokenColors]]
+scope = ["title"]
+settings = { foreground = "#ffffff" }
+
+[[tokenColors]]
+scope = ["label"]
+settings = { foreground = "#ffffff" }
+
+# [[tokenColors]]
+# scope = ["entity.name.type"] # type
+# settings = { foreground = "#3ddbd9", fontStyle = "italic" }
+
+# [[tokenColors]]
+# scope = ["entity.name.tag"] # constructor
+# settings = { foreground = "#ff7eb6", fontStyle = "bold" }
+
+[[tokenColors]]
+scope = ["entity.other.attribute-name"] # attribute
+settings = { foreground = "#f2f4f8" }
+
+[[tokenColors]]
+scope = ["markup.bold"]
+settings = { foreground = "#ffffff", fontStyle = "bold" }
+
+[[tokenColors]]
+scope = ["markup.italic"]
+settings = { foreground = "#ffffff", fontStyle = "italic" }
+
+# [[tokenColors]] # text vs URI
+# scope = ["markup.underline.link"]
+# settings = { foreground = "#be95ff", fontStyle = "underline" }
+
+[[tokenColors]]
+scope = ["markup.underline.link"]
+settings = { foreground = "#ff7eb6", fontStyle = "underline" }
+
+[[tokenColors]]
+scope = ["meta.embedded"]
+settings = { foreground = "#3ddbd9" }
+
+[[tokenColors]]
+scope = ["constant.language"] # boolean
+settings = { foreground = "#82cfff" } # TODO true/false
+
+[[tokenColors]]
+scope = ["variable.member"] # property
+settings = { foreground = "#08bdba" }
+
+[[tokenColors]]
+scope = ["preproc"]
+settings = { foreground = "#08bdba" }
+
+[[tokenColors]]
+scope = ["punctuation"]
+settings = { foreground = "#f2f4f8" }
+
+[[tokenColors]]
+scope = ["punctuation.definition.comment"]
+settings = { foreground = "#6f6f6f" }
