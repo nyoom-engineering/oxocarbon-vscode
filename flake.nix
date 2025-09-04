@@ -35,6 +35,7 @@
             gnumake
             nodejs_24
             vsce
+            jq
           ];
         };
       }

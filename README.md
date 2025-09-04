@@ -208,3 +208,26 @@ Before contributing, its recommended to read through the [style guide](https://g
 ## License
 
 The project is vendored under the MIT license
+
+## Zed (beta)
+
+You may autogenerate themes for the Zed text editor from VSCode themes
+
+E.g. on macOS (make sure full Xcode is installed, not just command-line-tools)
+
+```
+# need cmake
+nix shell nixpkgs#cmake
+
+# use app toolchain
+sudo xcode-select -s /Applications/Xcode.app 
+
+# install metal toolchain
+xcodebuild -downloadComponent MetalToolchain
+
+# clone zed repo
+git clone --depth 1 https://github.com/zed-industries/zed.git && cd zed
+
+# build colorscheme of choice
+cargo run -p theme_importer -- ../themes/oxocarbon-compat-color-theme.json --output zed-theme.json
+```
