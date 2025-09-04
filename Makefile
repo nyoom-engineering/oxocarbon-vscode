@@ -5,6 +5,7 @@ THEMESDIR := themes
 ASSETS := assets
 
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
+ZED_CFG := ~/.config/zed
 EXTENSIONS := $(ASSETS)/extensions.txt
 
 ZED_REPO_URL := https://github.com/zed-industries/zed.git
@@ -24,7 +25,7 @@ DEFAULT_THEMES := \
 	$(THEMESDIR)/PRINT.json
 
 .PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray \
-	PRINT zed zed-setup
+	PRINT zed setup-zed dotfiles-zed install-zed
 
 .SECONDARY:
 
@@ -86,7 +87,7 @@ check-jq: ## Verify jq is available
 
 zed: $(ZED_BUNDLE)
 
-zed-setup: check-xcode $(ZED_SRC_DIR)
+setup-zed: check-xcode $(ZED_SRC_DIR)
 
 $(ZED_SRC_DIR): | check-xcode
 	@[ -d "$(ZED_SRC_DIR)/.git" ] || \
@@ -94,11 +95,11 @@ $(ZED_SRC_DIR): | check-xcode
 		git -C $(ZED_SRC_DIR) fetch --depth 1 origin main >/dev/null 2>&1 && \
 		git -C $(ZED_SRC_DIR) reset --hard FETCH_HEAD >/dev/null 2>&1
 
-$(ZED_IMPORTER): | zed-setup
+$(ZED_IMPORTER): | setup-zed
 	cargo build --release -p theme_importer \
 		--manifest-path $(ZED_SRC_DIR)/Cargo.toml
 
-$(ZED_BUNDLE): check-jq zed-setup $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
+$(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@echo "Converting themes for Zed..."
 	@for f in $(filter-out $(THEMESDIR)/PRINT.json $(ZED_BUNDLE),$(wildcard $(THEMESDIR)/*.json)); do \
 		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
@@ -124,3 +125,12 @@ install: dotfiles
 	mkdir -p $(CURSOR_CFG)
 	cp $(ASSETS)/settings.json $(CURSOR_CFG)/
 	cp $(ASSETS)/keybindings.json $(CURSOR_CFG)/
+
+dotfiles-zed:
+	mkdir -p $(ASSETS)
+	cp $(ZED_CFG)/settings.json $(ASSETS)/settings-zed.json
+
+install-zed:
+	mkdir -p $(ZED_CFG)/themes
+	if [ -f $(ZED_BUNDLE) ]; then mv -f $(ZED_BUNDLE) $(ZED_CFG)/themes/oxocarbon.json; fi
+	if [ -f $(ASSETS)/settings-zed.json ]; then mv -f $(ASSETS)/settings-zed.json $(ZED_CFG)/settings.json; fi

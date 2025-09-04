@@ -4,7 +4,8 @@
     "editor.fontFamily": "Berkeley Mono Retina",
     "customizeUI.font.regular": "Univers",
     "customizeUI.font.monospace": "Berkeley Mono Retina",
-  
+    "editor.fontLigatures": "'calt', 'ss01', 'ss04', 'ss05', 'ss06'",
+
     //  "editor.fontFamily": "Liga SFMono Nerd Font",
     //  "customizeUI.font.regular": "SF Pro",
     //  "customizeUI.font.monospace": "SF Mono",
@@ -40,7 +41,6 @@
     // technically experimental
     "debug.toolBarLocation": "docked",
   
-    "editor.fontLigatures": true,
     "editor.fontSize": 14,
     "editor.smoothScrolling": true,
     "editor.cursorBlinking": "smooth",
@@ -62,8 +62,8 @@
     "workbench.colorTheme": "oxocarbon",
     "workbench.preferredDarkColorTheme": "oxocarbon",
     "workbench.productIconTheme": "icons-carbon",
-    "workbench.editor.showTabs": "single",
     "workbench.iconTheme": null,
+    "workbench.editor.showTabs": "single",
     "workbench.list.smoothScrolling": true,
     "workbench.tree.renderIndentGuides": "none",
     "workbench.fontAliasing": "auto",
