@@ -215,9 +215,9 @@ You may autogenerate themes for the Zed text editor from VSCode themes
 
 E.g. on macOS (make sure full Xcode is installed, not just command-line-tools)
 
-```
+```sh
 # need cmake
-nix shell nixpkgs#cmake
+nix shell nixpkgs#cmake nixpkgs#jq
 
 # use app toolchain
 sudo xcode-select -s /Applications/Xcode.app 
@@ -225,9 +225,6 @@ sudo xcode-select -s /Applications/Xcode.app
 # install metal toolchain
 xcodebuild -downloadComponent MetalToolchain
 
-# clone zed repo
-git clone --depth 1 https://github.com/zed-industries/zed.git && cd zed
-
-# build colorscheme of choice
-cargo run -p theme_importer -- ../themes/oxocarbon-compat-color-theme.json --output zed-theme.json
+# build gpui, translate themes, bundle
+make zed
 ```

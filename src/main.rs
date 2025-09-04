@@ -256,13 +256,12 @@ fn compute_theme_name(
     mono_family: Option<&str>,
 ) -> Option<String> {
     if monochrome {
-        let fam = match mono_family.unwrap_or("gray") {
-            "coolgray" | "cool-gray" | "cool" => "Cool Gray",
-            "warmgray" | "warm-gray" | "warm" => "Warm Gray",
-            _ => "Gray",
-        };
         let base = if oled { "Oxocarbon OLED Monochrom" } else { "Oxocarbon Monochrom" };
-        let mut name = format!("{base} ({fam})");
+        let mut name = match mono_family.unwrap_or("gray") {
+            "coolgray" | "cool-gray" | "cool" => format!("{base} (Cool Gray)"),
+            "warmgray" | "warm-gray" | "warm" => format!("{base} (Warm Gray)"),
+            _ => base.to_string(),
+        };
         if compat { name.push_str(" (compatibility)"); }
         Some(name)
     } else {
