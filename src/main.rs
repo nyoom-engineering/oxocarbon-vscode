@@ -178,9 +178,10 @@ const OLED_REPLACEMENTS: [(&str, &str); 7] = [
     ("#525252", "#393939"),
 ];
 
-const COMPAT_BG_KEYS: [&str; 6] = [
+const COMPAT_BG_KEYS: [&str; 7] = [
     "titleBar.activeBackground",
     "editorGroupHeader.tabsBackground",
+    "tab.inactiveBackground",
     "activityBar.background",
     "sideBar.background",
     "panel.background",
@@ -198,7 +199,8 @@ const COMPAT_CONTRAST_KEYS: [&str; 6] = [
     "list.hoverBackground"
 ];
 
-const COMPAT_CONTRAST_KEYS_2: [&str; 2] = [
+const COMPAT_CONTRAST_KEYS_2: [&str; 3] = [
+    "tab.border",
     "sideBar.border",
     "panel.border",
 ];
