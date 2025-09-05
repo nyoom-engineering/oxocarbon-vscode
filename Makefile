@@ -104,10 +104,19 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@for f in $(filter-out $(THEMESDIR)/PRINT.json $(ZED_BUNDLE),$(wildcard $(THEMESDIR)/*.json)); do \
 		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
 	done; \
-	jq -s '{ "$$schema":"https://zed.dev/schema/themes/v0.2.0.json", \
-		"name":"Oxocarbon", \
-		"author":"Nyoom Engineering", \
-		"themes":[ .[] | (.themes // .) | (if type=="array" then .[] else . end) ] }' \
+	jq -s 'def set_accent_and_players: \
+		(.name | ascii_downcase | contains("monochrom")) as $$mono \
+		| (.name | ascii_downcase | contains("compatibility")) as $$compat \
+		| .style["text.accent"] = (if $$mono then "#ffffff" else "#ff7eb6" end) \
+		| .style["text.muted"] = (if $$compat then "#8d8d8d" else "#f2f4f8" end) \
+		| .style["editor.document_highlight.bracket_background"] = "#393939" \
+		| .style.syntax.function.font_weight = 600 \
+		| .style.syntax.type = { "color":"#3ddbd9", "font_style":"italic", "font_weight":null } \
+		| .style.players = [ { "cursor":"#ffffffff", "background":"#ffffffff", "selection":"#52525290" } ]; \
+		{ "$$schema":"https://zed.dev/schema/themes/v0.2.0.json", \
+		  "name":"Oxocarbon", \
+		  "author":"Nyoom Engineering", \
+		  "themes":[ .[] | (.themes // .) | (if type=="array" then .[] else . end) | set_accent_and_players ] }' \
 		$(OUTDIR)/zed-*.json > $(ZED_BUNDLE)
 	@echo "Zed theme bundle created: $(ZED_BUNDLE)"
 

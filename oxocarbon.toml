@@ -1,6 +1,19 @@
 name = "Oxocarbon Dark"
 type = "dark"
 
+# zed manual compat triggered w/ jq
+
+# bold -> weight 600, supposed to be 635 but unspported
+
+# text.accent = #ff7eb6
+# "players": [
+#   {
+#     "cursor": "#ffffffff",
+#     "background": "#ffffffff",
+#     "selection": "#52525290"
+#   }
+# ],
+
 [colors]
 foreground = "#f2f4f8"
 focusBorder = "#262626"
@@ -47,6 +60,12 @@ disabledForeground = "#8d8d8d"
 "editorInfo.foreground" = "#ff7eb6"
 "editorHint.foreground" = "#dde1e6"
 "editorLightBulb.foreground" = "#ffffff"
+
+# for zed export -> error, warning, info, hint background
+"editorError.background" = "#00000000"
+"editorWarning.background" = "#00000000"
+"editorInfo.background" = "#00000000"
+"editorHint.background" = "#00000000"
 
 "editorGutter.addedBackground" = "#42be65"
 "editorGutter.modifiedBackground" = "#08bdba"
@@ -128,6 +147,9 @@ disabledForeground = "#8d8d8d"
 
 "editor.wordHighlightBackground" = "#26262630"
 "editor.wordHighlightBorder" = "#00000000"
+
+# for zed export -> bracket match background
+"editorBracketMatch.background" = "#00000000"
 
 "editorBracketHighlight.foreground1" = "#8d8d8d"
 "editorBracketHighlight.foreground2" = "#6f6f6f"
@@ -317,6 +339,11 @@ disabledForeground = "#8d8d8d"
 "gauge.warningForeground" = "#ff7eb6"
 "gauge.errorBackground" = "#262626"
 "gauge.errorForeground" = "#ee5396"
+
+# for zed export -> minimap "thumb" background, hover, active
+"minimapSlider.background" = "#52525233"
+"minimapSlider.hoverBackground" = "#52525244"
+"minimapSlider.activeBackground" = "#52525255"
 
 "minimap.findMatchHighlight" = "#ee539650"
 "minimap.selectionHighlight" = "#39393950"
