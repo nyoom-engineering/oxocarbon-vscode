@@ -109,9 +109,17 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 		| (.name | ascii_downcase | contains("compatibility")) as $$compat \
 		| .style["text.accent"] = (if $$mono then "#ffffff" else "#ff7eb6" end) \
 		| .style["text.muted"] = (if $$compat then "#8d8d8d" else "#f2f4f8" end) \
+		| .style["panel.focused_border"] = "#6f6f6f" \
 		| .style["editor.document_highlight.bracket_background"] = "#393939" \
-		| .style.syntax.function.font_weight = 600 \
-		| .style.syntax.type = { "color":"#3ddbd9", "font_style":"italic", "font_weight":null } \
+		| .style["panel.focused_border"] = "#6f6f6f" \
+		| .style.syntax.function.font_weight = 700 \
+		| .style.syntax.constructor.font_weight = 600 \
+		| .style.syntax.emphasis.font_weight = 500 \
+		| .style.syntax.["emphasis.strong"].font_weight = 700 \
+		| .style.syntax.selector = { "color": "#f2f4f8", "font_style": null, "font_weight": null } \
+		| .style.syntax["selector.pseudo"] = { "color": "#dde1e6", "font_style": null, "font_weight": null } \
+		| .style.syntax.namespace = { "color": "#ffffff", "font_style": null, "font_weight": null } \
+		| .style.syntax["function.builtin"] = { "color": (if $$mono then "#ffffff" else "#ff7eb6" end), "font_style": null, "font_weight": 500 } \
 		| .style.players = [ { "cursor":"#ffffffff", "background":"#ffffffff", "selection":"#52525290" } ]; \
 		{ "$$schema":"https://zed.dev/schema/themes/v0.2.0.json", \
 		  "name":"Oxocarbon", \

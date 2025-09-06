@@ -109,17 +109,22 @@ fn main() {
         let (from, to) = if opts.is_oled() { ("#000000", "#161616") } else { ("#161616", "#262626") };
         let c1 = midpoint_hex(from, to);
         insert_value(colors, &COMPAT_BG_KEYS, &toml::Value::String(c1));
+        // compatibility variants - gutter, six deviations
+        // - Standard compat: #131313
+        // - OLED compat:     #030303
+        let c2 = if opts.is_oled() { "#030303" } else { "#131313" }.to_string();
+        insert_value(colors, &COMPAT_BG_KEYS_2, &toml::Value::String(c2));
         // compatibility variants - contrast headers, borders
         // - Standard compat: #393939
         // - OLED compat:     #262626
-        let c2 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
-        insert_value(colors, &COMPAT_CONTRAST_KEYS, &toml::Value::String(c2.clone()));
+        let c3 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
+        insert_value(colors, &COMPAT_CONTRAST_KEYS, &toml::Value::String(c3.clone()));
         // compatibility variants - additional contrast
         // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
         // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
         let base = if opts.is_oled() { "#161616" } else { "#262626" };
-        let c3 = midpoint_hex(base, &c2);
-        insert_value(colors, &COMPAT_CONTRAST_KEYS_2, &toml::Value::String(c3));
+        let c4 = midpoint_hex(base, &c3);
+        insert_value(colors, &COMPAT_CONTRAST_KEYS_2, &toml::Value::String(c4));
     }
 
     // name override
@@ -186,6 +191,10 @@ const COMPAT_BG_KEYS: [&str; 7] = [
     "sideBar.background",
     "panel.background",
     "statusBar.background"
+];
+
+const COMPAT_BG_KEYS_2: [&str; 1] = [
+    "editorGutter.background",
 ];
 
 const COMPAT_CONTRAST_KEYS: [&str; 6] = [

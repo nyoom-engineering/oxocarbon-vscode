@@ -3,16 +3,9 @@ type = "dark"
 
 # zed manual compat triggered w/ jq
 
-# bold -> weight 600, supposed to be 635 but unspported
-
-# text.accent = #ff7eb6
-# "players": [
-#   {
-#     "cursor": "#ffffffff",
-#     "background": "#ffffffff",
-#     "selection": "#52525290"
-#   }
-# ],
+# bold -> weight 600, supposed to be 635 but unsupported
+# editor_gutter_background: vscode_editor_background, -> should be editor gutter background
+# | .style.syntax.type = { "color":"#3ddbd9", "font_style":"italic", "font_weight":null } \
 
 [colors]
 foreground = "#f2f4f8"
@@ -65,8 +58,8 @@ disabledForeground = "#8d8d8d"
 "editorError.background" = "#00000000"
 "editorWarning.background" = "#00000000"
 "editorInfo.background" = "#00000000"
-"editorHint.background" = "#00000000"
 
+"editorGutter.background" = "#161616"
 "editorGutter.addedBackground" = "#42be65"
 "editorGutter.modifiedBackground" = "#08bdba"
 "editorGutter.deletedBackground" = "#ee5396"
@@ -476,11 +469,16 @@ scope = ["storage.modifier", "keyword.other"]
 settings = { foreground = "#33b1ff" }
 
 [[tokenColors]]
-scope = ["entity.name.function", "storage.type.function.m.nosideeffects"]
+scope = [
+    "entity.name.command", 
+    "entity.name.function", 
+    "support.function",
+    "storage.type.function.m.nosideeffects"
+]
 settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
-scope = ["string"]
+scope = ["string", "punctuation.definition.string"]
 settings = { foreground = "#be95ff" }
 
 [[tokenColors]]
@@ -503,7 +501,7 @@ settings = { fontStyle = "italic" }
 
 # C
 [[tokenColors]]
-scope = ["keyword.control.directive"]
+scope = ["keyword.control.directive", "punctuation.definition.directive"]
 settings = { foreground = "#08bdba" }
 
 # Rust
@@ -545,7 +543,68 @@ settings = { foreground = "#ff7eb6" }
 
 [[tokenColors]]
 scope = [
-    "punctuation.definition.raw.markdown", 
+    "punctuation.definition.raw.markdown",
     "punctuation.definition.markdown"
 ]
 settings = { foreground = "#08bdba" }
+
+# for zed export
+[[tokenColors]]
+scope = ["title"]
+settings = { foreground = "#ffffff" }
+
+[[tokenColors]]
+scope = ["label"]
+settings = { foreground = "#ffffff" }
+
+# [[tokenColors]]
+# scope = ["entity.name.type"] # type
+# settings = { foreground = "#3ddbd9", fontStyle = "italic" }
+ 
+# [[tokenColors]]
+# scope = ["entity.name.tag"] # constructor
+# settings = { foreground = "#ff7eb6", fontStyle = "bold" }
+
+[[tokenColors]]
+scope = ["entity.other.attribute-name"] # attribute
+settings = { foreground = "#f2f4f8" }
+
+[[tokenColors]]
+scope = ["markup.bold"]
+settings = { foreground = "#ffffff", fontStyle = "bold" }
+
+[[tokenColors]]
+scope = ["markup.italic"]
+settings = { foreground = "#ffffff", fontStyle = "italic" }
+
+# [[tokenColors]] # text vs URI
+# scope = ["markup.underline.link"]
+# settings = { foreground = "#be95ff", fontStyle = "underline" }
+
+[[tokenColors]]
+scope = ["markup.underline.link"]
+settings = { foreground = "#ff7eb6", fontStyle = "underline" }
+ 
+[[tokenColors]]
+scope = ["meta.embedded"]
+settings = { foreground = "#3ddbd9" }
+
+[[tokenColors]]
+scope = ["constant.language"] # boolean
+settings = { foreground = "#82cfff" } # TODO true/false
+
+[[tokenColors]]
+scope = ["variable.member"] # property
+settings = { foreground = "#08bdba" }
+
+[[tokenColors]]
+scope = ["preproc"]
+settings = { foreground = "#08bdba" }
+
+[[tokenColors]]
+scope = ["punctuation"]
+settings = { foreground = "#f2f4f8" }
+
+[[tokenColors]]
+scope = ["punctuation.definition.comment"]
+settings = { foreground = "#6f6f6f" }
