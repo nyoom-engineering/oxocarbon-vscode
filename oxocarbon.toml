@@ -40,8 +40,8 @@ disabledForeground = "#8d8d8d"
 
 "editorCursor.foreground" = "#ffffff"
 "editorLink.activeForeground" = "#ff7eb6"
-"editorInlayHint.foreground" = "#878d96"
-"editorInlayHint.background" = "#00000000"
+"editorInlayHint.foreground" = "#ada8a8" # warm
+"editorInlayHint.background" = "#262626ff"
 "editorGroup.border" = "#262626"
 "editorGroup.dropBackground" = "#39393940"
 "editorGroupHeader.tabsBorder" = "#262626"
