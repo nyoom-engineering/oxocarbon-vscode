@@ -116,6 +116,7 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 		| .style.syntax.constructor.font_weight = 600 \
 		| .style.syntax.emphasis.font_weight = 500 \
 		| .style.syntax.["emphasis.strong"].font_weight = 700 \
+		| .style.syntax.link_text = { "color": "#be95ff", "font_style": null, "font_weight": null } \
 		| .style.syntax.selector = { "color": "#f2f4f8", "font_style": null, "font_weight": null } \
 		| .style.syntax["selector.pseudo"] = { "color": "#dde1e6", "font_style": null, "font_weight": null } \
 		| .style.syntax.namespace = { "color": "#ffffff", "font_style": null, "font_weight": null } \

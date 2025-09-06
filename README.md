@@ -220,11 +220,17 @@ E.g. on macOS (make sure full Xcode is installed, not just command-line-tools)
 nix shell nixpkgs#cmake nixpkgs#jq
 
 # use app toolchain
-sudo xcode-select -s /Applications/Xcode.app 
+sudo xcode-select -s /Applications/Xcode.app
 
 # install metal toolchain
 xcodebuild -downloadComponent MetalToolchain
 
 # build gpui, translate themes, bundle
 make zed
+
+# install theme + dotfiles
+make install-zed
+
+# run zed
+zed
 ```

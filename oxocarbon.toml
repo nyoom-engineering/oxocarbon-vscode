@@ -470,8 +470,8 @@ settings = { foreground = "#33b1ff" }
 
 [[tokenColors]]
 scope = [
-    "entity.name.command", 
-    "entity.name.function", 
+    "entity.name.command",
+    "entity.name.function",
     "support.function",
     "storage.type.function.m.nosideeffects"
 ]
@@ -560,7 +560,7 @@ settings = { foreground = "#ffffff" }
 # [[tokenColors]]
 # scope = ["entity.name.type"] # type
 # settings = { foreground = "#3ddbd9", fontStyle = "italic" }
- 
+
 # [[tokenColors]]
 # scope = ["entity.name.tag"] # constructor
 # settings = { foreground = "#ff7eb6", fontStyle = "bold" }
@@ -584,7 +584,7 @@ settings = { foreground = "#ffffff", fontStyle = "italic" }
 [[tokenColors]]
 scope = ["markup.underline.link"]
 settings = { foreground = "#ff7eb6", fontStyle = "underline" }
- 
+
 [[tokenColors]]
 scope = ["meta.embedded"]
 settings = { foreground = "#3ddbd9" }
