@@ -162,10 +162,10 @@
 			<string>storage.type, variable.parameter</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>italic</string>
 				<key>foreground</key>
 				<string>#f2f4f8</string>
+				<key>fontStyle</key>
+				<string>italic</string>
 			</dict>
 		</dict>
 		<dict>
@@ -254,10 +254,10 @@
 			<string>entity.name.section.markdown, markup.inline.raw.string.markdown</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ffffff</string>
 				<key>fontStyle</key>
 				<string>bold</string>
+				<key>foreground</key>
+				<string>#ffffff</string>
 			</dict>
 		</dict>
 		<dict>
@@ -322,10 +322,10 @@
 			<string>markup.bold</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>bold</string>
 				<key>foreground</key>
 				<string>#ffffff</string>
+				<key>fontStyle</key>
+				<string>bold</string>
 			</dict>
 		</dict>
 		<dict>
@@ -422,7 +422,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>123dfbc7-999c-45cc-bb0d-6901aaa6b950</string>
+	<string>ab4172f6-0c0d-48cd-96a5-ec3b439a77d5</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>

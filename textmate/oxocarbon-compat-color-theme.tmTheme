@@ -250,10 +250,10 @@
 			<string>entity.name.section.markdown, markup.inline.raw.string.markdown</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>bold</string>
 				<key>foreground</key>
 				<string>#ffffff</string>
+				<key>fontStyle</key>
+				<string>bold</string>
 			</dict>
 		</dict>
 		<dict>
@@ -344,10 +344,10 @@
 			<string>markup.underline.link</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ff7eb6</string>
 				<key>fontStyle</key>
 				<string>underline</string>
+				<key>foreground</key>
+				<string>#ff7eb6</string>
 			</dict>
 		</dict>
 		<dict>
@@ -418,7 +418,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>573b253a-7e66-4b59-a984-e559bc6f2bd6</string>
+	<string>eae0894d-49a2-46e5-ba3d-d867df8f014c</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>

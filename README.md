@@ -241,9 +241,9 @@ make install-zed
 zed
 ```
 
-## Textmate/Sublime
+## Textmate
 
-Uses in-house `json2tm` crate, works with Textmate-compatible editors (e.g. Sublime Text)
+Uses in-house `json2tm` crate, works with Textmate-compatible editors
 
 ```sh
 # translate themes
@@ -255,6 +255,13 @@ make install-sublime
 # (optional) install to Textmate (macOS only)
 make install-textmate
 ```
+
+Tested with; including but not limited to
+
+- Textmate
+- Sublime Text
+- Atom (deprecated)
+- RStudio
 
 ## Intellij 
 
@@ -268,4 +275,8 @@ make intellij
 
 # settings -> color theme -> cog -> manual import
 ```
+
+### Visual Studio 
+
+Use Microsoft's [Theme Converter for Visual Studio](https://github.com/microsoft/theme-converter-for-vs), requires .NET Desktop & the Visual Studio extension development enviornment. Json files are in `themes`
 
