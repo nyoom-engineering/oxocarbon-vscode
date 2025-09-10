@@ -3,6 +3,7 @@ INPUT := oxocarbon.toml
 OUTDIR := out
 THEMESDIR := themes
 ASSETS := assets
+SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
 
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 ZED_CFG := ~/.config/zed
@@ -10,8 +11,12 @@ EXTENSIONS := $(ASSETS)/extensions.txt
 
 ZED_REPO_URL := https://github.com/zed-industries/zed.git
 ZED_SRC_DIR := target/zed
-ZED_BUNDLE := $(THEMESDIR)/oxocarbon-zed.json
+ZEDDIR := zed
+ZED_BUNDLE := $(ZEDDIR)/oxocarbon.json
 ZED_IMPORTER := $(ZED_SRC_DIR)/target/release/theme_importer
+
+TMDIR := textmate
+TM_CONVERTER := json2tm/target/release/json2tm
 
 DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-color-theme.json \
@@ -24,8 +29,10 @@ DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-oled-mono-compat-color-theme.json \
 	$(THEMESDIR)/PRINT.json
 
+TEXTMATE_THEMES := $(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(DEFAULT_THEMES))
+
 .PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray \
-	PRINT zed setup-zed dotfiles-zed install-zed
+	PRINT zed setup-zed dotfiles-zed install-zed install-sublime textmate
 
 .SECONDARY:
 
@@ -100,6 +107,7 @@ $(ZED_IMPORTER): | setup-zed
 		--manifest-path $(ZED_SRC_DIR)/Cargo.toml
 
 $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
+	@mkdir -p $(dir $(ZED_BUNDLE))
 	@echo "Converting themes for Zed..."
 	@for f in $(filter-out $(THEMESDIR)/PRINT.json $(ZED_BUNDLE),$(wildcard $(THEMESDIR)/*.json)); do \
 		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
@@ -115,7 +123,7 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 		| .style.syntax.function.font_weight = 700 \
 		| .style.syntax.constructor.font_weight = 600 \
 		| .style.syntax.emphasis.font_weight = 500 \
-		| .style.syntax.["emphasis.strong"].font_weight = 700 \
+		| .style.syntax["emphasis.strong"].font_weight = 700 \
 		| .style.syntax.link_text = { "color": "#be95ff", "font_style": null, "font_weight": null } \
 		| .style.syntax.selector = { "color": "#f2f4f8", "font_style": null, "font_weight": null } \
 		| .style.syntax["selector.pseudo"] = { "color": "#dde1e6", "font_style": null, "font_weight": null } \
@@ -129,8 +137,17 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 		$(OUTDIR)/zed-*.json > $(ZED_BUNDLE)
 	@echo "Zed theme bundle created: $(ZED_BUNDLE)"
 
+$(TM_CONVERTER):
+	cargo build --release --manifest-path json2tm/Cargo.toml
+
+$(TMDIR)/%.tmTheme: $(THEMESDIR)/%.json $(TM_CONVERTER)
+	@mkdir -p $(dir $@)
+	$(TM_CONVERTER) $< $@
+
+textmate: $(TEXTMATE_THEMES)
+
 clean:
-	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json
+	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme
 
 dotfiles:
 	mkdir -p $(ASSETS)
@@ -150,5 +167,9 @@ dotfiles-zed:
 
 install-zed:
 	mkdir -p $(ZED_CFG)/themes
-	if [ -f $(ZED_BUNDLE) ]; then mv -f $(ZED_BUNDLE) $(ZED_CFG)/themes/oxocarbon.json; fi
+	if [ -f $(ZED_BUNDLE) ]; then cp -f $(ZED_BUNDLE) $(ZED_CFG)/themes/oxocarbon.json; fi
 	if [ -f $(ASSETS)/settings-zed.json ]; then mv -f $(ASSETS)/settings-zed.json $(ZED_CFG)/settings.json; fi
+
+install-sublime:
+	mkdir -p $(SUBLIME_USER)
+	cp $(TMDIR)/*.tmTheme $(SUBLIME_USER)/

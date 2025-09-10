@@ -209,9 +209,15 @@ Before contributing, its recommended to read through the [style guide](https://g
 
 The project is vendored under the MIT license
 
-## Zed (beta)
+# Converters (Beta)
 
-You may autogenerate themes for the Zed text editor from VSCode themes
+Preliminary support for autogenerating themes from VSCode implementation(s)
+
+## Zed
+
+Uses the Zed Team's `theme_importer` crate
+
+Depends on `gpui` for the time being, so ensure dependencies
 
 E.g. on macOS (make sure full Xcode is installed, not just command-line-tools)
 
@@ -233,4 +239,16 @@ make install-zed
 
 # run zed
 zed
+```
+
+## Textmate/Sublime
+
+Uses in-house `json2tm` crate, works with Textmate-compatible editors (e.g. Sublime Text)
+
+```sh
+# translate themes
+make textmate
+
+# (optional) install to Sublime user folder
+make install-sublime
 ```
