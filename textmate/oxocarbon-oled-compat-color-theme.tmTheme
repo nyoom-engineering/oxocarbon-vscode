@@ -17,6 +17,8 @@
 				<string>#f2f4f8</string>
 				<key>selection</key>
 				<string>#262626</string>
+				<key>lineHighlight</key>
+				<string>#161616</string>
 			</dict>
 		</dict>
 		<dict>
@@ -235,10 +237,10 @@
 			<string>entity.name.tag.module.reference</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ff7eb6</string>
 				<key>fontStyle</key>
 				<string>bold</string>
+				<key>foreground</key>
+				<string>#ff7eb6</string>
 			</dict>
 		</dict>
 		<dict>
@@ -248,10 +250,10 @@
 			<string>entity.name.section.markdown, markup.inline.raw.string.markdown</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>bold</string>
 				<key>foreground</key>
 				<string>#ffffff</string>
+				<key>fontStyle</key>
+				<string>bold</string>
 			</dict>
 		</dict>
 		<dict>
@@ -329,10 +331,10 @@
 			<string>markup.italic</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ffffff</string>
 				<key>fontStyle</key>
 				<string>italic</string>
+				<key>foreground</key>
+				<string>#ffffff</string>
 			</dict>
 		</dict>
 		<dict>
@@ -416,8 +418,8 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string></string>
+	<string>61f11f8b-4753-4ce2-9361-f3a0ade32569</string>
 	<key>license</key>
-	<string></string>
+	<string>MIT</string>
 </dict>
 </plist>

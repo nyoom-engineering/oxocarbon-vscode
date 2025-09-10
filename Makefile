@@ -3,7 +3,6 @@ INPUT := oxocarbon.toml
 OUTDIR := out
 THEMESDIR := themes
 ASSETS := assets
-SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
 
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 ZED_CFG := ~/.config/zed
@@ -17,6 +16,12 @@ ZED_IMPORTER := $(ZED_SRC_DIR)/target/release/theme_importer
 
 TMDIR := textmate
 TM_CONVERTER := json2tm/target/release/json2tm
+TM_USER := ~/Library/Application\ Support/TextMate/Themes
+SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
+
+INTELLIJDIR := intellij
+JB_REPO_URL := https://github.com/JetBrains/colorSchemeTool
+JB_SRC_DIR := target/colorSchemeTool
 
 DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-color-theme.json \
@@ -32,7 +37,7 @@ DEFAULT_THEMES := \
 TEXTMATE_THEMES := $(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(DEFAULT_THEMES))
 
 .PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray \
-	PRINT zed setup-zed dotfiles-zed install-zed install-sublime textmate
+	PRINT zed setup-zed dotfiles-zed dotfiles-sublime install-zed install-sublime install-textmate textmate intellij
 
 .SECONDARY:
 
@@ -137,6 +142,8 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 		$(OUTDIR)/zed-*.json > $(ZED_BUNDLE)
 	@echo "Zed theme bundle created: $(ZED_BUNDLE)"
 
+textmate: $(TEXTMATE_THEMES)
+
 $(TM_CONVERTER):
 	cargo build --release --manifest-path json2tm/Cargo.toml
 
@@ -144,10 +151,23 @@ $(TMDIR)/%.tmTheme: $(THEMESDIR)/%.json $(TM_CONVERTER)
 	@mkdir -p $(dir $@)
 	$(TM_CONVERTER) $< $@
 
-textmate: $(TEXTMATE_THEMES)
+intellij: textmate
+	@echo "Converting TextMate themes to IntelliJ..."
+	@set -e; \
+	PY=$$(command -v python2.7 >/dev/null 2>&1 && echo python2.7 || (command -v python3 >/dev/null 2>&1 && echo python3 || (command -v python >/dev/null 2>&1 && echo python || echo ""))); \
+	if [ -z "$$PY" ]; then echo "Error: python3 or python required"; exit 1; fi; \
+	@[ -d "$(JB_SRC_DIR)/.git" ] || git clone --depth 1 $(JB_REPO_URL) $(JB_SRC_DIR); \
+	git -C $(JB_SRC_DIR) fetch --depth 1 origin master >/dev/null 2>&1 || true; \
+	git -C $(JB_SRC_DIR) reset --hard FETCH_HEAD >/dev/null 2>&1 || true; \
+	mkdir -p $(INTELLIJDIR); \
+	for f in $(wildcard $(TMDIR)/*.tmTheme); do \
+		name=$$(basename $$f .tmTheme); \
+		( cd $(JB_SRC_DIR) && $$PY colorSchemeTool.py ../..//$$f ../..//$(INTELLIJDIR)/$$name.icls ); \
+	done; \
+	echo "IntelliJ schemes written to $(INTELLIJDIR)"
 
 clean:
-	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme
+	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls
 
 dotfiles:
 	mkdir -p $(ASSETS)
@@ -165,6 +185,10 @@ dotfiles-zed:
 	mkdir -p $(ASSETS)
 	cp $(ZED_CFG)/settings.json $(ASSETS)/settings-zed.json
 
+dotfiles-sublime:
+	mkdir -p $(ASSETS)
+	cp $(SUBLIME_USER)/Preferences.sublime-settings $(ASSETS)/Preferences.sublime-settings
+
 install-zed:
 	mkdir -p $(ZED_CFG)/themes
 	if [ -f $(ZED_BUNDLE) ]; then cp -f $(ZED_BUNDLE) $(ZED_CFG)/themes/oxocarbon.json; fi
@@ -173,3 +197,8 @@ install-zed:
 install-sublime:
 	mkdir -p $(SUBLIME_USER)
 	cp $(TMDIR)/*.tmTheme $(SUBLIME_USER)/
+	cp $(ASSETS)/Preferences.sublime-settings $(SUBLIME_USER)/Preferences.sublime-settings
+
+install-textmate:
+	mkdir -p $(TM_USER)
+	cp $(TMDIR)/*.tmTheme $(TM_USER)/

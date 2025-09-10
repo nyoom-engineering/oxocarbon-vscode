@@ -249,6 +249,23 @@ Uses in-house `json2tm` crate, works with Textmate-compatible editors (e.g. Subl
 # translate themes
 make textmate
 
-# (optional) install to Sublime user folder
+# (optional) install to Sublime user folder (macOS only)
 make install-sublime
+
+# (optional) install to Textmate (macOS only)
+make install-textmate
 ```
+
+## Intellij 
+
+(not recommended)
+
+Uses Jetbrain's colorSchemeTool
+
+```sh
+# translate themes
+make intellij
+
+# settings -> color theme -> cog -> manual import
+```
+

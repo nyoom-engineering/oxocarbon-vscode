@@ -1,0 +1,22 @@
+{
+	"theme": "auto",
+	"color_scheme": "Packages/User/oxocarbon-color-theme.tmTheme",
+
+    "font_face": "Berkeley Mono Retina",
+    "font_size": "14",
+    "font_options": ["calt", "ss01", "ss04", "ss05", "ss06"],
+    "default_font_size": "14",
+
+    "line_numbers": false,
+    "rulers": [80],
+    "highlight_line": true,
+    "highlight_gutter": false,
+
+    "draw_white_space": ["selection"],
+    "draw_indent_guides": false,
+
+	"themed_title_bar": true,
+	"file_tab_style": "square",
+
+	"hardware_acceleration": "opengl"
+}

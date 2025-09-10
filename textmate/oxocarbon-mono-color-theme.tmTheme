@@ -17,6 +17,8 @@
 				<string>#f2f4f8</string>
 				<key>selection</key>
 				<string>#393939</string>
+				<key>lineHighlight</key>
+				<string>#262626</string>
 			</dict>
 		</dict>
 		<dict>
@@ -239,10 +241,10 @@
 			<string>entity.name.tag.module.reference</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>bold</string>
 				<key>foreground</key>
 				<string>#ffffff</string>
+				<key>fontStyle</key>
+				<string>bold</string>
 			</dict>
 		</dict>
 		<dict>
@@ -420,8 +422,8 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string></string>
+	<string>2c50e2ae-16a7-4e4c-a5d5-15eca346d33f</string>
 	<key>license</key>
-	<string></string>
+	<string>MIT</string>
 </dict>
 </plist>
