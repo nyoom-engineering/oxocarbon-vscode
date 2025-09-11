@@ -88,13 +88,20 @@ jobs:
           }
         }
 
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v7
-      with:
-        commit-message: "chore(vs): convert VS Code themes to Visual Studio"
-        title: "Generate Visual Studio themes from VS Code themes"
-        body: "Automated conversion of VS Code themes under `themes/` using Microsoft's Theme Converter."
-        branch: "chore/visualstudio-themes"
-        base: "main"
-        add-paths: |
-          visualstudio/**
+    - name: Commit and push generated Visual Studio themes
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        if (!(Test-Path "$env:GITHUB_WORKSPACE/visualstudio")) {
+          Write-Host "No visualstudio output. Skipping commit."
+          exit 0
+        }
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add visualstudio/**
+        if (-not (git status --porcelain)) {
+          Write-Host "No changes to commit."
+          exit 0
+        }
+        git commit -m "chore(vs): update Visual Studio themes from VS Code sources"
+        git push origin HEAD:main
