@@ -64,15 +64,27 @@ jobs:
         New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
         $exe = Get-ChildItem -Path $repo -Filter ThemeConverter.exe -Recurse -File | Where-Object { $_.FullName -match "\\bin\\Release\\" } | Select-Object -First 1
         if ($exe) {
-          Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
-            & $exe.FullName -i $_.FullName -o $outputDir
+          $exeDir = Split-Path -Parent $exe.FullName
+          Push-Location $exeDir
+          try {
+            Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
+              & .\ThemeConverter.exe -i $_.FullName -o $outputDir
+            }
+          } finally {
+            Pop-Location
           }
         } else {
           $default = Join-Path $repo 'ThemeConverter\ThemeConverter.csproj'
           $csproj = if (Test-Path $default) { Get-Item $default } else { Get-ChildItem -Path $repo -Filter *.csproj -Recurse -File | Where-Object { $_.Name -match 'ThemeConverter' } | Select-Object -First 1 }
           if (-not $csproj) { throw "Neither ThemeConverter.exe nor matching csproj found under $repo" }
-          Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
-            dotnet run --no-build --project $csproj.FullName -c Release -- -i $_.FullName -o $outputDir
+          $projDir = Split-Path -Parent $csproj.FullName
+          Push-Location $projDir
+          try {
+            Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
+              dotnet run --no-build -c Release -- -i $_.FullName -o $outputDir
+            }
+          } finally {
+            Pop-Location
           }
         }
 
