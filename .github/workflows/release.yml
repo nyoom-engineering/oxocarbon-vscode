@@ -1,7 +1,6 @@
 name: Nightly packages and prerelease
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       notes:
@@ -17,6 +16,7 @@ jobs:
   package-and-release:
     name: Build VSIX, zip folders, publish prerelease
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]'
     permissions:
       contents: write
     steps:
