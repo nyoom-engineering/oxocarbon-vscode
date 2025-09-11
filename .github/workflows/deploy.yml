@@ -44,7 +44,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          make zed textmate intellij
+          # make zed textmate intellij TODO
+          make zed textmate
 
       - name: Upload themes artifacts
         uses: actions/upload-artifact@v4
