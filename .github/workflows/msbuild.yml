@@ -1,71 +1,10 @@
-name: MSBuild
+name: deprecated-msbuild
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'themes/**'
-      - '.github/workflows/msbuild.yml'
-
-permissions:
-  contents: write
-  actions: write
+  workflow_dispatch: {}
 
 jobs:
-  convert:
-    runs-on: windows-latest
-
+  noop:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: '6.0.x'
-
-    - name: Clone theme converter
-      run: git clone https://github.com/microsoft/theme-converter-for-vs.git
-
-    - name: Build converter
-      working-directory: theme-converter-for-vs/ThemeConverter
-      run: dotnet build -c Release
-
-    - name: Convert VS Code themes to Visual Studio
-      shell: pwsh
-      run: |
-        $inputDir = Join-Path $env:GITHUB_WORKSPACE 'themes'
-        $outputDir = Join-Path $env:GITHUB_WORKSPACE 'visualstudio'
-        if (Test-Path $outputDir) { Remove-Item -Recurse -Force $outputDir }
-        New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
-        $bin = Join-Path $env:GITHUB_WORKSPACE 'theme-converter-for-vs\ThemeConverter\bin\Release'
-        $exe = Get-ChildItem -Path $bin -Filter ThemeConverter.exe -Recurse -File | Select-Object -ExpandProperty FullName -First 1
-        $exeDir = Split-Path -Parent $exe
-        Push-Location $exeDir
-        Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object { & .\ThemeConverter.exe -i $_.FullName -o $outputDir }
-        Pop-Location
-
-    - name: Commit and push generated Visual Studio themes
-      shell: pwsh
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        $ErrorActionPreference = 'Stop'
-        if (!(Test-Path "$env:GITHUB_WORKSPACE/visualstudio")) {
-          Write-Host "No visualstudio output. Skipping commit."
-          exit 0
-        }
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add visualstudio/**
-        if (-not (git status --porcelain)) {
-          Write-Host "No changes to commit."
-          exit 0
-        }
-        git commit -m "chore(vs): update Visual Studio themes from VS Code sources"
-        git push origin HEAD:main
-        $headers = @{ Authorization = "Bearer $env:GITHUB_TOKEN"; Accept = 'application/vnd.github+json'; 'X-GitHub-Api-Version' = '2022-11-28' }
-        $body = @{ ref = 'main'; inputs = @{ notes = "Automated VS theme update from MSBuild workflow ($env:GITHUB_RUN_ID)" } } | ConvertTo-Json
-        $uri = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/actions/workflows/release.yml/dispatches"
-        Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $body
+      - run: echo "Replaced by deploy.yml"

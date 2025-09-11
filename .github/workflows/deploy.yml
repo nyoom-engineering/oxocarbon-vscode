@@ -1,0 +1,194 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unix-themes:
+    name: Build TextMate/Zed/IntelliJ themes (macOS)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew update
+          brew install jq cmake
+
+      - name: Build themes
+        shell: bash
+        run: |
+          set -euo pipefail
+          make zed textmate intellij
+
+      - name: Upload themes artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: unix-themes
+          if-no-files-found: warn
+          path: |
+            themes/*.json
+            textmate/**/*.tmTheme
+            intellij/**/*.icls
+            zed/oxocarbon.json
+
+  visualstudio:
+    name: Build Visual Studio themes (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Clone theme converter
+        run: git clone https://github.com/microsoft/theme-converter-for-vs.git
+
+      - name: Build converter
+        working-directory: theme-converter-for-vs/ThemeConverter
+        run: dotnet build -c Release
+
+      - name: Convert VS Code themes to Visual Studio
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $inputDir = Join-Path $env:GITHUB_WORKSPACE 'themes'
+          $outputDir = Join-Path $env:GITHUB_WORKSPACE 'visualstudio'
+          if (Test-Path $outputDir) { Remove-Item -Recurse -Force $outputDir }
+          New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+          $root = Join-Path $env:GITHUB_WORKSPACE 'theme-converter-for-vs'
+          $exe = Get-ChildItem -Path $root -Filter ThemeConverter.exe -Recurse -File | Select-Object -ExpandProperty FullName -First 1
+          if (-not $exe) { throw "ThemeConverter.exe not found under $root" }
+          Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object { & $exe -i $_.FullName -o $outputDir }
+
+      - name: Upload Visual Studio themes
+        uses: actions/upload-artifact@v4
+        with:
+          name: visualstudio-themes
+          if-no-files-found: warn
+          path: visualstudio/**
+
+  vsix:
+    name: Package VSIX (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Compute metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          NAME=$(jq -r .name package.json)
+          VERSION=$(jq -r .version package.json)
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
+
+      - name: Package VSCode extension (.vsix)
+        shell: bash
+        run: |
+          npx --yes @vscode/vsce package -o "${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.sha_short }}.vsix"
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: "*.vsix"
+
+  release:
+    name: Create GitHub prerelease
+    runs-on: ubuntu-latest
+    needs: [unix-themes, visualstudio, vsix]
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Compute metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +%Y%m%d)
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          TAG="nightly-$DATE-$SHA_SHORT"
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -R dist || true
+          # Flatten VSIX
+          mkdir -p release
+          if compgen -G "dist/vsix/*.vsix" > /dev/null; then
+            mv dist/vsix/*.vsix release/
+          fi
+          # Zip folders from unix / vs artifacts
+          if [ -d dist/unix-themes ]; then
+            (cd dist/unix-themes && zip -r ../../release/unix-themes-${{ steps.meta.outputs.date }}-${{ steps.meta.outputs.sha_short }}.zip .)
+          fi
+          if [ -d dist/visualstudio-themes ]; then
+            (cd dist/visualstudio-themes && zip -r ../../release/visualstudio-themes-${{ steps.meta.outputs.date }}-${{ steps.meta.outputs.sha_short }}.zip .)
+          fi
+
+      - name: Collect files
+        id: collect
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=$(ls -1 release/*.vsix 2>/dev/null || true)
+          for f in release/*.zip; do
+            [ -f "$f" ] && files="$files"$'\n'$f || true
+          done
+          echo 'list<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$files" >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub prerelease
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: Nightly ${{ steps.meta.outputs.date }} (${{ steps.meta.outputs.sha_short }})
+          prerelease: true
+          generate_release_notes: true
+          files: ${{ steps.collect.outputs.list }}
+
+

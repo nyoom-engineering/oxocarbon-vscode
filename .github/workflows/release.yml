@@ -1,101 +1,10 @@
-name: Nightly packages and prerelease
+name: deprecated-release
 
 on:
-  workflow_dispatch:
-    inputs:
-      notes:
-        description: Optional notes for this nightly
-        type: string
-        required: false
-
-concurrency:
-  group: nightly-release-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch: {}
 
 jobs:
-  package-and-release:
-    name: Build VSIX, zip folders, publish prerelease
+  noop:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]'
-    permissions:
-      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Compute metadata
-        id: meta
-        shell: bash
-        run: |
-          set -euo pipefail
-          NAME=$(jq -r .name package.json)
-          VERSION=$(jq -r .version package.json)
-          DATE=$(date -u +%Y%m%d)
-          SHA_SHORT=$(git rev-parse --short HEAD)
-          SUFFIX="$DATE-$SHA_SHORT"
-          TAG="nightly-$SUFFIX"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "date=$DATE" >> "$GITHUB_OUTPUT"
-          echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
-          echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
-      - name: Package VSCode extension (.vsix)
-        run: |
-          npx --yes @vscode/vsce package -o "${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.sha_short }}.vsix"
-
-      - name: Zip theme folders
-        run: |
-          if [ -d visualstudio ]; then zip -r "visualstudio-${{ steps.meta.outputs.suffix }}.zip" visualstudio; fi
-          if [ -d textmate ]; then zip -r "textmate-${{ steps.meta.outputs.suffix }}.zip" textmate; fi
-          if [ -d intellij ]; then zip -r "intellij-${{ steps.meta.outputs.suffix }}.zip" intellij; fi
-          if [ -d themes ]; then zip -r "themes-${{ steps.meta.outputs.suffix }}.zip" themes; fi
-          if [ -d zed ]; then zip -r "zed-${{ steps.meta.outputs.suffix }}.zip" zed; fi
-
-      - name: Collect artifact files
-        id: collect
-        run: |
-          set -euo pipefail
-          files="${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.sha_short }}.vsix"
-          for f in \
-            "visualstudio-${{ steps.meta.outputs.suffix }}.zip" \
-            "textmate-${{ steps.meta.outputs.suffix }}.zip" \
-            "intellij-${{ steps.meta.outputs.suffix }}.zip" \
-            "themes-${{ steps.meta.outputs.suffix }}.zip" \
-            "zed-${{ steps.meta.outputs.suffix }}.zip"; do
-            [ -f "$f" ] && files="$files"$'\n'$f
-          done
-          echo 'list<<EOF' >> "$GITHUB_OUTPUT"
-          echo "$files" >> "$GITHUB_OUTPUT"
-          echo 'EOF' >> "$GITHUB_OUTPUT"
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nightly-artifacts-${{ steps.meta.outputs.suffix }}
-          retention-days: 7
-          path: ${{ steps.collect.outputs.list }}
-
-      - name: Create GitHub prerelease
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.meta.outputs.tag }}
-          name: Nightly ${{ steps.meta.outputs.date }} (${{ steps.meta.outputs.sha_short }})
-          prerelease: true
-          generate_release_notes: true
-          body: |
-            Nightly artifacts built from ${{ github.sha }} on ${{ github.ref_name }} by @${{ github.actor }}.
-
-            Attached files:
-            ${{ steps.collect.outputs.list }}
-
-            ${{ github.event.inputs.notes }}
-          files: ${{ steps.collect.outputs.list }}
+      - run: echo "Replaced by deploy.yml"
