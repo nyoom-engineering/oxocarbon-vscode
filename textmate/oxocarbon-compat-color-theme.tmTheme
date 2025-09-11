@@ -237,10 +237,10 @@
 			<string>entity.name.tag.module.reference</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ff7eb6</string>
 				<key>fontStyle</key>
 				<string>bold</string>
+				<key>foreground</key>
+				<string>#ff7eb6</string>
 			</dict>
 		</dict>
 		<dict>
@@ -331,10 +331,10 @@
 			<string>markup.italic</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ffffff</string>
 				<key>fontStyle</key>
 				<string>italic</string>
+				<key>foreground</key>
+				<string>#ffffff</string>
 			</dict>
 		</dict>
 		<dict>
@@ -344,10 +344,10 @@
 			<string>markup.underline.link</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>underline</string>
 				<key>foreground</key>
 				<string>#ff7eb6</string>
+				<key>fontStyle</key>
+				<string>underline</string>
 			</dict>
 		</dict>
 		<dict>
@@ -418,7 +418,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>eae0894d-49a2-46e5-ba3d-d867df8f014c</string>
+	<string>90e833fc-e9b2-4810-ad0f-6b8e304b706d</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>

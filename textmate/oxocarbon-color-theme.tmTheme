@@ -331,10 +331,10 @@
 			<string>markup.italic</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>italic</string>
 				<key>foreground</key>
 				<string>#ffffff</string>
+				<key>fontStyle</key>
+				<string>italic</string>
 			</dict>
 		</dict>
 		<dict>
@@ -418,7 +418,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>806d558e-97fb-49a0-96bc-0b288426e857</string>
+	<string>224a635b-c4c1-4ad7-b838-7729b52538aa</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>

@@ -162,10 +162,10 @@
 			<string>storage.type, variable.parameter</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#f2f4f8</string>
 				<key>fontStyle</key>
 				<string>italic</string>
+				<key>foreground</key>
+				<string>#f2f4f8</string>
 			</dict>
 		</dict>
 		<dict>
@@ -322,10 +322,10 @@
 			<string>markup.bold</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ffffff</string>
 				<key>fontStyle</key>
 				<string>bold</string>
+				<key>foreground</key>
+				<string>#ffffff</string>
 			</dict>
 		</dict>
 		<dict>
@@ -335,10 +335,10 @@
 			<string>markup.italic</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>italic</string>
 				<key>foreground</key>
 				<string>#f2f4f8</string>
+				<key>fontStyle</key>
+				<string>italic</string>
 			</dict>
 		</dict>
 		<dict>
@@ -422,7 +422,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>ab4172f6-0c0d-48cd-96a5-ec3b439a77d5</string>
+	<string>ab6eaa0c-4eee-45ae-aee2-5c337c7fd9e0</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>

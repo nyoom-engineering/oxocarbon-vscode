@@ -34,7 +34,7 @@ DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-oled-mono-compat-color-theme.json \
 	$(THEMESDIR)/PRINT.json
 
-TEXTMATE_THEMES := $(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(DEFAULT_THEMES))
+TEXTMATE_THEMES := $(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(filter-out $(THEMESDIR)/%compat%.json,$(DEFAULT_THEMES)))
 
 .PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray \
 	PRINT zed setup-zed dotfiles-zed dotfiles-sublime install-zed install-sublime install-textmate textmate intellij

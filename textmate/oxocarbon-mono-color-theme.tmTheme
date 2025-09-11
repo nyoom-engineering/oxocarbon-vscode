@@ -149,10 +149,10 @@
 			<string>entity.name.function, variable.other.definition</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ffffff</string>
 				<key>fontStyle</key>
 				<string>bold</string>
+				<key>foreground</key>
+				<string>#ffffff</string>
 			</dict>
 		</dict>
 		<dict>
@@ -335,10 +335,10 @@
 			<string>markup.italic</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#f2f4f8</string>
 				<key>fontStyle</key>
 				<string>italic</string>
+				<key>foreground</key>
+				<string>#f2f4f8</string>
 			</dict>
 		</dict>
 		<dict>
@@ -422,7 +422,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>59b1e6cd-80e5-4b95-adb3-d5d993251011</string>
+	<string>89f9d070-d93f-4697-9b9c-0f196733900e</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>
