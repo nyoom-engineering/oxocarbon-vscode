@@ -237,10 +237,10 @@
 			<string>entity.name.tag.module.reference</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#ff7eb6</string>
 				<key>fontStyle</key>
 				<string>bold</string>
+				<key>foreground</key>
+				<string>#ff7eb6</string>
 			</dict>
 		</dict>
 		<dict>
@@ -418,7 +418,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>224a635b-c4c1-4ad7-b838-7729b52538aa</string>
+	<string>6f1aeef9-7d8c-442e-864a-8e5f2143bc3e</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>

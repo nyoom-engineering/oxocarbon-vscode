@@ -1,0 +1,63 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: MSBuild
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'themes/**'
+      - '.github/workflows/msbuild.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  convert:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 6 SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Clone theme converter
+      run: git clone https://github.com/microsoft/theme-converter-for-vs.git
+
+    - name: Build converter
+      run: dotnet build .\theme-converter-for-vs\ThemeConverter\ThemeConverter.csproj -c Release
+
+    - name: Convert VS Code themes to Visual Studio
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $converter = Join-Path $PWD 'theme-converter-for-vs\ThemeConverter\bin\Release\net6.0\ThemeConverter.exe'
+        if (!(Test-Path $converter)) { throw "Converter not found at $converter" }
+        $inputDir = Join-Path $env:GITHUB_WORKSPACE 'themes'
+        if (!(Test-Path $inputDir)) { throw "Input directory not found: $inputDir" }
+        $outputDir = Join-Path $env:GITHUB_WORKSPACE 'visualstudio'
+        if (Test-Path $outputDir) { Remove-Item -Recurse -Force $outputDir }
+        New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+        Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
+          & $converter -i $_.FullName -o $outputDir
+        }
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        commit-message: "chore(vs): convert VS Code themes to Visual Studio"
+        title: "Generate Visual Studio themes from VS Code themes"
+        body: "Automated conversion of VS Code themes under `themes/` using Microsoft's Theme Converter."
+        branch: "chore/visualstudio-themes"
+        base: "main"
+        add-paths: |
+          visualstudio/**

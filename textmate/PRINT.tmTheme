@@ -241,10 +241,10 @@
 			<string>entity.name.tag.module.reference</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>bold</string>
 				<key>foreground</key>
 				<string>#000000</string>
+				<key>fontStyle</key>
+				<string>bold</string>
 			</dict>
 		</dict>
 		<dict>
@@ -254,10 +254,10 @@
 			<string>entity.name.section.markdown, markup.inline.raw.string.markdown</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#000000</string>
 				<key>fontStyle</key>
 				<string>bold</string>
+				<key>foreground</key>
+				<string>#000000</string>
 			</dict>
 		</dict>
 		<dict>
@@ -335,10 +335,10 @@
 			<string>markup.italic</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#0d0b07</string>
 				<key>fontStyle</key>
 				<string>italic</string>
+				<key>foreground</key>
+				<string>#0d0b07</string>
 			</dict>
 		</dict>
 		<dict>
@@ -348,10 +348,10 @@
 			<string>markup.underline.link</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#575757</string>
 				<key>fontStyle</key>
 				<string>underline</string>
+				<key>foreground</key>
+				<string>#575757</string>
 			</dict>
 		</dict>
 		<dict>
@@ -422,7 +422,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>f74c9a3c-0005-4dcf-9904-232c192039f0</string>
+	<string>42dec55b-4596-44f7-82ef-4e7c82730967</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>

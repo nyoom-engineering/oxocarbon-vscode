@@ -19,9 +19,10 @@ TM_CONVERTER := json2tm/target/release/json2tm
 TM_USER := ~/Library/Application\ Support/TextMate/Themes
 SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
 
-INTELLIJDIR := intellij
 JB_REPO_URL := https://github.com/JetBrains/colorSchemeTool
 JB_SRC_DIR := target/colorSchemeTool
+INTELLIJDIR := intellij
+INTELLIJ_CONVERTER := $(JB_SRC_DIR)/colorSchemeTool.py
 
 DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-color-theme.json \
@@ -34,12 +35,9 @@ DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-oled-mono-compat-color-theme.json \
 	$(THEMESDIR)/PRINT.json
 
-TEXTMATE_THEMES := $(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(filter-out $(THEMESDIR)/%compat%.json,$(DEFAULT_THEMES)))
-
-.PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray \
-	PRINT zed setup-zed dotfiles-zed dotfiles-sublime install-zed install-sublime install-textmate textmate intellij
-
-.SECONDARY:
+.PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray PRINT \
+	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
+	install-zed install-sublime install-textmate textmate
 
 all: $(DEFAULT_THEMES)
 
@@ -91,15 +89,18 @@ check-xcode:
 		exit 1; \
 	}
 
-check-jq: ## Verify jq is available
+check-jq:
 	@command -v jq >/dev/null 2>&1 || { \
 		echo "Error: jq required"; \
 		exit 1; \
 	}
 
-zed: $(ZED_BUNDLE)
+check-python:
+	@PY=$$(command -v python2.7 >/dev/null 2>&1 && echo python2.7 || (command -v python3 >/dev/null 2>&1 && echo python3 || (command -v python >/dev/null 2>&1 && echo python || echo ""))); \
+	if [ -z "$$PY" ]; then echo "Error: python3 or python required"; exit 1; fi
 
 setup-zed: check-xcode $(ZED_SRC_DIR)
+zed: $(ZED_BUNDLE)
 
 $(ZED_SRC_DIR): | check-xcode
 	@[ -d "$(ZED_SRC_DIR)/.git" ] || \
@@ -114,7 +115,7 @@ $(ZED_IMPORTER): | setup-zed
 $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@mkdir -p $(dir $(ZED_BUNDLE))
 	@echo "Converting themes for Zed..."
-	@for f in $(filter-out $(THEMESDIR)/PRINT.json $(ZED_BUNDLE),$(wildcard $(THEMESDIR)/*.json)); do \
+	@for f in $(filter-out $(THEMESDIR)/PRINT.json,$(wildcard $(THEMESDIR)/*.json)); do \
 		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
 	done; \
 	jq -s 'def set_accent_and_players: \
@@ -142,7 +143,7 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 		$(OUTDIR)/zed-*.json > $(ZED_BUNDLE)
 	@echo "Zed theme bundle created: $(ZED_BUNDLE)"
 
-textmate: $(TEXTMATE_THEMES)
+textmate: $(foreach f,$(sort $(DEFAULT_THEMES) $(wildcard $(THEMESDIR)/*.json)),$(if $(findstring compat,$(notdir $(f))),,$(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(f))))
 
 $(TM_CONVERTER):
 	cargo build --release --manifest-path json2tm/Cargo.toml
@@ -151,35 +152,31 @@ $(TMDIR)/%.tmTheme: $(THEMESDIR)/%.json $(TM_CONVERTER)
 	@mkdir -p $(dir $@)
 	$(TM_CONVERTER) $< $@
 
-intellij: textmate
-	@echo "Converting TextMate themes to IntelliJ..."
+setup-intellij: check-python $(JB_SRC_DIR)
+intellij: $(patsubst $(THEMESDIR)/%.json,$(INTELLIJDIR)/%.icls,$(wildcard $(THEMESDIR)/*.json))
+	@echo "IntelliJ schemes written to $(INTELLIJDIR)"
+
+$(JB_SRC_DIR):
+	@[ -d "$(JB_SRC_DIR)/.git" ] || \
+		git clone --depth 1 $(JB_REPO_URL) $(JB_SRC_DIR); \
+		git -C $(JB_SRC_DIR) fetch --depth 1 origin master >/dev/null 2>&1 && \
+		git -C $(JB_SRC_DIR) reset --hard FETCH_HEAD >/dev/null 2>&1
+
+$(INTELLIJ_CONVERTER): | setup-intellij
+	@test -f $@ || { echo "Error: converter not found: $@"; exit 1; }
+
+$(INTELLIJDIR)/%.icls: $(THEMESDIR)/%.json | setup-intellij $(INTELLIJ_CONVERTER)
+	@mkdir -p $(dir $@)
 	@set -e; \
 	PY=$$(command -v python2.7 >/dev/null 2>&1 && echo python2.7 || (command -v python3 >/dev/null 2>&1 && echo python3 || (command -v python >/dev/null 2>&1 && echo python || echo ""))); \
 	if [ -z "$$PY" ]; then echo "Error: python3 or python required"; exit 1; fi; \
-	@[ -d "$(JB_SRC_DIR)/.git" ] || git clone --depth 1 $(JB_REPO_URL) $(JB_SRC_DIR); \
-	git -C $(JB_SRC_DIR) fetch --depth 1 origin master >/dev/null 2>&1 || true; \
-	git -C $(JB_SRC_DIR) reset --hard FETCH_HEAD >/dev/null 2>&1 || true; \
-	mkdir -p $(INTELLIJDIR); \
-	for f in $(wildcard $(TMDIR)/*.tmTheme); do \
-		name=$$(basename $$f .tmTheme); \
-		( cd $(JB_SRC_DIR) && $$PY colorSchemeTool.py ../..//$$f ../..//$(INTELLIJDIR)/$$name.icls ); \
-	done; \
-	echo "IntelliJ schemes written to $(INTELLIJDIR)"
-
-clean:
-	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls
+		( cd $(JB_SRC_DIR) && $$PY colorSchemeTool.py ../..//$< ../..//$@ )
 
 dotfiles:
 	mkdir -p $(ASSETS)
 	cursor --list-extensions > $(EXTENSIONS)
 	cp $(CURSOR_CFG)/settings.json $(ASSETS)/settings.json
 	cp $(CURSOR_CFG)/keybindings.json $(ASSETS)/keybindings.json
-
-install: dotfiles
-	xargs -I {} cursor --install-extension {} < $(EXTENSIONS)
-	mkdir -p $(CURSOR_CFG)
-	cp $(ASSETS)/settings.json $(CURSOR_CFG)/
-	cp $(ASSETS)/keybindings.json $(CURSOR_CFG)/
 
 dotfiles-zed:
 	mkdir -p $(ASSETS)
@@ -189,16 +186,25 @@ dotfiles-sublime:
 	mkdir -p $(ASSETS)
 	cp $(SUBLIME_USER)/Preferences.sublime-settings $(ASSETS)/Preferences.sublime-settings
 
-install-zed:
+install: dotfiles
+	xargs -I {} cursor --install-extension {} < $(EXTENSIONS)
+	mkdir -p $(CURSOR_CFG)
+	cp $(ASSETS)/settings.json $(CURSOR_CFG)/
+	cp $(ASSETS)/keybindings.json $(CURSOR_CFG)/
+
+install-zed: zed
 	mkdir -p $(ZED_CFG)/themes
 	if [ -f $(ZED_BUNDLE) ]; then cp -f $(ZED_BUNDLE) $(ZED_CFG)/themes/oxocarbon.json; fi
-	if [ -f $(ASSETS)/settings-zed.json ]; then mv -f $(ASSETS)/settings-zed.json $(ZED_CFG)/settings.json; fi
+	if [ -f $(ASSETS)/settings-zed.json ]; then cp -f $(ASSETS)/settings-zed.json $(ZED_CFG)/settings.json; fi
 
-install-sublime:
+install-sublime: textmate
 	mkdir -p $(SUBLIME_USER)
-	cp $(TMDIR)/*.tmTheme $(SUBLIME_USER)/
+	cp $(wildcard $(THEMESDIR)/*.json) $(SUBLIME_USER)/
 	cp $(ASSETS)/Preferences.sublime-settings $(SUBLIME_USER)/Preferences.sublime-settings
 
-install-textmate:
+install-textmate: textmate
 	mkdir -p $(TM_USER)
-	cp $(TMDIR)/*.tmTheme $(TM_USER)/
+	cp $(filter-out %compat%.tmTheme,$(wildcard $(TMDIR)/*.tmTheme)) $(TM_USER)/
+
+clean:
+	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls

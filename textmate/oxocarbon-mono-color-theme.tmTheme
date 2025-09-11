@@ -162,10 +162,10 @@
 			<string>storage.type, variable.parameter</string>
 			<key>settings</key>
 			<dict>
-				<key>foreground</key>
-				<string>#f2f4f8</string>
 				<key>fontStyle</key>
 				<string>italic</string>
+				<key>foreground</key>
+				<string>#f2f4f8</string>
 			</dict>
 		</dict>
 		<dict>
@@ -241,10 +241,10 @@
 			<string>entity.name.tag.module.reference</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>bold</string>
 				<key>foreground</key>
 				<string>#ffffff</string>
+				<key>fontStyle</key>
+				<string>bold</string>
 			</dict>
 		</dict>
 		<dict>
@@ -322,10 +322,10 @@
 			<string>markup.bold</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>bold</string>
 				<key>foreground</key>
 				<string>#ffffff</string>
+				<key>fontStyle</key>
+				<string>bold</string>
 			</dict>
 		</dict>
 		<dict>
@@ -335,10 +335,10 @@
 			<string>markup.italic</string>
 			<key>settings</key>
 			<dict>
-				<key>fontStyle</key>
-				<string>italic</string>
 				<key>foreground</key>
 				<string>#f2f4f8</string>
+				<key>fontStyle</key>
+				<string>italic</string>
 			</dict>
 		</dict>
 		<dict>
@@ -422,7 +422,7 @@
 		</dict>
 	</array>
 	<key>uuid</key>
-	<string>89f9d070-d93f-4697-9b9c-0f196733900e</string>
+	<string>b817eb35-96a6-4c95-bce1-835007db6a4b</string>
 	<key>license</key>
 	<string>MIT</string>
 </dict>
