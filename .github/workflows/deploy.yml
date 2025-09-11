@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   unix-themes:
-    name: Build TextMate/Zed/IntelliJ themes (macOS)
+    name: Build Unix Themes
     runs-on: macos-latest
     steps:
       - name: Checkout repository
@@ -48,7 +48,7 @@ jobs:
             zed/oxocarbon.json
 
   visualstudio:
-    name: Build Visual Studio themes (Windows)
+    name: Build Visual Studio Theme
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -77,7 +77,13 @@ jobs:
           $root = Join-Path $env:GITHUB_WORKSPACE 'theme-converter-for-vs'
           $exe = Get-ChildItem -Path $root -Filter ThemeConverter.exe -Recurse -File | Select-Object -ExpandProperty FullName -First 1
           if (-not $exe) { throw "ThemeConverter.exe not found under $root" }
-          Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object { & $exe -i $_.FullName -o $outputDir }
+          $exeDir = Split-Path -Parent $exe
+          Push-Location $exeDir
+          try {
+            Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object { & .\ThemeConverter.exe -i $_.FullName -o $outputDir }
+          } finally {
+            Pop-Location
+          }
 
       - name: Upload Visual Studio themes
         uses: actions/upload-artifact@v4
@@ -87,7 +93,7 @@ jobs:
           path: visualstudio/**
 
   vsix:
-    name: Package VSIX (Ubuntu)
+    name: Package VSIX
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
