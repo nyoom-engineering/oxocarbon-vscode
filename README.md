@@ -263,6 +263,8 @@ Tested with; including but not limited to
 - Atom (deprecated)
 - RStudio
 
+As the Textmate themes only affect the code window, compatibility variants are not generated
+
 ## Intellij 
 
 (not recommended)
