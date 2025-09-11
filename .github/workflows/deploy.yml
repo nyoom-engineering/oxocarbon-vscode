@@ -106,7 +106,7 @@ jobs:
       - name: Upload Visual Studio themes
         uses: actions/upload-artifact@v4
         with:
-          name: visualstudio-themes
+          name: visualstudio
           if-no-files-found: warn
           path: visualstudio/**
 
@@ -168,9 +168,11 @@ jobs:
           DATE=$(date -u +%Y%m%d)
           SHA_SHORT=$(git rev-parse --short HEAD)
           TAG="nightly-$DATE-$SHA_SHORT"
+          SUFFIX="$DATE-$SHA_SHORT"
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
           echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
 
       - name: Prepare release files
         shell: bash
@@ -182,23 +184,24 @@ jobs:
           if compgen -G "dist/vsix/*.vsix" > /dev/null; then
             mv dist/vsix/*.vsix release/
           fi
-          # Zip folders from unix / vs artifacts
-          if [ -d dist/unix-themes ]; then
-            (cd dist/unix-themes && zip -r ../../release/unix-themes-${{ steps.meta.outputs.date }}-${{ steps.meta.outputs.sha_short }}.zip .)
-          fi
-          if [ -d dist/visualstudio-themes ]; then
-            (cd dist/visualstudio-themes && zip -r ../../release/visualstudio-themes-${{ steps.meta.outputs.date }}-${{ steps.meta.outputs.sha_short }}.zip .)
-          fi
+          while IFS='|' read -r src name; do
+            [ -z "$src" ] && continue
+            if [ -d "$src" ]; then
+              (cd "$src" && zip -r "${GITHUB_WORKSPACE}/release/${name}-${{ steps.meta.outputs.suffix }}.zip" .)
+            fi
+          done <<'EOF'
+          dist/unix-themes/themes|themes
+          dist/unix-themes/textmate|textmate
+          dist/unix-themes/zed|zed
+          dist/visualstudio|visualstudio
+          EOF
 
       - name: Collect files
         id: collect
         shell: bash
         run: |
           set -euo pipefail
-          files=$(ls -1 release/*.vsix 2>/dev/null || true)
-          for f in release/*.zip; do
-            [ -f "$f" ] && files="$files"$'\n'$f || true
-          done
+          files=$(ls -1 release/* 2>/dev/null || true)
           echo 'list<<EOF' >> "$GITHUB_OUTPUT"
           echo "$files" >> "$GITHUB_OUTPUT"
           echo 'EOF' >> "$GITHUB_OUTPUT"
