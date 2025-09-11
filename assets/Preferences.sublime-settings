@@ -1,24 +1,40 @@
 {
-	"theme": "Adaptive.sublime-theme",
+   "theme": "Adaptive.sublime-theme",
 	"color_scheme": "Packages/User/oxocarbon-color-theme.tmTheme",
 
-    "font_face": "Berkeley Mono Retina",
-    "font_size": 14,
-    "font_options": ["calt", "ss01", "ss04", "ss05", "ss06"],
-    "default_font_size": 14,
+   "font_face": "Berkeley Mono Retina",
+   "font_options": ["calt", "ss01", "ss04", "ss05", "ss06"],
+   "font_size": 14,
+   "default_font_size": 14,
 
-    "line_numbers": false,
-    "rulers": [80],
-    "highlight_line": true,
-    "highlight_gutter": false,
+   "auto_complete": true,
 
-    "draw_white_space": ["selection"],
-    "draw_indent_guides": false,
+   "caret_blink_interval": 0.5,
+   "caret_extra_bottom": -5,
+   "caret_extra_top": -5,
+   "caret_extra_width": 0, 
+   "caret_style": "wide",
+
+   "line_padding_top": -1,
+   "line_padding_bottom": -1,
+   "line_numbers": false, 
+   "highlight_line": true,
+
+   "rulers": [80],
+
+   "draw_white_space": ["selection"],
+   "draw_indent_guides": false,
 
 	"themed_title_bar": true,
 	"file_tab_style": "square",
-    "adaptive_dividers": true,
-    "native_tabs": "preferred",
+   "adaptive_dividers": true,
+   "native_tabs": "preferred",
+
+   "default_line_endings": "unix",
+   "show_line_endings": false,
+   "index_files": true,
+
+   "ignored_packages": [],
 
 	"hardware_acceleration": "opengl",
 }
