@@ -213,6 +213,8 @@ The project is vendored under the MIT license
 
 Preliminary support for autogenerating themes from VSCode implementation(s)
 
+Note, these are provided as-is under nightly releases
+
 ## Zed
 
 Uses the Zed Team's `theme_importer` crate
@@ -280,5 +282,5 @@ make intellij
 
 ### Visual Studio 
 
-Use Microsoft's [Theme Converter for Visual Studio](https://github.com/microsoft/theme-converter-for-vs), requires .NET Desktop & the Visual Studio extension development enviornment. Json files are in `themes`
+Use Microsoft's [Theme Converter for Visual Studio](https://github.com/microsoft/theme-converter-for-vs), requires .NET Desktop & the Visual Studio extension development enviornment. JSON files are in `themes`
 

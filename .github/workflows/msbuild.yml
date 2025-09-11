@@ -28,27 +28,52 @@ jobs:
     - name: Setup .NET 6 SDK
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: |
+          8.0.x
+          6.0.x
 
     - name: Clone theme converter
       run: git clone https://github.com/microsoft/theme-converter-for-vs.git
 
     - name: Build converter
-      run: dotnet build .\theme-converter-for-vs\ThemeConverter\ThemeConverter.csproj -c Release
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $repo = Join-Path $PWD 'theme-converter-for-vs'
+        if (!(Test-Path $repo)) { throw "Repo not found at $repo" }
+        $default = Join-Path $repo 'ThemeConverter\ThemeConverter.csproj'
+        $csproj = if (Test-Path $default) { Get-Item $default } else { Get-ChildItem -Path $repo -Filter ThemeConverter.csproj -Recurse -File | Select-Object -First 1 }
+        if (-not $csproj) {
+          $sln = Get-ChildItem -Path $repo -Filter *.sln -Recurse -File | Select-Object -First 1
+          if (-not $sln) { throw "No ThemeConverter.csproj or solution found under $repo" }
+          dotnet build $sln.FullName -c Release
+        } else {
+          dotnet build $csproj.FullName -c Release
+        }
 
     - name: Convert VS Code themes to Visual Studio
       shell: pwsh
       run: |
         $ErrorActionPreference = 'Stop'
-        $converter = Join-Path $PWD 'theme-converter-for-vs\ThemeConverter\bin\Release\net6.0\ThemeConverter.exe'
-        if (!(Test-Path $converter)) { throw "Converter not found at $converter" }
+        $repo = Join-Path $PWD 'theme-converter-for-vs'
+        if (!(Test-Path $repo)) { throw "Repo not found at $repo" }
         $inputDir = Join-Path $env:GITHUB_WORKSPACE 'themes'
         if (!(Test-Path $inputDir)) { throw "Input directory not found: $inputDir" }
         $outputDir = Join-Path $env:GITHUB_WORKSPACE 'visualstudio'
         if (Test-Path $outputDir) { Remove-Item -Recurse -Force $outputDir }
         New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
-        Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
-          & $converter -i $_.FullName -o $outputDir
+        $exe = Get-ChildItem -Path $repo -Filter ThemeConverter.exe -Recurse -File | Where-Object { $_.FullName -match "\\bin\\Release\\" } | Select-Object -First 1
+        if ($exe) {
+          Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
+            & $exe.FullName -i $_.FullName -o $outputDir
+          }
+        } else {
+          $default = Join-Path $repo 'ThemeConverter\ThemeConverter.csproj'
+          $csproj = if (Test-Path $default) { Get-Item $default } else { Get-ChildItem -Path $repo -Filter *.csproj -Recurse -File | Where-Object { $_.Name -match 'ThemeConverter' } | Select-Object -First 1 }
+          if (-not $csproj) { throw "Neither ThemeConverter.exe nor matching csproj found under $repo" }
+          Get-ChildItem -Path $inputDir -Filter *.json -File | ForEach-Object {
+            dotnet run --no-build --project $csproj.FullName -c Release -- -i $_.FullName -o $outputDir
+          }
         }
 
     - name: Create Pull Request
