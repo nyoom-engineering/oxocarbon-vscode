@@ -206,6 +206,60 @@ jobs:
           echo "$files" >> "$GITHUB_OUTPUT"
           echo 'EOF' >> "$GITHUB_OUTPUT"
 
+      - name: Generate release body
+        id: body
+        shell: bash
+        run: |
+          set -euo pipefail
+          BODY="release/BODY.md"
+          : > "$BODY"
+          {
+            echo "## Installation"
+            echo
+            if compgen -G "release/*.vsix" > /dev/null; then
+              VSIX=$(basename "$(ls -1 release/*.vsix | head -n1)")
+              echo "### VS Code"
+              echo
+              echo "- Install via UI: Extensions > ... > Install from VSIX... and select $VSIX"
+              echo "- Or via CLI:"
+              echo '```bash'
+              echo "code --install-extension \"$PWD/release/$VSIX\""
+              echo '```'
+              echo
+            fi
+            if compgen -G "release/zed-*.zip" > /dev/null; then
+              echo "### Zed"
+              echo
+              echo "- Unzip the Zed archive."
+              echo "- Copy oxocarbon.json to ~/.config/zed/themes/"
+              echo
+            fi
+            if compgen -G "release/textmate-*.zip" > /dev/null; then
+              echo "### TextMate"
+              echo
+              echo "- Unzip the TextMate archive."
+              echo "- Copy the .tmTheme files to ~/Library/Application Support/TextMate/Themes"
+              echo
+            fi
+            if compgen -G "release/intellij-*.zip" > /dev/null; then
+              echo "### TextMate"
+              echo
+              echo "- Unzip the IntelliJ archive."
+              echo "- Install .icls files to IntelliJ IDEA"
+            fi
+            if compgen -G "release/visualstudio-*.zip" > /dev/null; then
+              echo "### Visual Studio"
+              echo
+              echo "- Unzip the Visual Studio archive."
+              echo "- Copy the .pkgdef files to <vs_install_dir>\\Common7\\IDE\\CommonExtensions\\Platform"
+              echo "- Example:"
+              echo '```'
+              echo 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Platform'
+              echo '```'
+              echo
+            fi
+          } >> "$BODY"
+
       - name: Create GitHub prerelease
         uses: softprops/action-gh-release@v2
         env:
@@ -214,7 +268,7 @@ jobs:
           tag_name: ${{ steps.meta.outputs.tag }}
           name: Nightly ${{ steps.meta.outputs.date }} (${{ steps.meta.outputs.sha_short }})
           prerelease: true
-          generate_release_notes: true
+          body_path: release/BODY.md
           files: ${{ steps.collect.outputs.list }}
 
 
