@@ -38,13 +38,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for pkg in jq cmake; do
-            if brew list --versions "$pkg" >/dev/null 2>&1; then
-              echo "$pkg already installed"
-            else
-              brew install "$pkg"
-            fi
-          done
+          brew install jq cmake
 
       - name: Build themes
         shell: bash
@@ -222,46 +216,38 @@ jobs:
           {
             echo "## Installation"
             echo
-            if compgen -G "release/*.vsix" > /dev/null; then
-              VSIX=$(basename "$(ls -1 release/*.vsix | head -n1)")
-              echo "### VS Code"
-              echo
-              echo "- Install via UI: Extensions > ... > Install from VSIX... and select $VSIX"
-              echo "- Or via CLI:"
-              echo '```bash'
-              echo "code --install-extension \"$PWD/release/$VSIX\""
-              echo '```'
-              echo
-            fi
-            if compgen -G "release/zed-*.zip" > /dev/null; then
-              echo "### Zed"
-              echo
-              echo "- Unzip the Zed archive."
-              echo "- Copy oxocarbon.json to ~/.config/zed/themes/"
-              echo
-            fi
-            if compgen -G "release/textmate-*.zip" > /dev/null; then
-              echo "### TextMate"
-              echo
-              echo "- Unzip the TextMate archive."
-              echo "- Copy the .tmTheme files to ~/Library/Application Support/TextMate/Themes"
-              echo
-            fi
             if compgen -G "release/intellij-*.zip" > /dev/null; then
-              echo "### IntelliJ IDEA"
+              echo "### IntelliJ IDEA:"
               echo
               echo "- Unzip the IntelliJ archive."
               echo "- In IntelliJ: Settings > Editor > Color Scheme > Import Scheme..., then select the .icls files"
               echo
             fi
-            if compgen -G "release/intellij-*.zip" > /dev/null; then
-              echo "### TextMate"
+            if compgen -G "release/textmate-*.zip" > /dev/null; then
+              echo "### TextMate (macOS):"
               echo
-              echo "- Unzip the IntelliJ archive."
-              echo "- Install .icls files to IntelliJ IDEA"
+              echo "- Unzip the TextMate archive."
+              echo "- Copy the .tmTheme files to ~/Library/Application Support/TextMate/Themes"
+              echo
+              echo "### Sublime Text (Unix):"
+              echo
+              echo "  - Copy the .tmTheme files to ~/Library/Application Support/Sublime Text/Packages/User"
+              echo "  - Then select it via Preferences > Color Scheme"
+              echo
+            fi
+            if compgen -G "release/*.vsix" > /dev/null; then
+              VSIX=$(basename "$(ls -1 release/*.vsix | head -n1)")
+              echo "### VS Code:"
+              echo
+              echo "- Install via UI: Extensions > ... > Install from VSIX... and select *.vsix"
+              echo "- Or via CLI (Unix):"
+              echo '```bash'
+              echo "code --install-extension *.vsix"
+              echo '```'
+              echo
             fi
             if compgen -G "release/visualstudio-*.zip" > /dev/null; then
-              echo "### Visual Studio"
+              echo "### Visual Studio (Windows):"
               echo
               echo "- Unzip the Visual Studio archive."
               echo "- Copy the .pkgdef files to <vs_install_dir>\\Common7\\IDE\\CommonExtensions\\Platform"
@@ -269,6 +255,13 @@ jobs:
               echo '```'
               echo 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Platform'
               echo '```'
+              echo
+            fi
+            if compgen -G "release/zed-*.zip" > /dev/null; then
+              echo "### Zed (Unix):"
+              echo
+              echo "- Unzip the Zed archive."
+              echo "- Copy oxocarbon.json to ~/.config/zed/themes/"
               echo
             fi
           } >> "$BODY"
