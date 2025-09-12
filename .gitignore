@@ -1,7 +1,13 @@
-node_modules
-*.vsix
 .env
+node_modules
 /result
 /out
 **/target
 **/.DS_Store
+
+# handled by CI/CD
+*.vsix
+/intellij
+/textmate
+/visualstudio
+/zed

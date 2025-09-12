@@ -220,18 +220,18 @@ jobs:
               echo "### IntelliJ IDEA:"
               echo
               echo "- Unzip the IntelliJ archive."
-              echo "- In IntelliJ: Settings > Editor > Color Scheme > Import Scheme..., then select the .icls files"
+              echo "- In IntelliJ: Settings > Editor > Color Scheme > Import Scheme..., then select the `*.icls` files"
               echo
             fi
             if compgen -G "release/textmate-*.zip" > /dev/null; then
               echo "### TextMate (macOS):"
               echo
               echo "- Unzip the TextMate archive."
-              echo "- Copy the .tmTheme files to ~/Library/Application Support/TextMate/Themes"
+              echo "- Copy the `.tmTheme` files to `~/Library/Application Support/TextMate/Themes`"
               echo
               echo "### Sublime Text (Unix):"
               echo
-              echo "  - Copy the .tmTheme files to ~/Library/Application Support/Sublime Text/Packages/User"
+              echo "  - Copy the `.tmTheme` files to `~/Library/Application Support/Sublime Text/Packages/User`"
               echo "  - Then select it via Preferences > Color Scheme"
               echo
             fi
@@ -239,7 +239,7 @@ jobs:
               VSIX=$(basename "$(ls -1 release/*.vsix | head -n1)")
               echo "### VS Code:"
               echo
-              echo "- Install via UI: Extensions > ... > Install from VSIX... and select *.vsix"
+              echo "- Install via UI: Extensions > ... > Install from VSIX... and select `*.vsix`"
               echo "- Or via CLI (Unix):"
               echo '```bash'
               echo "code --install-extension *.vsix"
@@ -250,7 +250,7 @@ jobs:
               echo "### Visual Studio (Windows):"
               echo
               echo "- Unzip the Visual Studio archive."
-              echo "- Copy the .pkgdef files to <vs_install_dir>\\Common7\\IDE\\CommonExtensions\\Platform"
+              echo "- Copy the `.pkgdef` files to `<vs_install_dir>\\Common7\\IDE\\CommonExtensions\\Platform`"
               echo "- Example:"
               echo '```'
               echo 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Platform'
@@ -261,7 +261,7 @@ jobs:
               echo "### Zed (Unix):"
               echo
               echo "- Unzip the Zed archive."
-              echo "- Copy oxocarbon.json to ~/.config/zed/themes/"
+              echo "- Copy `oxocarbon.json` to `~/.config/zed/themes/`"
               echo
             fi
           } >> "$BODY"
