@@ -18,7 +18,12 @@ disabledForeground = "#8d8d8d"
 "simpleFindWidget.sashBorder" = "#262626"
 
 "button.background" = "#393939"
+"button.foreground" = "#f2f4f8"
 "button.hoverBackground" = "#525252"
+
+"dropdown.background" = "#262626"
+"dropdown.foreground" = "#f2f4f8"
+"dropdown.border" = "#393939"
 
 "welcomePage.progress.background" = "#393939"
 "welcomePage.progress.foreground" = "#525252"
