@@ -38,7 +38,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          brew install jq cmake
+          for pkg in jq cmake; do
+            if brew list --versions "$pkg" >/dev/null 2>&1; then
+              echo "$pkg already installed"
+            else
+              brew install "$pkg"
+            fi
+          done
 
       - name: Build themes
         shell: bash
@@ -239,6 +245,13 @@ jobs:
               echo
               echo "- Unzip the TextMate archive."
               echo "- Copy the .tmTheme files to ~/Library/Application Support/TextMate/Themes"
+              echo
+            fi
+            if compgen -G "release/intellij-*.zip" > /dev/null; then
+              echo "### IntelliJ IDEA"
+              echo
+              echo "- Unzip the IntelliJ archive."
+              echo "- In IntelliJ: Settings > Editor > Color Scheme > Import Scheme..., then select the .icls files"
               echo
             fi
             if compgen -G "release/intellij-*.zip" > /dev/null; then
