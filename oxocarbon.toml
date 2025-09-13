@@ -59,6 +59,11 @@ disabledForeground = "#8d8d8d"
 "editorHint.foreground" = "#dde1e6"
 "editorLightBulb.foreground" = "#ffffff"
 
+# visual studio
+"notificationsErrorIcon.foreground" = "#ee5396"
+"notificationsWarningIcon.foreground" = "#ff7eb6"
+"notificationsInfoIcon.foreground" = "#ff7eb6"
+
 # for zed export -> error, warning, info, hint background
 "editorError.background" = "#00000000"
 "editorWarning.background" = "#00000000"
@@ -68,6 +73,10 @@ disabledForeground = "#8d8d8d"
 "editorGutter.addedBackground" = "#42be65"
 "editorGutter.modifiedBackground" = "#08bdba"
 "editorGutter.deletedBackground" = "#ee5396"
+"editorGutter.foldingControlForeground" = "#525252"
+
+"editorLineNumber.foreground" = "#525252"
+"editorLineNumber.activeForeground" = "#dde1e6"
 
 "editorOverviewRuler.background" = "#00000000"
 "editorOverviewRuler.border" = "#262626"
@@ -79,7 +88,7 @@ disabledForeground = "#8d8d8d"
 "editorOverviewRuler.deletedForeground" = "#ee5396"
 "editorOverviewRuler.errorForeground" = "#ee5396"
 "editorOverviewRuler.warningForeground" = "#ff7eb6"
-"editorOverviewRuler.infoForeground" = "#dde1e6"
+"editorOverviewRuler.infoForeground" = "#ff7eb6" # TODO 
 "editorOverviewRuler.bracketMatchForeground" = "#6f6f6f"
 "editorOverviewRuler.inlineChatInserted" = "#42be65"
 "editorOverviewRuler.inlineChatRemoved" = "#ee5396"
@@ -199,7 +208,11 @@ disabledForeground = "#8d8d8d"
 "inputOption.activeBorder" = "#525252"
 "inputOption.activeForeground" = "#ffffff"
 
+"icon.foreground" = "#f2f4f8"
+
 "titleBar.border" = "#262626"
+"titleBar.activeForeground" = "#ffffff"
+"titleBar.inactiveForeground" = "#8d8d8d"
 "titleBar.activeBackground" = "#161616"
 "titleBar.inactiveBackground" = "#262626"
 
@@ -290,6 +303,14 @@ disabledForeground = "#8d8d8d"
 "notifications.background" = "#262626"
 "notificationCenterHeader.background" = "#262626"
 
+# "menu.foreground" = "#dde1e6" # FFFFFF??
+"menubar.selectionBorder" = "#525252"   # top command bar border
+# "menubar.selectionBorder" = "#ff7eb6"
+"menubar.selectionForeground" = "#ff7eb6"
+# "menubar.selectionBackground" = "#ff7eb620"
+"menubar.selectionBackground" = "#ff7eb640"
+"menu.border" = "#393939"
+
 "checkbox.background" = "#262626"
 "checkbox.border" = "#262626"
 "checkbox.foreground" = "#ffffff"
@@ -373,7 +394,6 @@ disabledForeground = "#8d8d8d"
 "menu.selectionBackground" = "#393939"
 "menu.selectionForeground" = "#ffffff"
 "menu.separatorBackground" = "#525252"
-"menu.border" = "#262626"
 
 "settings.modifiedItemIndicator" = "#ff7eb6"
 
