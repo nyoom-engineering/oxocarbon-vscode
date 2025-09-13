@@ -21,6 +21,12 @@ disabledForeground = "#8d8d8d"
 "button.foreground" = "#f2f4f8"
 "button.hoverBackground" = "#525252"
 
+# TEST
+"button.secondaryForeground" = "#33dd33"
+"button.secondaryHoverBackground" = "#33dd33"
+"statusBar.hoverBackground" = "#262626"
+# button.border
+
 "dropdown.background" = "#262626"
 "dropdown.foreground" = "#f2f4f8"
 "dropdown.border" = "#393939"
@@ -303,14 +309,6 @@ disabledForeground = "#8d8d8d"
 "notifications.background" = "#262626"
 "notificationCenterHeader.background" = "#262626"
 
-# "menu.foreground" = "#dde1e6" # FFFFFF??
-"menubar.selectionBorder" = "#525252"   # top command bar border
-# "menubar.selectionBorder" = "#ff7eb6"
-"menubar.selectionForeground" = "#ff7eb6"
-# "menubar.selectionBackground" = "#ff7eb620"
-"menubar.selectionBackground" = "#ff7eb640"
-"menu.border" = "#393939"
-
 "checkbox.background" = "#262626"
 "checkbox.border" = "#262626"
 "checkbox.foreground" = "#ffffff"
@@ -389,11 +387,16 @@ disabledForeground = "#8d8d8d"
 "banner.background" = "#1b1b1b"
 "banner.foreground" = "#dde1e6"
 
+"menu.border" = "#525252"
 "menu.background" = "#262626"
 "menu.foreground" = "#dde1e6"
 "menu.selectionBackground" = "#393939"
 "menu.selectionForeground" = "#ffffff"
 "menu.separatorBackground" = "#525252"
+
+"menubar.selectionBorder" = "#525252"
+"menubar.selectionBackground" = "#ff7eb640"
+"menubar.selectionForeground" = "#ffffff" # TODO
 
 "settings.modifiedItemIndicator" = "#ff7eb6"
 
