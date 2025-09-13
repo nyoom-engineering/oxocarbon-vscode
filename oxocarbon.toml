@@ -24,8 +24,9 @@ disabledForeground = "#8d8d8d"
 
 # MATCH
 "menu.border" = "#525252"
-"menu.separatorBackground" = "#525252"
 "dropdown.border" = "#525252"
+"menu.separatorBackground" = "#525252"
+"menubar.selectionBorder" = "#525252"
 
 "dropdown.background" = "#161616"
 "dropdown.foreground" = "#f2f4f8"
@@ -69,9 +70,9 @@ disabledForeground = "#8d8d8d"
 "notificationsInfoIcon.foreground" = "#ff7eb6"
 
 # for zed export -> error, warning, info, hint background
-# "editorError.background" = "#00000000"
-# "editorWarning.background" = "#00000000"
-# "editorInfo.background" = "#00000000"
+"editorError.background" = "#00000000"
+"editorWarning.background" = "#00000000"
+"editorInfo.background" = "#00000000"
 
 "editorGutter.background" = "#161616"
 "editorGutter.addedBackground" = "#42be65"
@@ -391,9 +392,8 @@ disabledForeground = "#8d8d8d"
 "menu.selectionBackground" = "#393939"
 "menu.selectionForeground" = "#ffffff"
 
-"menubar.selectionBackground" = "#ff7eb640"
+"menubar.selectionBackground" = "#00000000"
 "menubar.selectionForeground" = "#ffffff"
-# "menubar.selectionBorder" = "#525252"
 
 "settings.modifiedItemIndicator" = "#ff7eb6"
 
