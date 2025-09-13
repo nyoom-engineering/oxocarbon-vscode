@@ -183,14 +183,15 @@ const OLED_REPLACEMENTS: [(&str, &str); 7] = [
     ("#525252", "#393939"),
 ];
 
-const COMPAT_BG_KEYS: [&str; 7] = [
+const COMPAT_BG_KEYS: [&str; 8] = [
     "titleBar.activeBackground",
     "editorGroupHeader.tabsBackground",
     "tab.inactiveBackground",
     "activityBar.background",
     "sideBar.background",
     "panel.background",
-    "statusBar.background"
+    "statusBar.background",
+    "editorWidget.background",
 ];
 
 const COMPAT_BG_KEYS_2: [&str; 1] = [
@@ -208,10 +209,11 @@ const COMPAT_CONTRAST_KEYS: [&str; 6] = [
     "list.hoverBackground"
 ];
 
-const COMPAT_CONTRAST_KEYS_2: [&str; 3] = [
+const COMPAT_CONTRAST_KEYS_2: [&str; 4] = [
     "tab.border",
     "sideBar.border",
     "panel.border",
+    "editorWidget.resizeBorder",
 ];
 
 fn colors_table_mut(value: &mut toml::Value) -> Option<&mut toml::value::Table> {

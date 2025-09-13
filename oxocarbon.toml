@@ -20,16 +20,15 @@ disabledForeground = "#8d8d8d"
 "button.background" = "#393939"
 "button.foreground" = "#f2f4f8"
 "button.hoverBackground" = "#525252"
+"button.secondaryForeground" = "#dde1e6"
 
-# TEST
-"button.secondaryForeground" = "#33dd33"
-"button.secondaryHoverBackground" = "#33dd33"
-"statusBar.hoverBackground" = "#262626"
-# button.border
+# MATCH
+"menu.border" = "#525252"
+"menu.separatorBackground" = "#525252"
+"dropdown.border" = "#525252"
 
-"dropdown.background" = "#262626"
+"dropdown.background" = "#161616"
 "dropdown.foreground" = "#f2f4f8"
-"dropdown.border" = "#393939"
 
 "welcomePage.progress.background" = "#393939"
 "welcomePage.progress.foreground" = "#525252"
@@ -65,15 +64,14 @@ disabledForeground = "#8d8d8d"
 "editorHint.foreground" = "#dde1e6"
 "editorLightBulb.foreground" = "#ffffff"
 
-# visual studio
 "notificationsErrorIcon.foreground" = "#ee5396"
 "notificationsWarningIcon.foreground" = "#ff7eb6"
 "notificationsInfoIcon.foreground" = "#ff7eb6"
 
 # for zed export -> error, warning, info, hint background
-"editorError.background" = "#00000000"
-"editorWarning.background" = "#00000000"
-"editorInfo.background" = "#00000000"
+# "editorError.background" = "#00000000"
+# "editorWarning.background" = "#00000000"
+# "editorInfo.background" = "#00000000"
 
 "editorGutter.background" = "#161616"
 "editorGutter.addedBackground" = "#42be65"
@@ -94,7 +92,7 @@ disabledForeground = "#8d8d8d"
 "editorOverviewRuler.deletedForeground" = "#ee5396"
 "editorOverviewRuler.errorForeground" = "#ee5396"
 "editorOverviewRuler.warningForeground" = "#ff7eb6"
-"editorOverviewRuler.infoForeground" = "#ff7eb6" # TODO 
+"editorOverviewRuler.infoForeground" = "#ff7eb6"
 "editorOverviewRuler.bracketMatchForeground" = "#6f6f6f"
 "editorOverviewRuler.inlineChatInserted" = "#42be65"
 "editorOverviewRuler.inlineChatRemoved" = "#ee5396"
@@ -132,10 +130,11 @@ disabledForeground = "#8d8d8d"
 
 "widget.border" = "#262626"
 "widget.shadow" = "#00000080"
-"editorWidget.foreground" = "#dde1e6"
-"editorWidget.background" = "#1b1b1b"
+
 "editorWidget.border" = "#262626"
-"editorWidget.resizeBorder" = "#525252"
+"editorWidget.foreground" = "#f2f4f8"
+"editorWidget.background" = "#161616"
+"editorWidget.resizeBorder" = "#161616"
 
 "editorSuggestWidget.background" = "#1b1b1b"
 "editorSuggestWidget.border" = "#00000000"
@@ -309,7 +308,7 @@ disabledForeground = "#8d8d8d"
 "notifications.background" = "#262626"
 "notificationCenterHeader.background" = "#262626"
 
-"checkbox.background" = "#262626"
+"checkbox.background" = "#161616"
 "checkbox.border" = "#262626"
 "checkbox.foreground" = "#ffffff"
 "checkbox.selectBackground" = "#393939"
@@ -387,16 +386,14 @@ disabledForeground = "#8d8d8d"
 "banner.background" = "#1b1b1b"
 "banner.foreground" = "#dde1e6"
 
-"menu.border" = "#525252"
 "menu.background" = "#262626"
 "menu.foreground" = "#dde1e6"
 "menu.selectionBackground" = "#393939"
 "menu.selectionForeground" = "#ffffff"
-"menu.separatorBackground" = "#525252"
 
-"menubar.selectionBorder" = "#525252"
 "menubar.selectionBackground" = "#ff7eb640"
-"menubar.selectionForeground" = "#ffffff" # TODO
+"menubar.selectionForeground" = "#ffffff"
+# "menubar.selectionBorder" = "#525252"
 
 "settings.modifiedItemIndicator" = "#ff7eb6"
 
