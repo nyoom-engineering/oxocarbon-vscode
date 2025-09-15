@@ -1,35 +1,26 @@
 use clap::Parser;
 use json_comments::StripComments;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs::File, path::PathBuf};
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::{BufReader, BufWriter},
+    path::PathBuf,
+};
 use uuid::Uuid;
 
 #[derive(Parser)]
 struct Args {
-    pub json: PathBuf,
-    pub tm: PathBuf,
+    json: PathBuf,
+    tm: PathBuf,
 }
 
 #[derive(Deserialize)]
 struct VscodeTheme {
-    pub name: String,
+    name: String,
     #[serde(rename = "tokenColors")]
-    pub token_colors: Vec<TokenColor>,
-    pub colors: HashMap<String, String>,
-}
-
-#[derive(Deserialize)]
-struct TokenColor {
-    pub name: Option<String>,
-    pub scope: Option<StringOrVec>,
-    pub settings: HashMap<String, String>,
-}
-
-#[derive(Deserialize)]
-#[serde(untagged)]
-enum StringOrVec {
-    String(String),
-    Vec(Vec<String>),
+    token_colors: Vec<TokenColor>,
+    colors: HashMap<String, String>,
 }
 
 #[derive(Serialize)]
@@ -69,50 +60,71 @@ struct AnonFields {
     line_highlight: Option<String>,
 }
 
-impl TmTheme {
-    fn with_capacity(name: String, cap: usize) -> Self {
-        Self {
-            name,
-            settings: Vec::with_capacity(cap),
-            uuid: Uuid::new_v4().to_string(),
-            license: String::from("MIT"),
-        }
-    }
-
-    fn push_extra(&mut self, colors: &HashMap<String, String>) {
-        let s = AnonFields {
-            background: colors.get("editor.background").cloned(),
-            foreground: colors.get("editor.foreground").cloned(),
-            caret: colors.get("editorCursor.foreground").cloned(),
-            selection: colors.get("editor.selectionBackground").cloned(),
-            line_highlight: colors
-                .get("focusBorder")
-                .cloned(),
-        };
-        self.settings.push(Setting::Anon(AnonSetting { settings: s }));
-    }
+#[derive(Deserialize)]
+struct TokenColor {
+    name: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_scope")]
+    scope: Option<String>,
+    settings: HashMap<String, String>,
 }
 
-fn main() {
-    let args = Args::parse();
-    let reader = File::open(args.json).unwrap();
-    let stripped = StripComments::new(reader);
-    let VscodeTheme { name, token_colors, colors } =
-        serde_json::from_reader::<_, VscodeTheme>(stripped).unwrap();
-
-    let mut tm = TmTheme::with_capacity(name, token_colors.len() + 1);
-    tm.push_extra(&colors);
-
-    for token in token_colors {
-        if let Some(scope) = token.scope {
-            let scope = match scope { StringOrVec::String(s) => s, StringOrVec::Vec(v) => v.join(", ") };
-            tm.settings.push(Setting::Normal(NormalSetting {
-                name: token.name.unwrap_or_default(),
-                scope,
-                settings: token.settings,
-            }));
-        }
+fn deserialize_scope<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: serde::de::Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum Scope {
+        S(String),
+        V(Vec<String>),
     }
+    Ok(
+        Option::<Scope>::deserialize(deserializer)?.map(|s| match s {
+            Scope::S(s) => s,
+            Scope::V(v) => v.join(", "),
+        }),
+    )
+}
 
-    plist::to_file_xml(args.tm, &tm).unwrap();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
+    let reader = BufReader::new(File::open(args.json)?);
+    let VscodeTheme {
+        name,
+        token_colors,
+        mut colors,
+    } = serde_json::from_reader(StripComments::new(reader))?;
+
+    let anon = Setting::Anon(AnonSetting {
+        settings: AnonFields {
+            background: colors.remove("editor.background"),
+            foreground: colors.remove("editor.foreground"),
+            caret: colors.remove("editorCursor.foreground"),
+            selection: colors.remove("editor.selectionBackground"),
+            line_highlight: colors.remove("focusBorder"),
+        },
+    });
+
+    let settings = std::iter::once(anon)
+        .chain(token_colors.into_iter().filter_map(|t| {
+            t.scope.map(|s| {
+                Setting::Normal(NormalSetting {
+                    name: t.name.unwrap_or_default(),
+                    scope: s,
+                    settings: t.settings,
+                })
+            })
+        }))
+        .collect();
+
+    let tm = TmTheme {
+        name,
+        settings,
+        uuid: Uuid::new_v4().to_string(),
+        license: "MIT".into(),
+    };
+
+    let writer = BufWriter::new(File::create(args.tm)?);
+    plist::to_writer_xml(writer, &tm)?;
+    Ok(())
 }

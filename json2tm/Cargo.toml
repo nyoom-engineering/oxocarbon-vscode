@@ -12,6 +12,6 @@ serde_json = "1.0"
 uuid = { version = "1.18", features = ["v4", "fast-rng"] }
 
 [profile.release]
-strip = true
-lto = true
 codegen-units = 1
+lto = true
+strip = true

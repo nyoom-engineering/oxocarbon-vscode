@@ -24,6 +24,10 @@ JB_SRC_DIR := target/colorSchemeTool
 INTELLIJDIR := intellij
 INTELLIJ_CONVERTER := $(JB_SRC_DIR)/colorSchemeTool.py
 
+XCODEDIR := xcode
+XCODE_CONVERTER := json2xccolor/target/release/json2xccolor
+XCODE_USER := ~/Library/Developer/Xcode/UserData/FontAndColorThemes
+
 DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-color-theme.json \
 	$(THEMESDIR)/oxocarbon-oled-color-theme.json \
@@ -37,7 +41,7 @@ DEFAULT_THEMES := \
 
 .PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray PRINT \
 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
-	install-zed install-sublime install-textmate textmate
+	install-zed install-sublime install-textmate install-xcode textmate xcode
 
 all: $(DEFAULT_THEMES)
 
@@ -144,6 +148,7 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@echo "Zed theme bundle created: $(ZED_BUNDLE)"
 
 textmate: $(foreach f,$(sort $(DEFAULT_THEMES) $(wildcard $(THEMESDIR)/*.json)),$(if $(findstring compat,$(notdir $(f))),,$(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(f))))
+	@echo "Textmate themes written to $(TMDIR)"
 
 $(TM_CONVERTER):
 	cargo build --release --manifest-path json2tm/Cargo.toml
@@ -171,6 +176,16 @@ $(INTELLIJDIR)/%.icls: $(THEMESDIR)/%.json | setup-intellij $(INTELLIJ_CONVERTER
 	PY=$$(command -v python2.7 >/dev/null 2>&1 && echo python2.7 || (command -v python3 >/dev/null 2>&1 && echo python3 || (command -v python >/dev/null 2>&1 && echo python || echo ""))); \
 	if [ -z "$$PY" ]; then echo "Error: python3 or python required"; exit 1; fi; \
 		( cd $(JB_SRC_DIR) && $$PY colorSchemeTool.py ../..//$< ../..//$@ )
+
+xcode: $(foreach f,$(sort $(DEFAULT_THEMES) $(wildcard $(THEMESDIR)/*.json)),$(if $(findstring compat,$(notdir $(f))),,$(patsubst $(THEMESDIR)/%.json,$(XCODEDIR)/%.xccolortheme,$(f))))
+	@echo "Xcode themes written to $(XCODEDIR)"
+
+$(XCODE_CONVERTER):
+	cargo build --release --manifest-path json2xccolor/Cargo.toml
+
+$(XCODEDIR)/%.xccolortheme: $(THEMESDIR)/%.json $(XCODE_CONVERTER)
+	@mkdir -p $(dir $@)
+	$(XCODE_CONVERTER) $< $@
 
 dotfiles:
 	mkdir -p $(ASSETS)
@@ -205,6 +220,10 @@ install-sublime: textmate
 install-textmate: textmate
 	mkdir -p $(TM_USER)
 	cp $(filter-out %compat%.tmTheme,$(wildcard $(TMDIR)/*.tmTheme)) $(TM_USER)/
+
+install-xcode: xcode
+	mkdir -p $(XCODE_USER)
+	cp $(XCODEDIR)/*.xccolortheme $(XCODE_USER)/
 
 clean:
 	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls

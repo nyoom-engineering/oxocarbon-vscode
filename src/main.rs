@@ -4,12 +4,7 @@
 
 #![warn(clippy::pedantic)]
 
-use std::{
-    borrow::Cow,
-    env, fs,
-    io::{self, Read},
-    process,
-};
+use std::{borrow::Cow, env, fs, io, process};
 
 #[derive(Default)]
 struct Options {
@@ -123,11 +118,7 @@ fn main() {
         // compatibility variants - contrast panels
         // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
         // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
-        let (from, to) = if opts.is_oled() {
-            ("#000000", "#161616")
-        } else {
-            ("#161616", "#262626")
-        };
+        let (from, to) = if opts.is_oled() {("#000000", "#161616")} else {("#161616", "#262626")};
         let c1 = midpoint_hex(from, to);
         insert_value(colors, &COMPAT_BG_KEYS, &toml::Value::String(c1));
         // compatibility variants - gutter, six deviations
@@ -139,11 +130,7 @@ fn main() {
         // - Standard compat: #393939
         // - OLED compat:     #262626
         let c3 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
-        insert_value(
-            colors,
-            &COMPAT_CONTRAST_KEYS,
-            &toml::Value::String(c3.clone()),
-        );
+        insert_value(colors, &COMPAT_CONTRAST_KEYS, &toml::Value::String(c3.clone()));
         // compatibility variants - additional contrast
         // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
         // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
@@ -168,9 +155,10 @@ fn main() {
     // print variant: invert all hex colors and force light type
     if opts.is_print() {
         invert_all_hex_colors(&mut value);
-        if let Some(root) = value.as_table_mut() {
-            root.insert("type".into(), toml::Value::String("light".into()));
-        }
+        value
+            .as_table_mut()
+            .unwrap()
+            .insert("type".into(), toml::Value::String("light".into()));
     }
 
     if let Err(e) = (if opts.is_pretty() {
@@ -185,19 +173,10 @@ fn main() {
 }
 
 fn read_input(input_src: &str) -> String {
-    if input_src == "-" {
-        let mut buf = String::new();
-        io::stdin().read_to_string(&mut buf).unwrap_or_else(|e| {
-            eprintln!("Failed to read from stdin: {e}");
-            process::exit(1);
-        });
-        buf
-    } else {
-        fs::read_to_string(input_src).unwrap_or_else(|e| {
-            eprintln!("Failed to read '{input_src}': {e}");
-            process::exit(1);
-        })
-    }
+    fs::read_to_string(input_src).unwrap_or_else(|e| {
+        eprintln!("Failed to read '{input_src}': {e}");
+        process::exit(1);
+    })
 }
 
 const OLED_REPLACEMENTS: [(&str, &str); 7] = [
@@ -221,7 +200,9 @@ const COMPAT_BG_KEYS: [&str; 8] = [
     "editorWidget.background",
 ];
 
-const COMPAT_BG_KEYS_2: [&str; 1] = ["editorGutter.background"];
+const COMPAT_BG_KEYS_2: [&str; 1] = [
+    "editorGutter.background"
+];
 
 const COMPAT_CONTRAST_KEYS: [&str; 7] = [
     // borders
@@ -336,7 +317,7 @@ const GRAY_RAMP: [&str; 10] = [
 ];
 
 // IBM Cool Gray family
-const COOL_GRAY_RAMP: [&str; 8] = [
+const COOL_GRAY_RAMP: [&str; 10] = [
     "#121619", // Cool Gray 100
     "#21272a", // Cool Gray 90
     "#343a3f", // Cool Gray 80
@@ -345,6 +326,8 @@ const COOL_GRAY_RAMP: [&str; 8] = [
     "#878d96", // Cool Gray 50
     "#a2a9b0", // Cool Gray 40
     "#c1c7cd", // Cool Gray 30
+    "#dde1e6", // Cool Gray 20
+    "#f2f4f8", // Cool Gray 10
 ];
 
 // IBM Warm Gray family

@@ -1,0 +1,21 @@
+[package]
+name = "json2xccolor"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Convert VSCode color theme JSON to Xcode .xccolortheme"
+repository = "https://github.com/nyoom-engineering/oxocarbon-vscode"
+readme = "README.md"
+keywords = ["theme", "xcode", "vscode", "converter", "color"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+serde_json = "1.0"
+plist = "1.6"
+serde = { version = "1.0", features = ["derive"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true
+

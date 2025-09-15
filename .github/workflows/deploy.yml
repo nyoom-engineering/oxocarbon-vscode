@@ -44,8 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # make zed textmate intellij TODO
-          make zed textmate
+          make zed textmate xcode
 
       - name: Upload themes artifacts
         uses: actions/upload-artifact@v4
@@ -56,6 +55,7 @@ jobs:
             themes/*.json
             textmate/**/*.tmTheme
             intellij/**/*.icls
+            xcode/**/*.xccolortheme
             zed/oxocarbon.json
 
   visualstudio:
@@ -193,6 +193,7 @@ jobs:
           dist/unix-themes/themes|themes
           dist/unix-themes/textmate|textmate
           dist/unix-themes/zed|zed
+          dist/unix-themes/xcode|xcode
           dist/visualstudio|visualstudio
           EOF
 
@@ -255,6 +256,13 @@ jobs:
               echo '```'
               echo 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Platform'
               echo '```'
+              echo
+            fi
+            if compgen -G "release/xcode-*.zip" > /dev/null; then
+              echo "### Xcode (macOS):"
+              echo
+              echo "- Unzip the Xcode archive."
+              echo '- Copy the `.xccolortheme` files to `~/Library/Developer/Xcode/UserData/FontAndColorThemes`'
               echo
             fi
             if compgen -G "release/zed-*.zip" > /dev/null; then
