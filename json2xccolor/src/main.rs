@@ -105,8 +105,8 @@ fn main() -> io::Result<()> {
             ["SFMono-Bold - 14.0", "SFMono-BoldItalic - 14.0"],
         ],
         [
-            [".SFNS-Regular - 14.0", ".SFNS-RegularItalic - 14.0"],
-            [".SFNS-Bold - 14.0", ".SFNS-BoldItalic - 14.0"],
+            ["SFProText-Regular - 14.0", "SFProText-Italic - 14.0"],
+            ["SFProText-Bold - 14.0", "SFProText-BoldItalic - 14.0"],
         ],
     ];
 
