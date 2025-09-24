@@ -229,7 +229,7 @@ disabledForeground = "#8d8d8d"
 "tab.inactiveForeground" = "#8d8d8d"
 "tab.unfocusedInactiveForeground" = "#8d8d8d"
 
-"tab.border" = "#161616"
+"tab.border" = "#262626"
 "tab.activeBorder" = "#161616"
 "tab.activeBorderTop" = "#ff7eb6"
 "tab.unfocusedActiveBorder" = "#161616"
