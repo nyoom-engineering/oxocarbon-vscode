@@ -1,0 +1,16 @@
+[package]
+name = "oxocarbon-utils"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Shared utilities for oxocarbon tools"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true
+
+

@@ -5,6 +5,10 @@
 #![warn(clippy::pedantic)]
 
 use std::{borrow::Cow, env, fs, io, process};
+use oxocarbon_utils::{
+    format_hex_color, luminance_from_u8, midpoint_hex,
+    parse_hex_rgba_u8 as parse_hex_color,
+};
 
 #[derive(Default)]
 struct Options {
@@ -248,29 +252,6 @@ fn apply_replacements_in_table(table: &mut toml::value::Table, replacements: &[(
     });
 }
 
-fn midpoint_hex(a_hex: &str, b_hex: &str) -> String {
-    let (ar, ag, ab) = (
-        u8::from_str_radix(&a_hex[1..3], 16).unwrap(),
-        u8::from_str_radix(&a_hex[3..5], 16).unwrap(),
-        u8::from_str_radix(&a_hex[5..7], 16).unwrap(),
-    );
-    let (br, bg, bb) = (
-        u8::from_str_radix(&b_hex[1..3], 16).unwrap(),
-        u8::from_str_radix(&b_hex[3..5], 16).unwrap(),
-        u8::from_str_radix(&b_hex[5..7], 16).unwrap(),
-    );
-
-    let mr = average_channel(ar, br);
-    let mg = average_channel(ag, bg);
-    let mb = average_channel(ab, bb);
-
-    format!("#{mr:02x}{mg:02x}{mb:02x}")
-}
-
-fn average_channel(a: u8, b: u8) -> u8 {
-    // overflow-free average: (a & b) + ((a ^ b) >> 1)
-    (a & b).wrapping_add((a ^ b) >> 1)
-}
 
 fn compute_theme_name(
     oled: bool,
@@ -477,36 +458,6 @@ fn walk_table_strings_mut<F: FnMut(&mut String)>(t: &mut toml::value::Table, f: 
     }
 }
 
-fn parse_hex_color(input: &str) -> Option<([u8; 3], Option<u8>)> {
-    if !input.starts_with('#') {
-        return None;
-    }
-    match input.len() {
-        7 => {
-            let red = u8::from_str_radix(&input[1..3], 16).ok()?;
-            let green = u8::from_str_radix(&input[3..5], 16).ok()?;
-            let blue = u8::from_str_radix(&input[5..7], 16).ok()?;
-            Some(([red, green, blue], None))
-        }
-        9 => {
-            let red = u8::from_str_radix(&input[1..3], 16).ok()?;
-            let green = u8::from_str_radix(&input[3..5], 16).ok()?;
-            let blue = u8::from_str_radix(&input[5..7], 16).ok()?;
-            let alpha = u8::from_str_radix(&input[7..9], 16).ok()?;
-            Some(([red, green, blue], Some(alpha)))
-        }
-        _ => None,
-    }
-}
-
-fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
-    let [r, g, b] = rgb;
-    match alpha {
-        Some(a) => format!("#{r:02x}{g:02x}{b:02x}{a:02x}"),
-        None => format!("#{r:02x}{g:02x}{b:02x}"),
-    }
-}
-
 fn invert_all_hex_colors(value: &mut toml::Value) {
     walk_value_strings_mut(value, &mut |s| {
         if let Some((mut rgb, a)) = parse_hex_color(s) {
@@ -514,19 +465,4 @@ fn invert_all_hex_colors(value: &mut toml::Value) {
             *s = format_hex_color(rgb, a);
         }
     });
-}
-
-fn luminance_from_u8(r: u8, g: u8, b: u8) -> f32 {
-    // convert to linear sRGB, then compute relative luminance (WCAG / Rec. 709)
-    fn srgb_to_linear(c: f32) -> f32 {
-        if c <= 0.04045 {
-            c / 12.92
-        } else {
-            ((c + 0.055) / 1.055).powf(2.4)
-        }
-    }
-    let rf = srgb_to_linear(f32::from(r) / 255.0);
-    let gf = srgb_to_linear(f32::from(g) / 255.0);
-    let bf = srgb_to_linear(f32::from(b) / 255.0);
-    0.2126 * rf + 0.7152 * gf + 0.0722 * bf
 }

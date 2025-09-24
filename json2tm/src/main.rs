@@ -1,6 +1,7 @@
 use clap::Parser;
 use json_comments::StripComments;
 use serde::{Deserialize, Serialize};
+use oxocarbon_utils::serde_helpers::deserialize_scope;
 use std::{
     collections::HashMap,
     fs::File,
@@ -66,24 +67,6 @@ struct TokenColor {
     #[serde(default, deserialize_with = "deserialize_scope")]
     scope: Option<String>,
     settings: HashMap<String, String>,
-}
-
-fn deserialize_scope<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
-where
-    D: serde::de::Deserializer<'de>,
-{
-    #[derive(Deserialize)]
-    #[serde(untagged)]
-    enum Scope {
-        S(String),
-        V(Vec<String>),
-    }
-    Ok(
-        Option::<Scope>::deserialize(deserializer)?.map(|s| match s {
-            Scope::S(s) => s,
-            Scope::V(v) => v.join(", "),
-        }),
-    )
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

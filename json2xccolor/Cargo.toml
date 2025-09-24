@@ -13,6 +13,7 @@ categories = ["command-line-utilities", "development-tools"]
 serde_json = "1.0"
 plist = "1.6"
 serde = { version = "1.0", features = ["derive"] }
+oxocarbon-utils = { path = "../oxocarbon-utils" }
 
 [profile.release]
 codegen-units = 1

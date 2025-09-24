@@ -49,6 +49,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 name = "json2xccolor"
 version = "0.1.0"
 dependencies = [
+ "oxocarbon-utils",
  "plist",
  "serde",
  "serde_json",
@@ -65,6 +66,13 @@ name = "num-conv"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51d515d32fb182ee37cda2ccdcb92950d6a3c2893aa280e540671c2cd0f3b1d9"
+
+[[package]]
+name = "oxocarbon-utils"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "plist"

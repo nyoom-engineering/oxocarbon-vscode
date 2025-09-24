@@ -1,6 +1,7 @@
 use plist::to_writer_xml;
 use serde::Serialize;
 use std::{collections::BTreeMap, env, fs, io};
+use oxocarbon_utils::parse_hex_rgba_f32 as parse_hex;
 
 fn main() -> io::Result<()> {
     let args: Vec<_> = env::args().skip(1).collect();
@@ -161,36 +162,6 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn parse_hex(hex: &str) -> Option<(f32, f32, f32, f32)> {
-    const INV_255: f32 = 1.0 / 255.0;
-    const fn nibble(b: u8) -> Option<u8> {
-        match b {
-            b'0'..=b'9' => Some(b - b'0'),
-            b'a'..=b'f' => Some(b - b'a' + 10),
-            b'A'..=b'F' => Some(b - b'A' + 10),
-            _ => None,
-        }
-    }
-
-    let hex = hex.trim_start_matches('#');
-    let bytes = hex.as_bytes();
-    let byte =
-        |h, l| Some((nibble(bytes.get(h).copied()?)? << 4) | nibble(bytes.get(l).copied()?)?);
-    let (r, g, b, a) = match bytes.len() {
-        3 => (byte(0, 0)?, byte(1, 1)?, byte(2, 2)?, 255),
-        4 => (byte(0, 0)?, byte(1, 1)?, byte(2, 2)?, byte(3, 3)?),
-        6 => (byte(0, 1)?, byte(2, 3)?, byte(4, 5)?, 255),
-        8 => (byte(0, 1)?, byte(2, 3)?, byte(4, 5)?, byte(6, 7)?),
-        _ => return None,
-    };
-
-    Some((
-        f32::from(r) * INV_255,
-        f32::from(g) * INV_255,
-        f32::from(b) * INV_255,
-        f32::from(a) * INV_255,
-    ))
-}
 
 const COLOR_MAPPINGS: &[(&str, &[&str])] = &[
     ("xcode.syntax.comment.doc.keyword", &["comment.doc.keyword"]),
