@@ -216,11 +216,12 @@ const COMPAT_CONTRAST_KEYS: [&str; 7] = [
     "dropdown.background",
 ];
 
-const COMPAT_CONTRAST_KEYS_2: [&str; 4] = [
+const COMPAT_CONTRAST_KEYS_2: [&str; 5] = [
     "tab.border",
     "sideBar.border",
     "panel.border",
     "editorWidget.resizeBorder",
+    "editorGroupHeader.border",
 ];
 
 fn colors_table_mut(value: &mut toml::Value) -> Option<&mut toml::value::Table> {
