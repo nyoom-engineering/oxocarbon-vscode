@@ -5,46 +5,102 @@ const INV_255: f32 = 1.0 / 255.0;
 #[inline]
 const fn expand_nibble(n: u8) -> u8 { (n << 4) | n }
 
-const fn hex_nibble(b: u8) -> Option<u8> {
-    match b {
-        b'0'..=b'9' => Some(b - b'0'),
-        b'a'..=b'f' => Some(b - b'a' + 10),
-        b'A'..=b'F' => Some(b - b'A' + 10),
-        _ => None,
+const INVALID: u8 = 0xFF;
+
+const fn build_hex_decode() -> [u8; 256] {
+    let mut table = [INVALID; 256];
+    let mut i = 0;
+    while i < 10 {
+        table[b'0' as usize + i] = i as u8;
+        i += 1;
     }
+    i = 0;
+    while i < 6 {
+        let value = (10 + i) as u8;
+        table[b'a' as usize + i] = value;
+        table[b'A' as usize + i] = value;
+        i += 1;
+    }
+    table
+}
+
+const HEX_DECODE: [u8; 256] = build_hex_decode();
+
+#[inline(always)]
+fn nibble_value(b: u8) -> u8 { HEX_DECODE[b as usize] }
+
+#[inline(always)]
+fn decode_nibble(b: u8) -> Option<u8> {
+    let value = nibble_value(b);
+    (value != INVALID).then_some(value)
+}
+
+#[inline(always)]
+fn decode_hex_u32(bytes: &[u8]) -> Option<u32> {
+    let mut acc = 0u32;
+    for &b in bytes {
+        acc = (acc << 4) | u32::from(decode_nibble(b)?);
+    }
+    Some(acc)
 }
 
 /// parses hex color strings: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
 /// returns (rgb, alpha) with 8-bit channels; alpha is None if not provided.
 pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
-    let s = input.strip_prefix('#')?;
-    let b = s.as_bytes();
-    let byte = |h: usize, l: usize| -> Option<u8> {
-        Some((hex_nibble(*b.get(h)?)? << 4) | hex_nibble(*b.get(l)?)?)
-    };
-    match b.len() {
-        3 => Some(([expand_nibble(hex_nibble(b[0])?), expand_nibble(hex_nibble(b[1])?), expand_nibble(hex_nibble(b[2])?)], None)),
-        4 => Some(([
-            expand_nibble(hex_nibble(b[0])?),
-            expand_nibble(hex_nibble(b[1])?),
-            expand_nibble(hex_nibble(b[2])?),
-        ], Some(expand_nibble(hex_nibble(b[3])?)))),
-        6 => Some(([byte(0, 1)?, byte(2, 3)?, byte(4, 5)?], None)),
-        8 => Some(([byte(0, 1)?, byte(2, 3)?, byte(4, 5)?], Some(byte(6, 7)?))),
+    let data = input.as_bytes().strip_prefix(b"#")?;
+    match data.len() {
+        3 => {
+            let raw = decode_hex_u32(data)?;
+            let rgb = [
+                expand_nibble(((raw >> 8) & 0xF) as u8),
+                expand_nibble(((raw >> 4) & 0xF) as u8),
+                expand_nibble((raw & 0xF) as u8),
+            ];
+            Some((rgb, None))
+        }
+        4 => {
+            let raw = decode_hex_u32(data)?;
+            let rgb = [
+                expand_nibble(((raw >> 12) & 0xF) as u8),
+                expand_nibble(((raw >> 8) & 0xF) as u8),
+                expand_nibble(((raw >> 4) & 0xF) as u8),
+            ];
+            let alpha = expand_nibble((raw & 0xF) as u8);
+            Some((rgb, Some(alpha)))
+        }
+        6 => {
+            let raw = decode_hex_u32(data)?;
+            let rgb = [
+                (raw >> 16) as u8,
+                (raw >> 8) as u8,
+                raw as u8,
+            ];
+            Some((rgb, None))
+        }
+        8 => {
+            let raw = decode_hex_u32(data)?;
+            let rgb = [
+                (raw >> 24) as u8,
+                (raw >> 16) as u8,
+                (raw >> 8) as u8,
+            ];
+            Some((rgb, Some(raw as u8)))
+        }
         _ => None,
     }
 }
 
 /// Parses hex and returns normalized floats (0..1) rgba.
 pub fn parse_hex_rgba_f32(input: &str) -> Option<(f32, f32, f32, f32)> {
-    let (rgb, a) = parse_hex_rgba_u8(input)?;
-    let [r, g, b] = rgb;
-    Some((
-        f32::from(r) * INV_255,
-        f32::from(g) * INV_255,
-        f32::from(b) * INV_255,
-        f32::from(a.unwrap_or(255)) * INV_255,
-    ))
+    parse_hex_rgba_u8(input).map(|([r, g, b], a)| {
+        let scale = INV_255;
+        (
+            f32::from(r) * scale,
+            f32::from(g) * scale,
+            f32::from(b) * scale,
+            f32::from(a.unwrap_or(255)) * scale,
+        )
+    })
 }
 
 #[inline]
@@ -66,22 +122,26 @@ fn linear_to_srgb_u8(c: f32) -> u8 {
     (s.mul_add(255.0, 0.5)).clamp(0.0, 255.0) as u8
 }
 
-#[must_use]
+#[inline(always)]
 pub fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
-    #[inline]
-    fn push_hex(s: &mut String, byte: u8) {
-        const HEX: &[u8; 16] = b"0123456789abcdef";
-        let n = byte as usize;
-        s.push(HEX[n >> 4] as char);
-        s.push(HEX[n & 0x0f] as char);
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let len = 7 + alpha.map_or(0, |_| 2);
+    let mut out = String::with_capacity(len);
+    unsafe {
+        let vec = out.as_mut_vec();
+        vec.set_len(len);
+        vec[0] = b'#';
+        let mut idx = 1;
+        for &byte in &rgb {
+            vec[idx] = HEX[(byte >> 4) as usize];
+            vec[idx + 1] = HEX[(byte & 0x0f) as usize];
+            idx += 2;
+        }
+        if let Some(a) = alpha {
+            vec[idx] = HEX[(a >> 4) as usize];
+            vec[idx + 1] = HEX[(a & 0x0f) as usize];
+        }
     }
-    let [r, g, b] = rgb;
-    let mut out = String::with_capacity(if alpha.is_some() { 9 } else { 7 });
-    out.push('#');
-    push_hex(&mut out, r);
-    push_hex(&mut out, g);
-    push_hex(&mut out, b);
-    if let Some(a) = alpha { push_hex(&mut out, a); }
     out
 }
 
@@ -99,24 +159,37 @@ pub const fn average_channel(a: u8, b: u8) -> u8 { (a & b).wrapping_add((a ^ b) 
 /// computes midpoint color between two hex strings (ignores alpha)
 #[must_use]
 pub fn midpoint_hex(a_hex: &str, b_hex: &str) -> String {
-    let ([ar, ag, ab], _) = parse_hex_rgba_u8(a_hex).expect("invalid hex a");
-    let ([br, bg, bb], _) = parse_hex_rgba_u8(b_hex).expect("invalid hex b");
-    let mr = average_channel(ar, br);
-    let mg = average_channel(ag, bg);
-    let mb = average_channel(ab, bb);
-    format_hex_color([mr, mg, mb], None)
+    let [ar, ag, ab] = strict_rgb(a_hex, "invalid hex a");
+    let [br, bg, bb] = strict_rgb(b_hex, "invalid hex b");
+    format_hex_color([
+        average_channel(ar, br),
+        average_channel(ag, bg),
+        average_channel(ab, bb),
+    ], None)
 }
 
 /// midpoint in linear sRGB (ignores alpha)
 #[must_use]
 pub fn midpoint_hex_linear(a_hex: &str, b_hex: &str) -> String {
-    let ([ar, ag, ab], _) = parse_hex_rgba_u8(a_hex).expect("invalid hex a");
-    let ([br, bg, bb], _) = parse_hex_rgba_u8(b_hex).expect("invalid hex b");
-    let r = 0.5 * (srgb_u8_to_linear(ar) + srgb_u8_to_linear(br));
-    let g = 0.5 * (srgb_u8_to_linear(ag) + srgb_u8_to_linear(bg));
-    let b = 0.5 * (srgb_u8_to_linear(ab) + srgb_u8_to_linear(bb));
-    let rgb = [linear_to_srgb_u8(r), linear_to_srgb_u8(g), linear_to_srgb_u8(b)];
+    let [ar, ag, ab] = strict_rgb(a_hex, "invalid hex a");
+    let [br, bg, bb] = strict_rgb(b_hex, "invalid hex b");
+    let rgb = [
+        linear_to_srgb_u8(0.5 * (srgb_u8_to_linear(ar) + srgb_u8_to_linear(br))),
+        linear_to_srgb_u8(0.5 * (srgb_u8_to_linear(ag) + srgb_u8_to_linear(bg))),
+        linear_to_srgb_u8(0.5 * (srgb_u8_to_linear(ab) + srgb_u8_to_linear(bb))),
+    ];
     format_hex_color(rgb, None)
+}
+
+#[inline(always)]
+fn strict_rgb(input: &str, label: &'static str) -> [u8; 3] {
+    if let Some((rgb, _)) = parse_hex_rgba_u8(input) { rgb } else { invalid_hex(label) }
+}
+
+#[cold]
+#[inline(never)]
+fn invalid_hex(label: &'static str) -> ! {
+    panic!("{label}");
 }
 
 pub mod serde_helpers {
