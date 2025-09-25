@@ -15,8 +15,4 @@ plist = "1.6"
 serde = { version = "1.0", features = ["derive"] }
 oxocarbon-utils = { path = "../oxocarbon-utils" }
 
-[profile.release]
-codegen-units = 1
-lto = true
-strip = true
 

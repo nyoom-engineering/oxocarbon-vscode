@@ -269,6 +269,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "json2xccolor"
+version = "0.1.0"
+dependencies = [
+ "oxocarbon-utils",
+ "plist",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "json_comments"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
