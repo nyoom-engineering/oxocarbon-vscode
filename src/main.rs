@@ -317,6 +317,19 @@ const MONO_RAMP_EXTRAS: [&str; 13] = [
     "#393939", "#525252", "#dde1e6", "#f2f4f8", "#ffffff",
 ];
 
+const MONO_ACCENT_CANDIDATES: [u32; 10] = [
+    0x08bdba,
+    0x33b1ff,
+    0x3ddbd9,
+    0x42be65,
+    0x78a9ff,
+    0x82cfff,
+    0xa6c8ff,
+    0xbe95ff,
+    0xee5396,
+    0xff7eb6,
+];
+
 const MONO_PRINT_EXTRA_ACCENTS: u32 = 0x0f62fe;
 
 static MONOCHROME_RAMPS: OnceLock<MonochromeRamps> = OnceLock::new();
@@ -394,7 +407,7 @@ fn apply_monochrome(value: &mut toml::Value, ramp: &MonoRamp, is_print: bool) {
         let Some((rgb, alpha)) = parse_hex_color(s) else {
             return;
         };
-        if is_allowed_accent(rgb, is_print) {
+        if !is_monochrome_candidate(rgb, is_print) {
             return;
         }
         let y = luminance_from_u8(rgb[0], rgb[1], rgb[2]);
@@ -406,9 +419,9 @@ fn apply_monochrome(value: &mut toml::Value, ramp: &MonoRamp, is_print: bool) {
 }
 
 #[inline(always)]
-fn is_allowed_accent(rgb: [u8; 3], is_print: bool) -> bool {
+fn is_monochrome_candidate(rgb: [u8; 3], is_print: bool) -> bool {
     let value = pack_rgb(rgb);
-    matches!(value, 0x08bdba | 0x33b1ff | 0x3ddbd9 | 0x42be65 | 0x78a9ff | 0x82cfff | 0xa6c8ff | 0xbe95ff | 0xee5396 | 0xff7eb6)
+    MONO_ACCENT_CANDIDATES.contains(&value)
         || (is_print && value == MONO_PRINT_EXTRA_ACCENTS)
 }
 
