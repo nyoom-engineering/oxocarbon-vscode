@@ -15,7 +15,7 @@ ZED_BUNDLE := $(ZEDDIR)/oxocarbon.json
 ZED_IMPORTER := $(ZED_SRC_DIR)/target/release/theme_importer
 
 TMDIR := textmate
-TM_CONVERTER := json2tm/target/release/json2tm
+TM_CONVERTER := target/release/json2tm
 TM_USER := ~/Library/Application\ Support/TextMate/Themes
 SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
 
@@ -25,7 +25,7 @@ INTELLIJDIR := intellij
 INTELLIJ_CONVERTER := $(JB_SRC_DIR)/colorSchemeTool.py
 
 XCODEDIR := xcode
-XCODE_CONVERTER := json2xccolor/target/release/json2xccolor
+XCODE_CONVERTER := target/release/json2xccolor
 XCODE_USER := ~/Library/Developer/Xcode/UserData/FontAndColorThemes
 
 HYPERFINE ?= $(shell command -v hyperfine >/dev/null 2>&1 && echo hyperfine || echo nix\ run\ nixpkgs\#hyperfine\ --)
