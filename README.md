@@ -201,6 +201,8 @@ Additionally, add the following in your `keybindings.json` to use `cmd+shift+i` 
 }
 ```
 
+You may also run `make dev` for file watcher & incremental compilation
+
 ## Contributing
 
 Before contributing, its recommended to read through the [style guide](https://github.com/nyoom-engineering/oxocarbon/blob/main/docs/style-guide.md). Discussion primarily takes place on the [Nyoom Engineering Discord Server](https://discord.gg/M528tDKXRG)
