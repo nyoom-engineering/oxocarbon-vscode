@@ -28,6 +28,13 @@ XCODEDIR := xcode
 XCODE_CONVERTER := json2xccolor/target/release/json2xccolor
 XCODE_USER := ~/Library/Developer/Xcode/UserData/FontAndColorThemes
 
+HYPERFINE ?= $(shell command -v hyperfine >/dev/null 2>&1 && echo hyperfine || echo nix\ run\ nixpkgs\#hyperfine\ --)
+HF_WARMUP := 3
+
+define bench
+$(HYPERFINE) --warmup $(HF_WARMUP) --prepare '$(1)' '$(2)'
+endef
+
 DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-color-theme.json \
 	$(THEMESDIR)/oxocarbon-oled-color-theme.json \
@@ -41,7 +48,8 @@ DEFAULT_THEMES := \
 
 .PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray PRINT \
 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
-	install-zed install-sublime install-textmate install-xcode textmate xcode
+	install-zed install-sublime install-textmate install-xcode textmate xcode \
+	benchmark
 
 all: $(DEFAULT_THEMES)
 
@@ -227,3 +235,8 @@ install-xcode: xcode
 
 clean:
 	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls
+
+benchmark: build $(TM_CONVERTER) $(XCODE_CONVERTER) all
+	$(call bench,rm -f $(THEMESDIR)/*.json,make -s all)
+	$(call bench,rm -f $(TMDIR)/*.tmTheme,make -s textmate)
+	$(call bench,rm -f $(XCODEDIR)/*.xccolortheme,make -s xcode)
