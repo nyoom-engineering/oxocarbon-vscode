@@ -27,50 +27,48 @@ const fn build_hex_decode() -> [u8; 256] {
 }
 
 #[inline(always)]
+fn decode_nibble(b: u8) -> Option<u8> {
+    let value = unsafe { *HEX_DECODE.get_unchecked(b as usize) };
+    (value != INVALID).then_some(value)
+}
+
+#[inline(always)]
 fn decode_pair(h: u8, l: u8) -> Option<u8> {
-    let h = HEX_DECODE[h as usize];
-    let l = HEX_DECODE[l as usize];
-    ((h | l) != INVALID).then_some((h << 4) | l)
+    let h_val = decode_nibble(h)?;
+    let l_val = decode_nibble(l)?;
+    Some((h_val << 4) | l_val)
 }
 
 #[inline(always)]
 pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
-    let data = input.strip_prefix('#')?.as_bytes();
+    let data = input.as_bytes().strip_prefix(b"#")?;
+    
+    if !matches!(data.len(), 3 | 4 | 6 | 8) {
+        return None;
+    }
+    
     match data.len() {
-        3 => {
-            let r = HEX_DECODE[data[0] as usize];
-            let g = HEX_DECODE[data[1] as usize];
-            let b = HEX_DECODE[data[2] as usize];
-            ((r | g | b) != INVALID)
-                .then_some(([expand_nibble(r), expand_nibble(g), expand_nibble(b)], None))
-        }
-        4 => {
-            let r = HEX_DECODE[data[0] as usize];
-            let g = HEX_DECODE[data[1] as usize];
-            let b = HEX_DECODE[data[2] as usize];
-            let a = HEX_DECODE[data[3] as usize];
-            ((r | g | b | a) != INVALID).then_some((
-                [expand_nibble(r), expand_nibble(g), expand_nibble(b)],
-                Some(expand_nibble(a)),
-            ))
-        }
-        6 => Some((
-            [
-                decode_pair(data[0], data[1])?,
-                decode_pair(data[2], data[3])?,
-                decode_pair(data[4], data[5])?,
-            ],
-            None,
-        )),
-        8 => Some((
-            [
-                decode_pair(data[0], data[1])?,
-                decode_pair(data[2], data[3])?,
-                decode_pair(data[4], data[5])?,
-            ],
-            Some(decode_pair(data[6], data[7])?),
-        )),
-        _ => None,
+        3 => Some(([
+            expand_nibble(decode_nibble(data[0])?),
+            expand_nibble(decode_nibble(data[1])?),
+            expand_nibble(decode_nibble(data[2])?),
+        ], None)),
+        4 => Some(([
+            expand_nibble(decode_nibble(data[0])?),
+            expand_nibble(decode_nibble(data[1])?),
+            expand_nibble(decode_nibble(data[2])?),
+        ], Some(expand_nibble(decode_nibble(data[3])?)))),
+        6 => Some(([
+            decode_pair(data[0], data[1])?,
+            decode_pair(data[2], data[3])?,
+            decode_pair(data[4], data[5])?,
+        ], None)),
+        8 => Some(([
+            decode_pair(data[0], data[1])?,
+            decode_pair(data[2], data[3])?,
+            decode_pair(data[4], data[5])?,
+        ], Some(decode_pair(data[6], data[7])?))),
+        _ => unsafe { std::hint::unreachable_unchecked() }, // We checked length above
     }
 }
 
@@ -90,9 +88,10 @@ pub fn parse_hex_rgba_f32(input: &str) -> Option<(f32, f32, f32, f32)> {
 #[inline]
 fn srgb_to_linear(c: f32) -> f32 {
     if c <= 0.04045 {
-        c / 12.92
+        c * (1.0 / 12.92)
     } else {
-        ((c + 0.055) / 1.055).powf(2.4)
+        let x = (c + 0.055) * 0.9478672985781991;
+        x * x * x.sqrt()
     }
 }
 
@@ -192,57 +191,24 @@ pub fn pack_rgb(rgb: [u8; 3]) -> u32 {
 
 #[inline(always)]
 fn strict_rgb(input: &str, label: &'static str) -> [u8; 3] {
-    if let Some((rgb, _)) = parse_hex_rgba_u8(input) {
-        rgb
-    } else {
-        invalid_hex(label)
-    }
-}
-
-#[cold]
-#[inline(never)]
-fn invalid_hex(label: &'static str) -> ! {
-    panic!("{label}");
+    parse_hex_rgba_u8(input).unwrap_or_else(|| panic!("{label}")).0
 }
 
 #[inline(always)]
 pub fn find_nearest_index(luminances: &[f32], target: f32) -> usize {
     let len = luminances.len();
-    if len <= 1 {
+    if len == 0 {
         return 0;
     }
 
     #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
     {
-        if len >= 8 {
-            return unsafe { nearest_index_neon(luminances, target) };
-        }
+        return unsafe { nearest_index_neon(luminances, target) };
     }
 
-    let mut left = 0;
-    let mut right = len;
-
-    while left < right {
-        let mid = left + (right - left) / 2;
-        if luminances[mid] < target {
-            left = mid + 1;
-        } else {
-            right = mid;
-        }
-    }
-
-    match left {
-        0 => 0,
-        n if n == len => n - 1,
-        idx => {
-            let prev = luminances[idx - 1];
-            let next = luminances[idx];
-            if (target - prev) <= (next - target) {
-                idx - 1
-            } else {
-                idx
-            }
-        }
+    #[cfg(not(all(target_arch = "aarch64", target_feature = "neon")))]
+    {
+        nearest_index_scaler(luminances, target)
     }
 }
 
@@ -251,50 +217,83 @@ pub fn find_nearest_index(luminances: &[f32], target: f32) -> usize {
 #[target_feature(enable = "neon")]
 pub unsafe fn nearest_index_neon(luminances: &[f32], target: f32) -> usize {
     use std::arch::aarch64::*;
-
+    
     let len = luminances.len();
+    if len == 0 {
+        return 0;
+    }
+    
     let ptr = luminances.as_ptr();
     let target_vec = vdupq_n_f32(target);
-
-    let chunks = len / 4;
     let mut best_idx = 0;
     let mut best_diff = f32::INFINITY;
-
+    
+    // smaller arrays scaler anyways
+    if len < 4 {
+        return nearest_index_scaler(luminances, target);
+    }
+    
+    let chunks = len / 4;
+    let remainder = len % 4;
+    
+    // prefetch for better performance with larger arrays
+    if chunks > 8 {
+        unsafe { std::arch::asm!("prfm pldl1keep, [{}]", in(reg) ptr) };
+        unsafe { std::arch::asm!("prfm pldl1keep, [{}]", in(reg) ptr.add(32)) };
+    }
+    
     for chunk in 0..chunks {
         let i = chunk * 4;
         let v = unsafe { vld1q_f32(ptr.add(i)) };
         let diff = vabsq_f32(vsubq_f32(v, target_vec));
-
-        let d0 = vgetq_lane_f32(diff, 0);
-        let d1 = vgetq_lane_f32(diff, 1);
-        let d2 = vgetq_lane_f32(diff, 2);
-        let d3 = vgetq_lane_f32(diff, 3);
-
-        if d0 < best_diff {
-            best_diff = d0;
-            best_idx = i;
+        
+        let min_in_vec = vminvq_f32(diff);
+        if min_in_vec >= best_diff {
+            continue;
         }
-        if d1 < best_diff {
-            best_diff = d1;
-            best_idx = i + 1;
-        }
-        if d2 < best_diff {
-            best_diff = d2;
-            best_idx = i + 2;
-        }
-        if d3 < best_diff {
-            best_diff = d3;
-            best_idx = i + 3;
+        
+        best_diff = min_in_vec;
+        let min_mask = vceqq_f32(diff, vdupq_n_f32(min_in_vec));
+        
+        if vgetq_lane_u32(min_mask, 0) != 0 { best_idx = i; }
+        else if vgetq_lane_u32(min_mask, 1) != 0 { best_idx = i + 1; }
+        else if vgetq_lane_u32(min_mask, 2) != 0 { best_idx = i + 2; }
+        else { best_idx = i + 3; }
+        
+        if best_diff == 0.0 {
+            return best_idx;
         }
     }
+    
+    if remainder > 0 {
+        let remainder_start = chunks * 4;
+        for i in remainder_start..len {
+            let diff = unsafe { (*ptr.add(i) - target).abs() };
+            if diff < best_diff {
+                best_diff = diff;
+                best_idx = i;
+                if best_diff == 0.0 {
+                    return best_idx;
+                }
+            }
+        }
+    }
+    
+    best_idx
+}
 
-    for i in (chunks * 4)..len {
-        let diff = unsafe { (*ptr.add(i) - target).abs() };
+#[inline]
+fn nearest_index_scaler(luminances: &[f32], target: f32) -> usize {
+    let mut best_idx = 0;
+    let mut best_diff = f32::INFINITY;
+    
+    for (i, &value) in luminances.iter().enumerate() {
+        let diff = (value - target).abs();
         if diff < best_diff {
             best_diff = diff;
             best_idx = i;
         }
     }
-
+    
     best_idx
 }
