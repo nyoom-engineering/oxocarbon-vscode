@@ -6,7 +6,7 @@
 
 # Example usage:
 #   ./scripts/benchneon.py --iterations 2 --warmups 0 --tokens 1000 --color-keys 200
-#   ./scripts/benchneon.py --iterations 4 --warmups 1 --tokens 200000 --color-keys 20000
+#   ./scripts/benchneon.py --iterations 4 --warmups 1 --tokens 200000 --color-keys 40000
 #
 # Options:
 #   --tokens, --color-keys, --iterations, --warmups, --profile, --bin, --no-build, --keep-temp
