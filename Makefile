@@ -57,7 +57,7 @@ build:
 	cargo build --release
 
 dev:
-	cargo run -p oxocarbon-dev
+	cargo run -r -p oxocarbon-dev
 
 THEME_FLAGS = $(strip \
 	$(if $(findstring oled,$@),--oled,) \
