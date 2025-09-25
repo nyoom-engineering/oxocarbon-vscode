@@ -1,11 +1,11 @@
 #![warn(clippy::pedantic)]
 
 const INV_255: f32 = 1.0 / 255.0;
-
-#[inline]
-const fn expand_nibble(n: u8) -> u8 { (n << 4) | n }
-
 const INVALID: u8 = 0xFF;
+const HEX_DECODE: [u8; 256] = build_hex_decode();
+
+#[inline(always)]
+const fn expand_nibble(n: u8) -> u8 { (n << 4) | n }
 
 const fn build_hex_decode() -> [u8; 256] {
     let mut table = [INVALID; 256];
@@ -24,8 +24,6 @@ const fn build_hex_decode() -> [u8; 256] {
     table
 }
 
-const HEX_DECODE: [u8; 256] = build_hex_decode();
-
 #[inline(always)]
 fn nibble_value(b: u8) -> u8 { HEX_DECODE[b as usize] }
 
@@ -36,12 +34,8 @@ fn decode_nibble(b: u8) -> Option<u8> {
 }
 
 #[inline(always)]
-fn decode_hex_u32(bytes: &[u8]) -> Option<u32> {
-    let mut acc = 0u32;
-    for &b in bytes {
-        acc = (acc << 4) | u32::from(decode_nibble(b)?);
-    }
-    Some(acc)
+fn decode_pair(h: u8, l: u8) -> Option<u8> {
+    Some((decode_nibble(h)? << 4) | decode_nibble(l)?)
 }
 
 /// parses hex color strings: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
@@ -49,48 +43,43 @@ fn decode_hex_u32(bytes: &[u8]) -> Option<u32> {
 pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
     let data = input.as_bytes().strip_prefix(b"#")?;
     match data.len() {
-        3 => {
-            let raw = decode_hex_u32(data)?;
-            let rgb = [
-                expand_nibble(((raw >> 8) & 0xF) as u8),
-                expand_nibble(((raw >> 4) & 0xF) as u8),
-                expand_nibble((raw & 0xF) as u8),
-            ];
-            Some((rgb, None))
-        }
-        4 => {
-            let raw = decode_hex_u32(data)?;
-            let rgb = [
-                expand_nibble(((raw >> 12) & 0xF) as u8),
-                expand_nibble(((raw >> 8) & 0xF) as u8),
-                expand_nibble(((raw >> 4) & 0xF) as u8),
-            ];
-            let alpha = expand_nibble((raw & 0xF) as u8);
-            Some((rgb, Some(alpha)))
-        }
-        6 => {
-            let raw = decode_hex_u32(data)?;
-            let rgb = [
-                (raw >> 16) as u8,
-                (raw >> 8) as u8,
-                raw as u8,
-            ];
-            Some((rgb, None))
-        }
-        8 => {
-            let raw = decode_hex_u32(data)?;
-            let rgb = [
-                (raw >> 24) as u8,
-                (raw >> 16) as u8,
-                (raw >> 8) as u8,
-            ];
-            Some((rgb, Some(raw as u8)))
-        }
+        3 => match data {
+            [r, g, b] => Some(([
+                expand_nibble(decode_nibble(*r)?),
+                expand_nibble(decode_nibble(*g)?),
+                expand_nibble(decode_nibble(*b)?),
+            ], None)),
+            _ => None,
+        },
+        4 => match data {
+            [r, g, b, a] => Some(([
+                expand_nibble(decode_nibble(*r)?),
+                expand_nibble(decode_nibble(*g)?),
+                expand_nibble(decode_nibble(*b)?),
+            ], Some(expand_nibble(decode_nibble(*a)?)))),
+            _ => None,
+        },
+        6 => match data {
+            [r0, r1, g0, g1, b0, b1] => Some(([
+                decode_pair(*r0, *r1)?,
+                decode_pair(*g0, *g1)?,
+                decode_pair(*b0, *b1)?,
+            ], None)),
+            _ => None,
+        },
+        8 => match data {
+            [r0, r1, g0, g1, b0, b1, a0, a1] => Some(([
+                decode_pair(*r0, *r1)?,
+                decode_pair(*g0, *g1)?,
+                decode_pair(*b0, *b1)?,
+            ], Some(decode_pair(*a0, *a1)?))),
+            _ => None,
+        },
         _ => None,
     }
 }
 
-/// Parses hex and returns normalized floats (0..1) rgba.
+/// parses hex and returns normalized floats (0..1) rgba.
 pub fn parse_hex_rgba_f32(input: &str) -> Option<(f32, f32, f32, f32)> {
     parse_hex_rgba_u8(input).map(|([r, g, b], a)| {
         let scale = INV_255;
@@ -127,6 +116,7 @@ pub fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
     let len = 7 + alpha.map_or(0, |_| 2);
     let mut out = String::with_capacity(len);
+    // fill the backing buffer in place, avoids intermediate alloc
     unsafe {
         let vec = out.as_mut_vec();
         vec.set_len(len);
@@ -145,14 +135,18 @@ pub fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
     out
 }
 
+/// computes relative luminance 
+/// suitable for wcag contrast checks
 #[inline]
 pub fn luminance_from_u8(r: u8, g: u8, b: u8) -> f32 {
+    // linearize components before applying luminance weights
     let rf = srgb_u8_to_linear(r);
     let gf = srgb_u8_to_linear(g);
     let bf = srgb_u8_to_linear(b);
     0.2126 * rf + 0.7152 * gf + 0.0722 * bf
 }
 
+/// returns the rounded midpoint of two channels without overflow
 #[inline]
 pub const fn average_channel(a: u8, b: u8) -> u8 { (a & b).wrapping_add((a ^ b) >> 1) }
 
@@ -168,7 +162,7 @@ pub fn midpoint_hex(a_hex: &str, b_hex: &str) -> String {
     ], None)
 }
 
-/// midpoint in linear sRGB (ignores alpha)
+/// averages two hex colors in linear sRGB space (ignores alpha)
 #[must_use]
 pub fn midpoint_hex_linear(a_hex: &str, b_hex: &str) -> String {
     let [ar, ag, ab] = strict_rgb(a_hex, "invalid hex a");
