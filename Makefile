@@ -46,7 +46,7 @@ DEFAULT_THEMES := \
 	$(THEMESDIR)/oxocarbon-oled-mono-compat-color-theme.json \
 	$(THEMESDIR)/PRINT.json
 
-.PHONY: all build clean dotfiles help install mono-coolgray mono-warmgray PRINT \
+.PHONY: all build clean dev dotfiles help install mono-coolgray mono-warmgray PRINT \
 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
 	install-zed install-sublime install-textmate install-xcode textmate xcode \
 	benchmark
@@ -55,6 +55,9 @@ all: $(DEFAULT_THEMES)
 
 build:
 	cargo build --release
+
+dev:
+	cargo run -p oxocarbon-dev
 
 THEME_FLAGS = $(strip \
 	$(if $(findstring oled,$@),--oled,) \

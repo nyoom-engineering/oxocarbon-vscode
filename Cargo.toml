@@ -1,3 +1,7 @@
+[workspace]
+members = ["dev"]
+resolver = "2"
+
 [package]
 name = "oxocarbon-themec"
 version = "0.1.0"

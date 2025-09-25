@@ -6,10 +6,10 @@
 
 mod ramp;
 
-use ramp::{is_monochrome_candidate, select_monochrome_ramp, MonoRamp};
 use oxocarbon_utils::{
     format_hex_color, luminance_from_u8, midpoint_hex, parse_hex_rgba_u8 as parse_hex_color,
 };
+use ramp::{MonoRamp, is_monochrome_candidate, select_monochrome_ramp};
 use std::{env, fs, io, process};
 
 #[derive(Default)]
@@ -114,7 +114,11 @@ fn main() {
         // compatibility variants - contrast panels
         // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
         // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
-        let (from, to) = if opts.is_oled() {("#000000", "#161616")} else {("#161616", "#262626")};
+        let (from, to) = if opts.is_oled() {
+            ("#000000", "#161616")
+        } else {
+            ("#161616", "#262626")
+        };
         let c1 = midpoint_hex(from, to);
         insert_value(colors, &COMPAT_BG_KEYS, &toml::Value::String(c1));
         // compatibility variants - gutter, six deviations
@@ -126,7 +130,11 @@ fn main() {
         // - Standard compat: #393939
         // - OLED compat:     #262626
         let c3 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
-        insert_value(colors, &COMPAT_CONTRAST_KEYS, &toml::Value::String(c3.clone()));
+        insert_value(
+            colors,
+            &COMPAT_CONTRAST_KEYS,
+            &toml::Value::String(c3.clone()),
+        );
         // compatibility variants - additional contrast
         // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
         // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
@@ -196,9 +204,7 @@ const COMPAT_BG_KEYS: [&str; 8] = [
     "editorWidget.background",
 ];
 
-const COMPAT_BG_KEYS_2: [&str; 1] = [
-    "editorGutter.background"
-];
+const COMPAT_BG_KEYS_2: [&str; 1] = ["editorGutter.background"];
 
 const COMPAT_CONTRAST_KEYS: [&str; 7] = [
     // borders
@@ -293,7 +299,7 @@ fn apply_monochrome_style_overrides(value: &mut toml::Value) {
     };
     const ITALIC_FG: &str = "#f2f4f8";
     const BOLD_FG: &str = "#ffffff";
-    
+
     for item in arr.iter_mut() {
         let Some(settings) = item.get_mut("settings").and_then(|v| v.as_table_mut()) else {
             continue;
@@ -301,14 +307,20 @@ fn apply_monochrome_style_overrides(value: &mut toml::Value) {
         let Some(font_style) = settings.get("fontStyle").and_then(|v| v.as_str()) else {
             continue;
         };
-        
+
         let has_italic = font_style.contains("italic") || font_style.contains("Italic");
         let is_bold_only = font_style.trim().eq_ignore_ascii_case("bold");
-        
+
         if has_italic {
-            settings.insert("foreground".into(), toml::Value::String(ITALIC_FG.to_string()));
+            settings.insert(
+                "foreground".into(),
+                toml::Value::String(ITALIC_FG.to_string()),
+            );
         } else if is_bold_only {
-            settings.insert("foreground".into(), toml::Value::String(BOLD_FG.to_string()));
+            settings.insert(
+                "foreground".into(),
+                toml::Value::String(BOLD_FG.to_string()),
+            );
         }
     }
 }

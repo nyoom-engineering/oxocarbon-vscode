@@ -35,11 +35,7 @@ fn decode_pair(h: u8, l: u8) -> Option<u8> {
 
 #[inline(always)]
 pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
-    let data = input.as_bytes();
-    if data.is_empty() || data[0] != b'#' {
-        return None;
-    }
-    let data = unsafe { data.get_unchecked(1..) };
+    let data = input.strip_prefix('#')?.as_bytes();
     match data.len() {
         3 => {
             let r = HEX_DECODE[data[0] as usize];
@@ -123,21 +119,25 @@ fn linear_to_srgb_u8(c: f32) -> u8 {
 #[inline(always)]
 pub fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
-    let has_alpha = alpha.is_some();
-    let len = if has_alpha { 9 } else { 7 };
-    let mut buf = [0u8; 9];
-    buf[0] = b'#';
-    buf[1] = HEX[(rgb[0] >> 4) as usize];
-    buf[2] = HEX[(rgb[0] & 0x0f) as usize];
-    buf[3] = HEX[(rgb[1] >> 4) as usize];
-    buf[4] = HEX[(rgb[1] & 0x0f) as usize];
-    buf[5] = HEX[(rgb[2] >> 4) as usize];
-    buf[6] = HEX[(rgb[2] & 0x0f) as usize];
-    if let Some(a) = alpha {
-        buf[7] = HEX[(a >> 4) as usize];
-        buf[8] = HEX[(a & 0x0f) as usize];
+    let len = 7 + alpha.map_or(0, |_| 2);
+    let mut out = String::with_capacity(len);
+    // fill the backing buffer in place, avoids intermediate alloc
+    unsafe {
+        let vec = out.as_mut_vec();
+        vec.set_len(len);
+        vec[0] = b'#';
+        let mut idx = 1;
+        for &byte in &rgb {
+            vec[idx] = HEX[(byte >> 4) as usize];
+            vec[idx + 1] = HEX[(byte & 0x0f) as usize];
+            idx += 2;
+        }
+        if let Some(a) = alpha {
+            vec[idx] = HEX[(a >> 4) as usize];
+            vec[idx + 1] = HEX[(a & 0x0f) as usize];
+        }
     }
-    unsafe { String::from_utf8_unchecked(buf[..len].to_vec()) }
+    out
 }
 
 /// computes relative luminance
@@ -237,7 +237,7 @@ pub fn find_nearest_index(luminances: &[f32], target: f32) -> usize {
         idx => {
             let prev = luminances[idx - 1];
             let next = luminances[idx];
-            if ((target - prev) * 1000.0) as i32 <= ((next - target) * 1000.0) as i32 {
+            if (target - prev) <= (next - target) {
                 idx - 1
             } else {
                 idx
@@ -252,54 +252,49 @@ pub fn find_nearest_index(luminances: &[f32], target: f32) -> usize {
 pub unsafe fn nearest_index_neon(luminances: &[f32], target: f32) -> usize {
     use std::arch::aarch64::*;
 
-    unsafe {
-        let len = luminances.len();
-        let ptr = luminances.as_ptr();
-        let target_vec = vdupq_n_f32(target);
+    let len = luminances.len();
+    let ptr = luminances.as_ptr();
+    let target_vec = vdupq_n_f32(target);
 
-        // process main blocks
-        let chunks = len / 4;
-        let mut best_idx = 0;
-        let mut best_diff = f32::INFINITY;
+    let chunks = len / 4;
+    let mut best_idx = 0;
+    let mut best_diff = f32::INFINITY;
 
-        for chunk in 0..chunks {
-            let i = chunk * 4;
-            let v = vld1q_f32(ptr.add(i));
-            let diff = vabsq_f32(vsubq_f32(v, target_vec));
+    for chunk in 0..chunks {
+        let i = chunk * 4;
+        let v = unsafe { vld1q_f32(ptr.add(i)) };
+        let diff = vabsq_f32(vsubq_f32(v, target_vec));
 
-            // Extract lanes and find minimum
-            let d0 = vgetq_lane_f32(diff, 0);
-            let d1 = vgetq_lane_f32(diff, 1);
-            let d2 = vgetq_lane_f32(diff, 2);
-            let d3 = vgetq_lane_f32(diff, 3);
+        let d0 = vgetq_lane_f32(diff, 0);
+        let d1 = vgetq_lane_f32(diff, 1);
+        let d2 = vgetq_lane_f32(diff, 2);
+        let d3 = vgetq_lane_f32(diff, 3);
 
-            if d0 < best_diff {
-                best_diff = d0;
-                best_idx = i;
-            }
-            if d1 < best_diff {
-                best_diff = d1;
-                best_idx = i + 1;
-            }
-            if d2 < best_diff {
-                best_diff = d2;
-                best_idx = i + 2;
-            }
-            if d3 < best_diff {
-                best_diff = d3;
-                best_idx = i + 3;
-            }
+        if d0 < best_diff {
+            best_diff = d0;
+            best_idx = i;
         }
-
-        // handle remaining elements
-        for i in (chunks * 4)..len {
-            let diff = (*ptr.add(i) - target).abs();
-            if diff < best_diff {
-                best_diff = diff;
-                best_idx = i;
-            }
+        if d1 < best_diff {
+            best_diff = d1;
+            best_idx = i + 1;
         }
-
-        best_idx
+        if d2 < best_diff {
+            best_diff = d2;
+            best_idx = i + 2;
+        }
+        if d3 < best_diff {
+            best_diff = d3;
+            best_idx = i + 3;
+        }
     }
+
+    for i in (chunks * 4)..len {
+        let diff = unsafe { (*ptr.add(i) - target).abs() };
+        if diff < best_diff {
+            best_diff = diff;
+            best_idx = i;
+        }
+    }
+
+    best_idx
 }
