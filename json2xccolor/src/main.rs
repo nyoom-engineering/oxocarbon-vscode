@@ -1,7 +1,7 @@
+use oxocarbon_utils::parse_hex_rgba_f32 as parse_hex;
 use plist::to_writer_xml;
 use serde::Serialize;
 use std::{collections::BTreeMap, env, fs, io};
-use oxocarbon_utils::parse_hex_rgba_f32 as parse_hex;
 
 fn main() -> io::Result<()> {
     let args: Vec<_> = env::args().skip(1).collect();
@@ -161,7 +161,6 @@ fn main() -> io::Result<()> {
     to_writer_xml(writer, &root).map_err(io::Error::other)?;
     Ok(())
 }
-
 
 const COLOR_MAPPINGS: &[(&str, &[&str])] = &[
     ("xcode.syntax.comment.doc.keyword", &["comment.doc.keyword"]),
