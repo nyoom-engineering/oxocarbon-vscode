@@ -1,4 +1,5 @@
 use notify::{Config, Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
+use rayon::prelude::*;
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -97,6 +98,7 @@ fn run() -> Result<(), String> {
 
 fn rebuild(manifest: &Path) -> Result<(), String> {
     println!("Compiling...");
+    let start = Instant::now();
     let root = manifest
         .parent()
         .ok_or("Manifest missing parent directory")?
@@ -108,7 +110,7 @@ fn rebuild(manifest: &Path) -> Result<(), String> {
     fs::create_dir_all(&out_dir)
         .map_err(|e| format!("Failed to create {}: {e}", out_dir.display()))?;
 
-    for spec in THEMES {
+    THEMES.par_iter().try_for_each(|spec| {
         let output = Command::new(&compiler)
             .args(spec.flags)
             .arg(manifest)
@@ -123,9 +125,11 @@ fn rebuild(manifest: &Path) -> Result<(), String> {
         let path = out_dir.join(spec.name);
         fs::write(&path, &output.stdout)
             .map_err(|e| format!("Failed to write {}: {e}", path.display()))?;
-    }
 
-    println!("Done");
+        Ok(())
+    })?;
+
+    println!("Done in {:.2?}", start.elapsed());
     Ok(())
 }
 

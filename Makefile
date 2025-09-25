@@ -4,6 +4,17 @@ OUTDIR := out
 THEMESDIR := themes
 ASSETS := assets
 
+NUM_CPUS ?= $(shell sysctl -n hw.logicalcpu 2>/dev/null || nproc 2>/dev/null || echo 1)
+MAKE_JOBS ?= $(NUM_CPUS)
+
+ifneq ($(filter --jobserver%,$(MAKEFLAGS)),)
+else
+ifneq ($(filter -j% --jobs%,$(MAKEFLAGS)),)
+else
+MAKEFLAGS += --jobs=$(MAKE_JOBS)
+endif
+endif
+
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 ZED_CFG := ~/.config/zed
 EXTENSIONS := $(ASSETS)/extensions.txt
@@ -13,6 +24,10 @@ ZED_SRC_DIR := target/zed
 ZEDDIR := zed
 ZED_BUNDLE := $(ZEDDIR)/oxocarbon.json
 ZED_IMPORTER := $(ZED_SRC_DIR)/target/release/theme_importer
+
+CARGO ?= cargo
+RUST_SOURCES := $(shell find . -path ./target -prune -o \( -name '*.rs' -o -name 'Cargo.toml' -o -name 'Cargo.lock' \) -print)
+CARGO_RELEASE_STAMP := target/release/.cargo-release-stamp
 
 TMDIR := textmate
 TM_CONVERTER := target/release/json2tm
@@ -51,10 +66,14 @@ DEFAULT_THEMES := \
 	install-zed install-sublime install-textmate install-xcode textmate xcode \
 	benchmark
 
+ZED_THEME_FILES := $(filter-out $(THEMESDIR)/PRINT.json,$(DEFAULT_THEMES))
+TEXTMATE_JSONS := $(filter-out %compat%.json,$(DEFAULT_THEMES))
+TEXTMATE_TARGETS := $(sort $(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(TEXTMATE_JSONS)))
+XCODE_TARGETS := $(sort $(patsubst $(THEMESDIR)/%.json,$(XCODEDIR)/%.xccolortheme,$(TEXTMATE_JSONS)))
+
 all: $(DEFAULT_THEMES)
 
-build:
-	cargo build --release
+build: $(PROG)
 
 dev:
 	cargo run -r -p oxocarbon-dev
@@ -66,10 +85,17 @@ THEME_FLAGS = $(strip \
 	$(if $(findstring -coolgray-,$@),--monochrome-family coolgray,) \
 	$(if $(findstring -warmgray-,$@),--monochrome-family warmgray,))
 
-$(THEMESDIR)/%.json: build $(INPUT) | $(THEMESDIR)
+
+$(PROG): $(CARGO_RELEASE_STAMP)
+
+$(CARGO_RELEASE_STAMP): $(RUST_SOURCES)
+	$(CARGO) build --release
+	@touch $@
+
+$(THEMESDIR)/%.json: $(PROG) $(INPUT) | $(THEMESDIR)
 	$(PROG) $(THEME_FLAGS) $(INPUT) > $@
 
-$(THEMESDIR)/PRINT.json: build $(INPUT) | $(THEMESDIR)
+$(THEMESDIR)/PRINT.json: $(PROG) $(INPUT) | $(THEMESDIR)
 	$(PROG) --monochrome --oled --print $(INPUT) > $@
 
 PRINT: $(THEMESDIR)/PRINT.json
@@ -130,10 +156,14 @@ $(ZED_IMPORTER): | setup-zed
 $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@mkdir -p $(dir $(ZED_BUNDLE))
 	@echo "Converting themes for Zed..."
-	@for f in $(filter-out $(THEMESDIR)/PRINT.json,$(wildcard $(THEMESDIR)/*.json)); do \
-		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
-	done; \
-	jq -s 'def set_accent_and_players: \
+	@rm -f $(OUTDIR)/zed-*.json 2>/dev/null || true
+	@files='$(ZED_THEME_FILES)'; \
+	if [ -n "$$files" ]; then \
+		set -- $$files; \
+		printf '%s\0' "$$@" | \
+		xargs -0 -P $(MAKE_JOBS) -n 1 -I {} sh -c '$(ZED_IMPORTER) "{}" --output $(OUTDIR)/zed-$$(basename "{}")'; \
+	fi
+	@jq -s 'def set_accent_and_players: \
 		(.name | ascii_downcase | contains("monochrom")) as $$mono \
 		| (.name | ascii_downcase | contains("compatibility")) as $$compat \
 		| .style["text.accent"] = (if $$mono then "#ffffff" else "#ff7eb6" end) \
