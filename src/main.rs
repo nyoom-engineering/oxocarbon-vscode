@@ -4,40 +4,25 @@
 
 #![warn(clippy::pedantic)]
 
-use std::{borrow::Cow, env, fs, io, process};
 use oxocarbon_utils::{
-    format_hex_color, luminance_from_u8, midpoint_hex,
+    find_nearest_index, format_hex_color, luminance_from_u8, midpoint_hex, pack_rgb,
     parse_hex_rgba_u8 as parse_hex_color,
 };
+use std::{env, fs, io, process, sync::OnceLock};
 
 #[derive(Default)]
 struct Options {
-    flags: OptionsFlags,
+    flags: u8,
     mono_family: Option<String>,
     input_src: String,
 }
 
-#[derive(Clone, Copy, Default)]
-struct OptionsFlags {
-    bits: u8,
-}
-
-impl OptionsFlags {
+impl Options {
     const PRETTY: u8 = 1 << 0;
     const OLED: u8 = 1 << 1;
     const MONOCHROME: u8 = 1 << 3;
     const COMPAT: u8 = 1 << 2;
     const PRINT: u8 = 1 << 4;
-
-    fn set(&mut self, mask: u8) {
-        self.bits |= mask;
-    }
-    fn contains(self, mask: u8) -> bool {
-        self.bits & mask != 0
-    }
-}
-
-impl Options {
     fn from_env_args() -> Self {
         let mut args = env::args().skip(1);
         let mut opts = Options {
@@ -47,11 +32,11 @@ impl Options {
 
         while let Some(arg) = args.next() {
             match arg.as_str() {
-                "-p" | "--pretty" => opts.flags.set(OptionsFlags::PRETTY),
-                "--oled" => opts.flags.set(OptionsFlags::OLED),
-                "-m" | "--mono" | "--monochrome" => opts.flags.set(OptionsFlags::MONOCHROME),
-                "-c" | "--compat" | "--compatibility" => opts.flags.set(OptionsFlags::COMPAT),
-                "--print" => opts.flags.set(OptionsFlags::PRINT),
+                "-p" | "--pretty" => opts.flags |= Self::PRETTY,
+                "--oled" => opts.flags |= Self::OLED,
+                "-m" | "--mono" | "--monochrome" => opts.flags |= Self::MONOCHROME,
+                "-c" | "--compat" | "--compatibility" => opts.flags |= Self::COMPAT,
+                "--print" => opts.flags |= Self::PRINT,
                 "--mono-family" | "--monochrome-family" => {
                     if let Some(fam) = args.next() {
                         opts.mono_family = Some(fam.to_lowercase());
@@ -72,20 +57,25 @@ impl Options {
         opts
     }
 
+    #[inline]
     fn is_pretty(&self) -> bool {
-        self.flags.contains(OptionsFlags::PRETTY)
+        self.flags & Self::PRETTY != 0
     }
+    #[inline]
     fn is_oled(&self) -> bool {
-        self.flags.contains(OptionsFlags::OLED)
+        self.flags & Self::OLED != 0
     }
+    #[inline]
     fn is_compat(&self) -> bool {
-        self.flags.contains(OptionsFlags::COMPAT)
+        self.flags & Self::COMPAT != 0
     }
+    #[inline]
     fn is_monochrome(&self) -> bool {
-        self.flags.contains(OptionsFlags::MONOCHROME)
+        self.flags & Self::MONOCHROME != 0
     }
+    #[inline]
     fn is_print(&self) -> bool {
-        self.flags.contains(OptionsFlags::PRINT)
+        self.flags & Self::PRINT != 0
     }
 }
 
@@ -110,7 +100,7 @@ fn main() {
     if opts.is_monochrome() {
         let family = opts.mono_family.as_deref().unwrap_or("gray");
         let ramp = select_monochrome_ramp(family);
-        apply_monochrome(&mut value, &ramp, opts.is_print());
+        apply_monochrome(&mut value, ramp, opts.is_print());
         // enforce style-based foregrounds for monochrome variants
         apply_monochrome_style_overrides(&mut value);
     }
@@ -240,18 +230,13 @@ fn insert_value(table: &mut toml::value::Table, keys: &[&str], value: &toml::Val
 
 fn apply_replacements_in_table(table: &mut toml::value::Table, replacements: &[(&str, &str)]) {
     walk_table_strings_mut(table, &mut |s: &mut String| {
-        let mut cur: Cow<str> = Cow::Borrowed(s);
-        for (from, to) in replacements {
-            if cur.contains(from) {
-                cur = Cow::Owned(cur.replace(from, to));
+        for &(from, to) in replacements {
+            if let Some(pos) = s.find(from) {
+                s.replace_range(pos..pos + from.len(), to);
             }
-        }
-        if let Cow::Owned(new) = cur {
-            *s = new;
         }
     });
 }
-
 
 fn compute_theme_name(
     oled: bool,
@@ -332,75 +317,108 @@ const MONO_RAMP_EXTRAS: [&str; 13] = [
     "#393939", "#525252", "#dde1e6", "#f2f4f8", "#ffffff",
 ];
 
-// allowed accents
-const MONO_ALLOWED_ACCENTS: [&str; 10] = [
-    "08bdba", "3ddbd9", "78a9ff", "ee5396", "33b1ff", "ff7eb6", "42be65", "be95ff", "82cfff",
-    "a6c8ff",
-];
+const MONO_PRINT_EXTRA_ACCENTS: u32 = 0x0f62fe;
 
-// accents only allowed when building print variant
-const MONO_PRINT_EXTRA_ACCENTS: [&str; 1] = ["0f62fe"];
+static MONOCHROME_RAMPS: OnceLock<MonochromeRamps> = OnceLock::new();
 
-fn select_monochrome_ramp(family: &str) -> Vec<&'static str> {
-    let base: &[&str] = match family {
-        "coolgray" | "cool-gray" | "cool" => &COOL_GRAY_RAMP,
-        "warmgray" | "warm-gray" | "warm" => &WARM_GRAY_RAMP,
-        _ => &GRAY_RAMP,
-    };
-    let mut seen: std::collections::HashSet<&'static str> = std::collections::HashSet::new();
-    let mut ramp: Vec<&'static str> = Vec::with_capacity(MONO_RAMP_EXTRAS.len() + base.len());
-    for &h in MONO_RAMP_EXTRAS.iter().chain(base.iter()) {
-        if seen.insert(h) {
-            ramp.push(h);
-        }
-    }
-    ramp
+#[repr(C)]
+struct MonochromeRamps {
+    default: MonoRamp,
+    cool: MonoRamp,
+    warm: MonoRamp,
 }
 
-fn apply_monochrome(value: &mut toml::Value, ramp_hex: &[&str], is_print: bool) {
-    // pre-sort ramp by luminance for nearest-neighbor lookup
-    let mut ramp: Vec<(f32, [u8; 3])> = ramp_hex
-        .iter()
-        .filter_map(|h| {
-            parse_hex_color(h).map(|(rgb, _)| (luminance_from_u8(rgb[0], rgb[1], rgb[2]), rgb))
-        })
-        .collect();
-    ramp.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+struct MonoRamp {
+    luminances: &'static [f32],
+    rgbs: &'static [[u8; 3]],
+}
 
+impl MonoRamp {
+    #[inline(always)]
+    fn nearest_rgb(&self, target: f32) -> [u8; 3] {
+        let idx = find_nearest_index(self.luminances, target);
+        self.rgbs[idx]
+    }
+}
+
+#[inline]
+fn monochrome_ramps() -> &'static MonochromeRamps {
+    MONOCHROME_RAMPS.get_or_init(build_monochrome_ramps)
+}
+
+fn build_monochrome_ramps() -> MonochromeRamps {
+    MonochromeRamps {
+        default: build_ramp(&GRAY_RAMP),
+        cool: build_ramp(&COOL_GRAY_RAMP),
+        warm: build_ramp(&WARM_GRAY_RAMP),
+    }
+}
+
+fn build_ramp(base: &'static [&'static str]) -> MonoRamp {
+    let mut entries: Vec<(f32, [u8; 3])> = Vec::with_capacity(MONO_RAMP_EXTRAS.len() + base.len());
+    let mut seen = 0u64;
+    
+    for &hex in MONO_RAMP_EXTRAS.iter().chain(base.iter()) {
+        let (rgb, _) = parse_hex_color(hex).unwrap();
+        let packed = pack_rgb(rgb) as u64;
+        if seen & (1u64 << (packed % 64)) != 0 {
+            continue;
+        }
+        seen |= 1u64 << (packed % 64);
+        let lum = luminance_from_u8(rgb[0], rgb[1], rgb[2]);
+        entries.push((lum, rgb));
+    }
+    
+    entries.sort_unstable_by(|a, b| a.0.total_cmp(&b.0));
+    
+    let (luminances, rgbs): (Vec<f32>, Vec<[u8; 3]>) = entries.into_iter().unzip();
+    
+    MonoRamp {
+        luminances: Box::leak(luminances.into_boxed_slice()),
+        rgbs: Box::leak(rgbs.into_boxed_slice()),
+    }
+}
+
+#[inline(always)]
+fn select_monochrome_ramp(family: &str) -> &'static MonoRamp {
+    let ramps = monochrome_ramps();
+    match family {
+        "coolgray" | "cool-gray" | "cool" => &ramps.cool,
+        "warmgray" | "warm-gray" | "warm" => &ramps.warm,
+        _ => &ramps.default,
+    }
+}
+
+fn apply_monochrome(value: &mut toml::Value, ramp: &MonoRamp, is_print: bool) {
     walk_value_strings_mut(value, &mut |s: &mut String| {
-        if !is_allowed_accent_hex(s, is_print) {
+        let Some((rgb, alpha)) = parse_hex_color(s) else {
+            return;
+        };
+        if is_allowed_accent(rgb, is_print) {
             return;
         }
-        if let Some((rgb, a)) = parse_hex_color(s) {
-            let y = luminance_from_u8(rgb[0], rgb[1], rgb[2]);
-            let i = ramp.partition_point(|&(ry, _)| ry < y);
-            let pick = match (i.checked_sub(1), ramp.get(i)) {
-                (Some(li), Some(&(_ry2, rgb2))) => {
-                    let (yl, yr) = (ramp[li].0, ramp[i].0);
-                    if (y - yl) <= (yr - y) {
-                        ramp[li].1
-                    } else {
-                        rgb2
-                    }
-                }
-                (Some(li), None) => ramp[li].1,
-                (None, Some(&(_ry2, rgb2))) => rgb2,
-                (None, None) => rgb,
-            };
-            *s = format_hex_color(pick, a);
+        let y = luminance_from_u8(rgb[0], rgb[1], rgb[2]);
+        let pick = ramp.nearest_rgb(y);
+        if pick != rgb {
+            *s = format_hex_color(pick, alpha);
         }
     });
 }
 
+#[inline(always)]
+fn is_allowed_accent(rgb: [u8; 3], is_print: bool) -> bool {
+    let value = pack_rgb(rgb);
+    matches!(value, 0x08bdba | 0x33b1ff | 0x3ddbd9 | 0x42be65 | 0x78a9ff | 0x82cfff | 0xa6c8ff | 0xbe95ff | 0xee5396 | 0xff7eb6)
+        || (is_print && value == MONO_PRINT_EXTRA_ACCENTS)
+}
+
 fn apply_monochrome_style_overrides(value: &mut toml::Value) {
-    // In monochrome themes:
-    // - any token with fontStyle containing 'italic' => foreground #f2f4f8
-    // - any token with fontStyle that is strictly 'bold' (pure bold) => foreground #ffffff
     let Some(arr) = value.get_mut("tokenColors").and_then(|v| v.as_array_mut()) else {
         return;
     };
-    let italic_fg = toml::Value::String("#f2f4f8".to_string());
-    let bold_fg = toml::Value::String("#ffffff".to_string());
+    const ITALIC_FG: &str = "#f2f4f8";
+    const BOLD_FG: &str = "#ffffff";
+    
     for item in arr.iter_mut() {
         let Some(settings) = item.get_mut("settings").and_then(|v| v.as_table_mut()) else {
             continue;
@@ -408,37 +426,16 @@ fn apply_monochrome_style_overrides(value: &mut toml::Value) {
         let Some(font_style) = settings.get("fontStyle").and_then(|v| v.as_str()) else {
             continue;
         };
-        let (count, has_bold, has_italic) =
-            font_style
-                .split_whitespace()
-                .fold((0usize, false, false), |(n, b, i), t| {
-                    (
-                        n + 1,
-                        b || t.eq_ignore_ascii_case("bold"),
-                        i || t.eq_ignore_ascii_case("italic"),
-                    )
-                });
+        
+        let has_italic = font_style.contains("italic") || font_style.contains("Italic");
+        let is_bold_only = font_style.trim().eq_ignore_ascii_case("bold");
+        
         if has_italic {
-            settings.insert("foreground".into(), italic_fg.clone());
-        } else if has_bold && count == 1 {
-            settings.insert("foreground".into(), bold_fg.clone());
+            settings.insert("foreground".into(), toml::Value::String(ITALIC_FG.to_string()));
+        } else if is_bold_only {
+            settings.insert("foreground".into(), toml::Value::String(BOLD_FG.to_string()));
         }
     }
-}
-
-fn is_allowed_accent_hex(s: &str, is_print: bool) -> bool {
-    if s.len() < 7 || s.as_bytes().first().is_none_or(|b| *b != b'#') {
-        return false;
-    }
-    // accept both rgb and rgba as long as rgb matches the list
-    let rgb = &s[1..7];
-    MONO_ALLOWED_ACCENTS
-        .iter()
-        .any(|allowed| rgb.eq_ignore_ascii_case(allowed))
-        || (is_print
-            && MONO_PRINT_EXTRA_ACCENTS
-                .iter()
-                .any(|allowed| rgb.eq_ignore_ascii_case(allowed)))
 }
 
 fn walk_value_strings_mut<F: FnMut(&mut String)>(v: &mut toml::Value, f: &mut F) {

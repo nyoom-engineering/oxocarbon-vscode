@@ -27,70 +27,53 @@ const fn build_hex_decode() -> [u8; 256] {
 }
 
 #[inline(always)]
-fn nibble_value(b: u8) -> u8 {
-    HEX_DECODE[b as usize]
-}
-
-#[inline(always)]
-fn decode_nibble(b: u8) -> Option<u8> {
-    let value = nibble_value(b);
-    (value != INVALID).then_some(value)
-}
-
-#[inline(always)]
 fn decode_pair(h: u8, l: u8) -> Option<u8> {
-    Some((decode_nibble(h)? << 4) | decode_nibble(l)?)
+    let h = HEX_DECODE[h as usize];
+    let l = HEX_DECODE[l as usize];
+    ((h | l) != INVALID).then_some((h << 4) | l)
 }
 
-/// parses hex color strings: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
-/// returns (rgb, alpha) with 8-bit channels; alpha is None if not provided.
+#[inline(always)]
 pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
-    let data = input.as_bytes().strip_prefix(b"#")?;
+    let data = input.as_bytes();
+    if data.is_empty() || data[0] != b'#' {
+        return None;
+    }
+    let data = unsafe { data.get_unchecked(1..) };
     match data.len() {
-        3 => match data {
-            [r, g, b] => Some((
-                [
-                    expand_nibble(decode_nibble(*r)?),
-                    expand_nibble(decode_nibble(*g)?),
-                    expand_nibble(decode_nibble(*b)?),
-                ],
-                None,
-            )),
-            _ => None,
-        },
-        4 => match data {
-            [r, g, b, a] => Some((
-                [
-                    expand_nibble(decode_nibble(*r)?),
-                    expand_nibble(decode_nibble(*g)?),
-                    expand_nibble(decode_nibble(*b)?),
-                ],
-                Some(expand_nibble(decode_nibble(*a)?)),
-            )),
-            _ => None,
-        },
-        6 => match data {
-            [r0, r1, g0, g1, b0, b1] => Some((
-                [
-                    decode_pair(*r0, *r1)?,
-                    decode_pair(*g0, *g1)?,
-                    decode_pair(*b0, *b1)?,
-                ],
-                None,
-            )),
-            _ => None,
-        },
-        8 => match data {
-            [r0, r1, g0, g1, b0, b1, a0, a1] => Some((
-                [
-                    decode_pair(*r0, *r1)?,
-                    decode_pair(*g0, *g1)?,
-                    decode_pair(*b0, *b1)?,
-                ],
-                Some(decode_pair(*a0, *a1)?),
-            )),
-            _ => None,
-        },
+        3 => {
+            let r = HEX_DECODE[data[0] as usize];
+            let g = HEX_DECODE[data[1] as usize];
+            let b = HEX_DECODE[data[2] as usize];
+            ((r | g | b) != INVALID)
+                .then_some(([expand_nibble(r), expand_nibble(g), expand_nibble(b)], None))
+        }
+        4 => {
+            let r = HEX_DECODE[data[0] as usize];
+            let g = HEX_DECODE[data[1] as usize];
+            let b = HEX_DECODE[data[2] as usize];
+            let a = HEX_DECODE[data[3] as usize];
+            ((r | g | b | a) != INVALID).then_some((
+                [expand_nibble(r), expand_nibble(g), expand_nibble(b)],
+                Some(expand_nibble(a)),
+            ))
+        }
+        6 => Some((
+            [
+                decode_pair(data[0], data[1])?,
+                decode_pair(data[2], data[3])?,
+                decode_pair(data[4], data[5])?,
+            ],
+            None,
+        )),
+        8 => Some((
+            [
+                decode_pair(data[0], data[1])?,
+                decode_pair(data[2], data[3])?,
+                decode_pair(data[4], data[5])?,
+            ],
+            Some(decode_pair(data[6], data[7])?),
+        )),
         _ => None,
     }
 }
@@ -140,25 +123,21 @@ fn linear_to_srgb_u8(c: f32) -> u8 {
 #[inline(always)]
 pub fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
-    let len = 7 + alpha.map_or(0, |_| 2);
-    let mut out = String::with_capacity(len);
-    // fill the backing buffer in place, avoids intermediate alloc
-    unsafe {
-        let vec = out.as_mut_vec();
-        vec.set_len(len);
-        vec[0] = b'#';
-        let mut idx = 1;
-        for &byte in &rgb {
-            vec[idx] = HEX[(byte >> 4) as usize];
-            vec[idx + 1] = HEX[(byte & 0x0f) as usize];
-            idx += 2;
-        }
-        if let Some(a) = alpha {
-            vec[idx] = HEX[(a >> 4) as usize];
-            vec[idx + 1] = HEX[(a & 0x0f) as usize];
-        }
+    let has_alpha = alpha.is_some();
+    let len = if has_alpha { 9 } else { 7 };
+    let mut buf = [0u8; 9];
+    buf[0] = b'#';
+    buf[1] = HEX[(rgb[0] >> 4) as usize];
+    buf[2] = HEX[(rgb[0] & 0x0f) as usize];
+    buf[3] = HEX[(rgb[1] >> 4) as usize];
+    buf[4] = HEX[(rgb[1] & 0x0f) as usize];
+    buf[5] = HEX[(rgb[2] >> 4) as usize];
+    buf[6] = HEX[(rgb[2] & 0x0f) as usize];
+    if let Some(a) = alpha {
+        buf[7] = HEX[(a >> 4) as usize];
+        buf[8] = HEX[(a & 0x0f) as usize];
     }
-    out
+    unsafe { String::from_utf8_unchecked(buf[..len].to_vec()) }
 }
 
 /// computes relative luminance
@@ -206,6 +185,11 @@ pub fn midpoint_hex_linear(a_hex: &str, b_hex: &str) -> String {
     format_hex_color(rgb, None)
 }
 
+#[inline]
+pub fn pack_rgb(rgb: [u8; 3]) -> u32 {
+    (u32::from(rgb[0]) << 16) | (u32::from(rgb[1]) << 8) | u32::from(rgb[2])
+}
+
 #[inline(always)]
 fn strict_rgb(input: &str, label: &'static str) -> [u8; 3] {
     if let Some((rgb, _)) = parse_hex_rgba_u8(input) {
@@ -219,4 +203,103 @@ fn strict_rgb(input: &str, label: &'static str) -> [u8; 3] {
 #[inline(never)]
 fn invalid_hex(label: &'static str) -> ! {
     panic!("{label}");
+}
+
+#[inline(always)]
+pub fn find_nearest_index(luminances: &[f32], target: f32) -> usize {
+    let len = luminances.len();
+    if len <= 1 {
+        return 0;
+    }
+
+    #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+    {
+        if len >= 8 {
+            return unsafe { nearest_index_neon(luminances, target) };
+        }
+    }
+
+    let mut left = 0;
+    let mut right = len;
+
+    while left < right {
+        let mid = left + (right - left) / 2;
+        if luminances[mid] < target {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+
+    match left {
+        0 => 0,
+        n if n == len => n - 1,
+        idx => {
+            let prev = luminances[idx - 1];
+            let next = luminances[idx];
+            if ((target - prev) * 1000.0) as i32 <= ((next - target) * 1000.0) as i32 {
+                idx - 1
+            } else {
+                idx
+            }
+        }
+    }
+}
+
+#[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+#[inline]
+#[target_feature(enable = "neon")]
+pub unsafe fn nearest_index_neon(luminances: &[f32], target: f32) -> usize {
+    use std::arch::aarch64::*;
+
+    unsafe {
+        let len = luminances.len();
+        let ptr = luminances.as_ptr();
+        let target_vec = vdupq_n_f32(target);
+
+        // process main blocks
+        let chunks = len / 4;
+        let mut best_idx = 0;
+        let mut best_diff = f32::INFINITY;
+
+        for chunk in 0..chunks {
+            let i = chunk * 4;
+            let v = vld1q_f32(ptr.add(i));
+            let diff = vabsq_f32(vsubq_f32(v, target_vec));
+
+            // Extract lanes and find minimum
+            let d0 = vgetq_lane_f32(diff, 0);
+            let d1 = vgetq_lane_f32(diff, 1);
+            let d2 = vgetq_lane_f32(diff, 2);
+            let d3 = vgetq_lane_f32(diff, 3);
+
+            if d0 < best_diff {
+                best_diff = d0;
+                best_idx = i;
+            }
+            if d1 < best_diff {
+                best_diff = d1;
+                best_idx = i + 1;
+            }
+            if d2 < best_diff {
+                best_diff = d2;
+                best_idx = i + 2;
+            }
+            if d3 < best_diff {
+                best_diff = d3;
+                best_idx = i + 3;
+            }
+        }
+
+        // handle remaining elements
+        for i in (chunks * 4)..len {
+            let diff = (*ptr.add(i) - target).abs();
+            if diff < best_diff {
+                best_diff = diff;
+                best_idx = i;
+            }
+        }
+
+        best_idx
+    }
 }
