@@ -48,9 +48,6 @@ dependencies = [
 [[package]]
 name = "oxocarbon-utils"
 version = "0.1.0"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "proc-macro2"

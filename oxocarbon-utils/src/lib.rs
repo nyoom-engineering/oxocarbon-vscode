@@ -5,7 +5,9 @@ const INVALID: u8 = 0xFF;
 const HEX_DECODE: [u8; 256] = build_hex_decode();
 
 #[inline(always)]
-const fn expand_nibble(n: u8) -> u8 { (n << 4) | n }
+const fn expand_nibble(n: u8) -> u8 {
+    (n << 4) | n
+}
 
 const fn build_hex_decode() -> [u8; 256] {
     let mut table = [INVALID; 256];
@@ -25,7 +27,9 @@ const fn build_hex_decode() -> [u8; 256] {
 }
 
 #[inline(always)]
-fn nibble_value(b: u8) -> u8 { HEX_DECODE[b as usize] }
+fn nibble_value(b: u8) -> u8 {
+    HEX_DECODE[b as usize]
+}
 
 #[inline(always)]
 fn decode_nibble(b: u8) -> Option<u8> {
@@ -44,35 +48,47 @@ pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
     let data = input.as_bytes().strip_prefix(b"#")?;
     match data.len() {
         3 => match data {
-            [r, g, b] => Some(([
-                expand_nibble(decode_nibble(*r)?),
-                expand_nibble(decode_nibble(*g)?),
-                expand_nibble(decode_nibble(*b)?),
-            ], None)),
+            [r, g, b] => Some((
+                [
+                    expand_nibble(decode_nibble(*r)?),
+                    expand_nibble(decode_nibble(*g)?),
+                    expand_nibble(decode_nibble(*b)?),
+                ],
+                None,
+            )),
             _ => None,
         },
         4 => match data {
-            [r, g, b, a] => Some(([
-                expand_nibble(decode_nibble(*r)?),
-                expand_nibble(decode_nibble(*g)?),
-                expand_nibble(decode_nibble(*b)?),
-            ], Some(expand_nibble(decode_nibble(*a)?)))),
+            [r, g, b, a] => Some((
+                [
+                    expand_nibble(decode_nibble(*r)?),
+                    expand_nibble(decode_nibble(*g)?),
+                    expand_nibble(decode_nibble(*b)?),
+                ],
+                Some(expand_nibble(decode_nibble(*a)?)),
+            )),
             _ => None,
         },
         6 => match data {
-            [r0, r1, g0, g1, b0, b1] => Some(([
-                decode_pair(*r0, *r1)?,
-                decode_pair(*g0, *g1)?,
-                decode_pair(*b0, *b1)?,
-            ], None)),
+            [r0, r1, g0, g1, b0, b1] => Some((
+                [
+                    decode_pair(*r0, *r1)?,
+                    decode_pair(*g0, *g1)?,
+                    decode_pair(*b0, *b1)?,
+                ],
+                None,
+            )),
             _ => None,
         },
         8 => match data {
-            [r0, r1, g0, g1, b0, b1, a0, a1] => Some(([
-                decode_pair(*r0, *r1)?,
-                decode_pair(*g0, *g1)?,
-                decode_pair(*b0, *b1)?,
-            ], Some(decode_pair(*a0, *a1)?))),
+            [r0, r1, g0, g1, b0, b1, a0, a1] => Some((
+                [
+                    decode_pair(*r0, *r1)?,
+                    decode_pair(*g0, *g1)?,
+                    decode_pair(*b0, *b1)?,
+                ],
+                Some(decode_pair(*a0, *a1)?),
+            )),
             _ => None,
         },
         _ => None,
@@ -94,16 +110,26 @@ pub fn parse_hex_rgba_f32(input: &str) -> Option<(f32, f32, f32, f32)> {
 
 #[inline]
 fn srgb_to_linear(c: f32) -> f32 {
-    if c <= 0.04045 { c / 12.92 } else { ((c + 0.055) / 1.055).powf(2.4) }
+    if c <= 0.04045 {
+        c / 12.92
+    } else {
+        ((c + 0.055) / 1.055).powf(2.4)
+    }
 }
 
 #[inline]
 fn linear_to_srgb(c: f32) -> f32 {
-    if c <= 0.003_130_8 { c * 12.92 } else { 1.055 * c.powf(1.0 / 2.4) - 0.055 }
+    if c <= 0.003_130_8 {
+        c * 12.92
+    } else {
+        1.055 * c.powf(1.0 / 2.4) - 0.055
+    }
 }
 
 #[inline]
-fn srgb_u8_to_linear(c: u8) -> f32 { srgb_to_linear(f32::from(c) * INV_255) }
+fn srgb_u8_to_linear(c: u8) -> f32 {
+    srgb_to_linear(f32::from(c) * INV_255)
+}
 
 #[inline]
 fn linear_to_srgb_u8(c: f32) -> u8 {
@@ -135,7 +161,7 @@ pub fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
     out
 }
 
-/// computes relative luminance 
+/// computes relative luminance
 /// suitable for wcag contrast checks
 #[inline]
 pub fn luminance_from_u8(r: u8, g: u8, b: u8) -> f32 {
@@ -148,18 +174,23 @@ pub fn luminance_from_u8(r: u8, g: u8, b: u8) -> f32 {
 
 /// returns the rounded midpoint of two channels without overflow
 #[inline]
-pub const fn average_channel(a: u8, b: u8) -> u8 { (a & b).wrapping_add((a ^ b) >> 1) }
+pub const fn average_channel(a: u8, b: u8) -> u8 {
+    (a & b).wrapping_add((a ^ b) >> 1)
+}
 
 /// computes midpoint color between two hex strings (ignores alpha)
 #[must_use]
 pub fn midpoint_hex(a_hex: &str, b_hex: &str) -> String {
     let [ar, ag, ab] = strict_rgb(a_hex, "invalid hex a");
     let [br, bg, bb] = strict_rgb(b_hex, "invalid hex b");
-    format_hex_color([
-        average_channel(ar, br),
-        average_channel(ag, bg),
-        average_channel(ab, bb),
-    ], None)
+    format_hex_color(
+        [
+            average_channel(ar, br),
+            average_channel(ag, bg),
+            average_channel(ab, bb),
+        ],
+        None,
+    )
 }
 
 /// averages two hex colors in linear sRGB space (ignores alpha)
@@ -177,7 +208,11 @@ pub fn midpoint_hex_linear(a_hex: &str, b_hex: &str) -> String {
 
 #[inline(always)]
 fn strict_rgb(input: &str, label: &'static str) -> [u8; 3] {
-    if let Some((rgb, _)) = parse_hex_rgba_u8(input) { rgb } else { invalid_hex(label) }
+    if let Some((rgb, _)) = parse_hex_rgba_u8(input) {
+        rgb
+    } else {
+        invalid_hex(label)
+    }
 }
 
 #[cold]
@@ -185,20 +220,3 @@ fn strict_rgb(input: &str, label: &'static str) -> [u8; 3] {
 fn invalid_hex(label: &'static str) -> ! {
     panic!("{label}");
 }
-
-pub mod serde_helpers {
-    use serde::Deserialize;
-
-    /// Deserialize scope which can be string or array of strings, joined by ", ".
-    pub fn deserialize_scope<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
-    where
-        D: serde::de::Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        #[serde(untagged)]
-        enum Scope { S(String), V(Vec<String>) }
-        Ok(Option::<Scope>::deserialize(deserializer)?.map(|s| match s { Scope::S(s) => s, Scope::V(v) => v.join(", ") }))
-    }
-}
-
-
