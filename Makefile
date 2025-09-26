@@ -19,6 +19,20 @@ TM_CONVERTER := target/release/json2tm
 TM_USER := ~/Library/Application\ Support/TextMate/Themes
 SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
 SUBLIME_UI := $(ASSETS)/sublime-ui
+JSON2ST := target/release/json2st
+
+SUBLIME_UI_PAIRS := \
+	oxocarbon-color-theme.json:oxocarbon.sublime-theme \
+	oxocarbon-oled-color-theme.json:oxocarbon_oled.sublime-theme \
+	oxocarbon-compat-color-theme.json:oxocarbon_compatibility.sublime-theme \
+	oxocarbon-oled-compat-color-theme.json:oxocarbon_oled_compatibility.sublime-theme \
+	oxocarbon-mono-color-theme.json:oxocarbon_mono.sublime-theme \
+	oxocarbon-oled-mono-color-theme.json:oxocarbon_oled_mono.sublime-theme \
+	oxocarbon-mono-compat-color-theme.json:oxocarbon_mono_compatibility.sublime-theme \
+	oxocarbon-oled-mono-compat-color-theme.json:oxocarbon_oled_mono_compatibility.sublime-theme \
+	PRINT.json:PRINT.sublime-theme
+
+SUBLIME_UI_INPUTS := $(addprefix $(THEMESDIR)/,$(foreach pair,$(SUBLIME_UI_PAIRS),$(word 1,$(subst :, ,$(pair)))))
 
 JB_REPO_URL := https://github.com/JetBrains/colorSchemeTool
 JB_SRC_DIR := target/colorSchemeTool
@@ -48,9 +62,9 @@ DEFAULT_THEMES := \
 	$(THEMESDIR)/PRINT.json
 
 .PHONY: all build clean dev dotfiles help install mono-coolgray mono-warmgray PRINT \
- 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
- 	install-zed install-sublime install-textmate install-xcode install-sublime-ui \
- 	textmate xcode benchmark
+	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
+	install-zed install-sublime install-textmate install-xcode install-sublime-ui \
+	textmate xcode benchmark sublime-ui
 
 all: $(DEFAULT_THEMES)
 
@@ -169,6 +183,18 @@ $(TMDIR)/%.tmTheme: $(THEMESDIR)/%.json $(TM_CONVERTER)
 	@mkdir -p $(dir $@)
 	$(TM_CONVERTER) $< $@
 
+sublime-ui: $(SUBLIME_UI_INPUTS) $(JSON2ST)
+	@mkdir -p $(SUBLIME_UI)
+	@for pair in $(SUBLIME_UI_PAIRS); do \
+		in=$(THEMESDIR)/$${pair%%:*}; \
+		out=$(SUBLIME_UI)/$${pair##*:}; \
+		echo "$$in -> $$out"; \
+		cat $$in | $(JSON2ST) > $$out; \
+		done
+
+$(JSON2ST):
+	cargo build --release --manifest-path json2st/Cargo.toml
+
 setup-intellij: check-python $(JB_SRC_DIR)
 intellij: $(patsubst $(THEMESDIR)/%.json,$(INTELLIJDIR)/%.icls,$(wildcard $(THEMESDIR)/*.json))
 	@echo "IntelliJ schemes written to $(INTELLIJDIR)"
@@ -242,7 +268,7 @@ install-xcode: xcode
 	cp $(XCODEDIR)/*.xccolortheme $(XCODE_USER)/
 
 clean:
-	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls
+	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls $(SUBLIME_UI)/*.sublime-theme
 
 benchmark: build $(TM_CONVERTER) $(XCODE_CONVERTER) all
 	$(call bench,rm -f $(THEMESDIR)/*.json,make -s all)

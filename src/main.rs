@@ -7,16 +7,9 @@
 mod ramp;
 
 use oxocarbon_utils::{
-    format_hex_color, 
-    luminance_from_u8, 
-    midpoint_hex, 
-    parse_hex_rgba_u8 as parse_hex_color
+    format_hex_color, luminance_from_u8, midpoint_hex, parse_hex_rgba_u8 as parse_hex_color,
 };
-use ramp::{
-    MonoRamp, 
-    is_monochrome_candidate, 
-    select_monochrome_ramp
-};
+use ramp::{MonoRamp, is_monochrome_candidate, select_monochrome_ramp};
 use std::{env, fs, io, process};
 
 #[derive(Default)]
@@ -121,6 +114,7 @@ fn main() {
         // compatibility variants - contrast panels
         // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
         // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
+        #[rustfmt::skip]
         let (from, to) = if opts.is_oled() {("#000000", "#161616")} else {("#161616", "#262626")};
         let c1 = midpoint_hex(from, to);
         insert_value(colors, &COMPAT_BG_KEYS, &toml::Value::String(c1));
@@ -133,6 +127,7 @@ fn main() {
         // - Standard compat: #393939
         // - OLED compat:     #262626
         let c3 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
+        #[rustfmt::skip]
         insert_value(colors, &COMPAT_CONTRAST_KEYS, &toml::Value::String(c3.clone()));
         // compatibility variants - additional contrast
         // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
@@ -203,6 +198,7 @@ const COMPAT_BG_KEYS: [&str; 8] = [
     "editorWidget.background",
 ];
 
+#[rustfmt::skip]
 const COMPAT_BG_KEYS_2: [&str; 1] = [
     "editorGutter.background"
 ];
