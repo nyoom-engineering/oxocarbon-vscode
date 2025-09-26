@@ -145,7 +145,7 @@ $(ZED_IMPORTER): | setup-zed
 $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@mkdir -p $(dir $(ZED_BUNDLE))
 	@echo "Converting themes for Zed..."
-	@for f in $(filter-out $(THEMESDIR)/PRINT.json,$(wildcard $(THEMESDIR)/*.json)); do \
+	@for f in $(wildcard $(THEMESDIR)/*.json); do \
 		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
 	done; \
 	jq -s 'def set_accent_and_players: \
