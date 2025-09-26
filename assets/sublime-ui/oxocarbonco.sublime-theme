@@ -17,7 +17,6 @@
     "medium_dark_bg": "#101010",
     "medium_bg": "#131313",
     "light_bg": "#171717",
-    "link_fg": "hsl(215, 68%, 58%)",
     "vcs_modified": "color(var(--bluish) min-contrast(var(--background) 2.8))",
     "vcs_missing": "color(var(--redish) min-contrast(var(--background) 2.8))",
     "vcs_staged": "color(var(--bluish) min-contrast(var(--background) 2.8))",

@@ -226,7 +226,7 @@ install-zed: zed
 
 install-sublime: textmate
 	mkdir -p $(SUBLIME_USER)
-	cp $(wildcard $(THEMESDIR)/*.json) $(SUBLIME_USER)/
+	cp $(wildcard $(TMDIR)/*.tmTheme) $(SUBLIME_USER)/
 	cp $(ASSETS)/Preferences.sublime-settings $(SUBLIME_USER)/Preferences.sublime-settings
 
 install-sublime-ui:
@@ -235,7 +235,7 @@ install-sublime-ui:
 
 install-textmate: textmate
 	mkdir -p $(TM_USER)
-	cp $(filter-out %compat%.tmTheme,$(wildcard $(TMDIR)/*.tmTheme)) $(TM_USER)/
+	cp $(wildcard $(TMDIR)/*.tmTheme) $(TM_USER)/
 
 install-xcode: xcode
 	mkdir -p $(XCODE_USER)
