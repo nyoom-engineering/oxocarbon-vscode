@@ -21,6 +21,10 @@ SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
 SUBLIME_UI := $(ASSETS)/sublime-ui
 JSON2ST := target/release/json2st
 
+JSON2ST_SRCS := $(shell find json2st/src -type f -name '*.rs')
+JSON2TM_SRCS := $(shell find json2tm/src -type f -name '*.rs')
+JSON2XCCOLOR_SRCS := $(shell find json2xccolor/src -type f -name '*.rs')
+
 SUBLIME_UI_PAIRS := \
 	oxocarbon-color-theme.json:oxocarbon.sublime-theme \
 	oxocarbon-oled-color-theme.json:oxocarbon_oled.sublime-theme \
@@ -145,7 +149,7 @@ $(ZED_IMPORTER): | setup-zed
 $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@mkdir -p $(dir $(ZED_BUNDLE))
 	@echo "Converting themes for Zed..."
-	@for f in $(wildcard $(THEMESDIR)/*.json); do \
+	@for f in $(filter-out $(THEMESDIR)/PRINT.json,$(wildcard $(THEMESDIR)/*.json)); do \
 		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
 	done; \
 	jq -s 'def set_accent_and_players: \
@@ -176,8 +180,8 @@ $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 textmate: $(foreach f,$(sort $(DEFAULT_THEMES) $(wildcard $(THEMESDIR)/*.json)),$(if $(findstring compat,$(notdir $(f))),,$(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(f))))
 	@echo "Textmate themes written to $(TMDIR)"
 
-$(TM_CONVERTER):
-	cargo build --release --manifest-path json2tm/Cargo.toml
+$(TM_CONVERTER): $(JSON2TM_SRCS)
+	cargo build -r -p json2tm
 
 $(TMDIR)/%.tmTheme: $(THEMESDIR)/%.json $(TM_CONVERTER)
 	@mkdir -p $(dir $@)
@@ -189,11 +193,18 @@ sublime-ui: $(SUBLIME_UI_INPUTS) $(JSON2ST)
 		in=$(THEMESDIR)/$${pair%%:*}; \
 		out=$(SUBLIME_UI)/$${pair##*:}; \
 		echo "$$in -> $$out"; \
-		cat $$in | $(JSON2ST) > $$out; \
-		done
+		if [ "$$(basename $$in)" = "PRINT.json" ]; then \
+			temp_in=$$(mktemp); \
+			$(PROG) --monochrome --oled --print --compat $(INPUT) > $$temp_in && \
+			cat $$temp_in | $(JSON2ST) > $$out && \
+			rm $$temp_in; \
+		else \
+			cat $$in | $(JSON2ST) > $$out; \
+		fi; \
+	done
 
-$(JSON2ST):
-	cargo build --release --manifest-path json2st/Cargo.toml
+$(JSON2ST): $(JSON2ST_SRCS)
+	cargo build -r -p json2st
 
 setup-intellij: check-python $(JB_SRC_DIR)
 intellij: $(patsubst $(THEMESDIR)/%.json,$(INTELLIJDIR)/%.icls,$(wildcard $(THEMESDIR)/*.json))
@@ -218,8 +229,8 @@ $(INTELLIJDIR)/%.icls: $(THEMESDIR)/%.json | setup-intellij $(INTELLIJ_CONVERTER
 xcode: $(foreach f,$(sort $(DEFAULT_THEMES) $(wildcard $(THEMESDIR)/*.json)),$(if $(findstring compat,$(notdir $(f))),,$(patsubst $(THEMESDIR)/%.json,$(XCODEDIR)/%.xccolortheme,$(f))))
 	@echo "Xcode themes written to $(XCODEDIR)"
 
-$(XCODE_CONVERTER):
-	cargo build --release --manifest-path json2xccolor/Cargo.toml
+$(XCODE_CONVERTER): $(JSON2XCCOLOR_SRCS)
+	cargo build -r -p json2xccolor
 
 $(XCODEDIR)/%.xccolortheme: $(THEMESDIR)/%.json $(XCODE_CONVERTER)
 	@mkdir -p $(dir $@)

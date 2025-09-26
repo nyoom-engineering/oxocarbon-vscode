@@ -195,7 +195,7 @@ const VCS_COLORS: &[(&str, &str)] = &[
     ("vcs_modified", "var(--bluish)"),
     ("vcs_missing", "var(--redish)"),
     ("vcs_staged", "var(--bluish)"),
-    ("vcs_added", "var(--greenish)"),
+    ("vcs_added", "var(--pinkish)"),
     ("vcs_deleted", "var(--redish)"),
     ("vcs_unmerged", "var(--orangish)"),
 ];
