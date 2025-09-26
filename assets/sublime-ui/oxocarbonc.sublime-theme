@@ -147,6 +147,86 @@
       "class": "tab_connector",
       "attributes": ["right_overhang"],
       "layer0.opacity": 0.0
+    },
+    {
+      "class": "status_bar",
+      "fg": "color(var(--foreground) blend(white 85%))"
+    },
+    {
+      "class": "status_bar",
+      "attributes": ["file_light"],
+      "fg": "#161616"
+    },
+    {
+      "class": "status_bar_label",
+      "fg": "color(var(--foreground) blend(white 75%))"
+    },
+    {
+      "class": "status_bar_label",
+      "parents": [{"class": "window", "attributes": ["file_light"]}],
+      "fg": "#161616"
+    },
+    {
+      "class": "button_control",
+      "layer0.tint": "",
+      "layer0.opacity": 0.0
+    },
+    {
+      "class": "button_label",
+      "fg": "color(var(--foreground) a(0.9))"
+    },
+    {
+      "class": "button_label",
+      "parents": [{"class": "button_control", "attributes": ["selected"]}],
+      "fg": "var(--pinkish)"
+    },
+    {
+      "class": "button_control",
+      "attributes": ["hover"],
+      "layer0.tint": ""
+    },
+    {
+      "class": "button_control",
+      "attributes": ["pressed"],
+      "layer0.tint": ""
+    },
+    {
+      "class": "icon_button_control",
+      "layer0.tint": "",
+      "layer0.opacity": 0.0
+    },
+    {
+      "class": "icon_button_control",
+      "attributes": ["hover"],
+      "layer0.tint": ""
+    },
+    {
+      "class": "icon_button_control",
+      "attributes": ["selected"],
+      "layer0.tint": ""
+    },
+    {
+      "class": "icon_button_control",
+      "attributes": ["pressed"],
+      "layer0.tint": ""
+    },
+    {
+      "class": "icon_button_label",
+      "fg": "color(var(--foreground) a(0.9))"
+    },
+    {
+      "class": "icon_button_label",
+      "attributes": ["selected"],
+      "fg": "var(--pinkish)"
+    },
+    {
+      "class": "panel_button_label",
+      "fg": "color(var(--foreground) a(0.9))"
+    },
+    {
+      "class": "panel_button_label",
+      "parents": [{"class": "panel_button_control", "attributes": ["selected"]}],
+      "fg": "var(--pinkish)"
     }
   ]
 }
