@@ -4,17 +4,6 @@ OUTDIR := out
 THEMESDIR := themes
 ASSETS := assets
 
-NUM_CPUS ?= $(shell sysctl -n hw.logicalcpu 2>/dev/null || nproc 2>/dev/null || echo 1)
-MAKE_JOBS ?= $(NUM_CPUS)
-
-ifneq ($(filter --jobserver%,$(MAKEFLAGS)),)
-else
-ifneq ($(filter -j% --jobs%,$(MAKEFLAGS)),)
-else
-MAKEFLAGS += --jobs=$(MAKE_JOBS)
-endif
-endif
-
 CURSOR_CFG := ~/Library/Application\ Support/Cursor/User
 ZED_CFG := ~/.config/zed
 EXTENSIONS := $(ASSETS)/extensions.txt
@@ -24,10 +13,6 @@ ZED_SRC_DIR := target/zed
 ZEDDIR := zed
 ZED_BUNDLE := $(ZEDDIR)/oxocarbon.json
 ZED_IMPORTER := $(ZED_SRC_DIR)/target/release/theme_importer
-
-CARGO ?= cargo
-RUST_SOURCES := $(shell find . -path ./target -prune -o \( -name '*.rs' -o -name 'Cargo.toml' -o -name 'Cargo.lock' \) -print)
-CARGO_RELEASE_STAMP := target/release/.cargo-release-stamp
 
 TMDIR := textmate
 TM_CONVERTER := target/release/json2tm
@@ -50,71 +35,42 @@ define bench
 $(HYPERFINE) --warmup $(HF_WARMUP) --prepare '$(1)' '$(2)'
 endef
 
-OLED_VARIANTS := plain oled
-COMPAT_VARIANTS := plain compat
-MONO_VARIANTS := color mono mono-coolgray mono-warmgray
-DEFAULT_MONO_VARIANTS := color mono
-
-theme_suffix_oled = $(if $(filter oled,$1),-oled,)
-theme_suffix_mono = $(if $(filter color,$1),,$(patsubst mono%,-mono%,$1))
-theme_suffix_compat = $(if $(filter compat,$1),-compat,)
-theme_filename = oxocarbon$(call theme_suffix_oled,$1)$(call theme_suffix_mono,$2)$(call theme_suffix_compat,$3)-color-theme.json
-
-theme_flags_oled = $(if $(filter oled,$1),--oled,)
-theme_flags_mono = $(if $(filter color,$1),,$(if $(filter mono,$1),--monochrome,$(strip --monochrome --monochrome-family $(patsubst mono-%,%,$1)))))
-theme_flags_compat = $(if $(filter compat,$1),--compat,)
-theme_flags = $(strip $(call theme_flags_oled,$1) $(call theme_flags_mono,$2) $(call theme_flags_compat,$3))
-
-define register_theme
-$(THEMESDIR)/$(call theme_filename,$1,$2,$3): THEME_ARGS := $(call theme_flags,$1,$2,$3)
-$(THEMESDIR)/$(call theme_filename,$1,$2,$3): $(PROG) $(INPUT) | $(THEMESDIR)
-	$(if $(strip $(THEME_ARGS)),$(PROG) $(THEME_ARGS) $(INPUT),$(PROG) $(INPUT)) > $$@
-endef
-
-$(foreach mono,$(MONO_VARIANTS), \
-	$(foreach compat,$(COMPAT_VARIANTS), \
-		$(foreach oled,$(OLED_VARIANTS), \
-			$(eval $(call register_theme,$(oled),$(mono),$(compat))))))
-
-$(THEMESDIR)/PRINT.json: THEME_ARGS := --monochrome --oled --print
-$(THEMESDIR)/PRINT.json: $(PROG) $(INPUT) | $(THEMESDIR)
-	$(PROG) $(THEME_ARGS) $(INPUT) > $(THEMESDIR)/PRINT.json
-
-DEFAULT_THEME_NAMES := \
-	oxocarbon-color-theme.json \
-	oxocarbon-oled-color-theme.json \
-	oxocarbon-compat-color-theme.json \
-	oxocarbon-oled-compat-color-theme.json \
-	oxocarbon-mono-color-theme.json \
-	oxocarbon-oled-mono-color-theme.json \
-	oxocarbon-mono-compat-color-theme.json \
-	oxocarbon-oled-mono-compat-color-theme.json \
-	PRINT.json
-
-DEFAULT_THEMES := $(addprefix $(THEMESDIR)/,$(DEFAULT_THEME_NAMES))
+DEFAULT_THEMES := \
+	$(THEMESDIR)/oxocarbon-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-color-theme.json \
+	$(THEMESDIR)/oxocarbon-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-mono-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-color-theme.json \
+	$(THEMESDIR)/oxocarbon-mono-compat-color-theme.json \
+	$(THEMESDIR)/oxocarbon-oled-mono-compat-color-theme.json \
+	$(THEMESDIR)/PRINT.json
 
 .PHONY: all build clean dev dotfiles help install mono-coolgray mono-warmgray PRINT \
 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
 	install-zed install-sublime install-textmate install-xcode textmate xcode \
 	benchmark
 
-ZED_THEME_FILES := $(filter-out $(THEMESDIR)/PRINT.json,$(DEFAULT_THEMES))
-TEXTMATE_JSONS := $(filter-out %compat%.json,$(DEFAULT_THEMES))
-TEXTMATE_TARGETS := $(sort $(patsubst $(THEMESDIR)/%.json,$(TMDIR)/%.tmTheme,$(TEXTMATE_JSONS)))
-XCODE_TARGETS := $(sort $(patsubst $(THEMESDIR)/%.json,$(XCODEDIR)/%.xccolortheme,$(TEXTMATE_JSONS)))
-
 all: $(DEFAULT_THEMES)
 
-build: $(PROG)
+build:
+	cargo build --release
 
 dev:
 	cargo run -r -p oxocarbon-dev
 
-$(PROG): $(CARGO_RELEASE_STAMP)
+THEME_FLAGS = $(strip \
+	$(if $(findstring oled,$@),--oled,) \
+	$(if $(findstring compat,$@),--compat,) \
+	$(if $(findstring -mono-,$@),--monochrome,) \
+	$(if $(findstring -coolgray-,$@),--monochrome-family coolgray,) \
+	$(if $(findstring -warmgray-,$@),--monochrome-family warmgray,))
 
-$(CARGO_RELEASE_STAMP): $(RUST_SOURCES)
-	$(CARGO) build --release
-	@touch $@
+$(THEMESDIR)/%.json: build $(INPUT) | $(THEMESDIR)
+	$(PROG) $(THEME_FLAGS) $(INPUT) > $@
+
+$(THEMESDIR)/PRINT.json: build $(INPUT) | $(THEMESDIR)
+	$(PROG) --monochrome --oled --print $(INPUT) > $@
 
 PRINT: $(THEMESDIR)/PRINT.json
 
@@ -174,14 +130,10 @@ $(ZED_IMPORTER): | setup-zed
 $(ZED_BUNDLE): check-jq setup-zed $(ZED_IMPORTER) all | $(THEMESDIR) $(OUTDIR)
 	@mkdir -p $(dir $(ZED_BUNDLE))
 	@echo "Converting themes for Zed..."
-	@rm -f $(OUTDIR)/zed-*.json 2>/dev/null || true
-	@files='$(ZED_THEME_FILES)'; \
-	if [ -n "$$files" ]; then \
-		set -- $$files; \
-		printf '%s\0' "$$@" | \
-		xargs -0 -P $(MAKE_JOBS) -n 1 -I {} sh -c '$(ZED_IMPORTER) "{}" --output $(OUTDIR)/zed-$$(basename "{}")'; \
-	fi
-	@jq -s 'def set_accent_and_players: \
+	@for f in $(filter-out $(THEMESDIR)/PRINT.json,$(wildcard $(THEMESDIR)/*.json)); do \
+		$(ZED_IMPORTER) $$f --output $(OUTDIR)/zed-$$(basename $$f); \
+	done; \
+	jq -s 'def set_accent_and_players: \
 		(.name | ascii_downcase | contains("monochrom")) as $$mono \
 		| (.name | ascii_downcase | contains("compatibility")) as $$compat \
 		| .style["text.accent"] = (if $$mono then "#ffffff" else "#ff7eb6" end) \
@@ -288,7 +240,6 @@ clean:
 	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls
 
 benchmark: build $(TM_CONVERTER) $(XCODE_CONVERTER) all
-	$(call bench,rm -f $(THEMESDIR)/*.json,make -j1 -s all)
-	$(call bench,rm -f $(THEMESDIR)/*.json,make -j8 -s all)
+	$(call bench,rm -f $(THEMESDIR)/*.json,make -s all)
 	$(call bench,rm -f $(TMDIR)/*.tmTheme,make -s textmate)
 	$(call bench,rm -f $(XCODEDIR)/*.xccolortheme,make -s xcode)
