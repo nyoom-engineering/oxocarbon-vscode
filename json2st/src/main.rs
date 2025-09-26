@@ -5,6 +5,212 @@ use oxocarbon_utils::{
 };
 use serde::Deserialize;
 
+const ACCENT_KEYS: &[&str] = &[
+    "scmGraph.foreground1",
+    "activityBar.activeBorder",
+    "statusBarItem.warningForeground",
+];
+
+const HUE_KEYS: &[(&str, &[&str])] = &[
+    (
+        "--redish",
+        &[
+            "charts.red",
+            "scmGraph.foreground1",
+            "problemsErrorIcon.foreground",
+            "gitDecoration.deletedResourceForeground",
+            "testing.iconFailed",
+        ],
+    ),
+    (
+        "--pinkish",
+        &[
+            "charts.blue",
+            "scmGraph.foreground2",
+            "textLink.foreground",
+            "editorSuggestWidget.focusHighlightForeground",
+        ],
+    ),
+    (
+        "--orangish",
+        &[
+            "charts.orange",
+            "scmGraph.foreground3",
+            "list.warningForeground",
+            "statusBarItem.warningForeground",
+        ],
+    ),
+    (
+        "--bluish",
+        &[
+            "charts.yellow",
+            "terminal.ansiBlue",
+            "scmGraph.foreground4",
+            "editorLink.activeForeground",
+            "activityBar.activeBorder",
+        ],
+    ),
+    (
+        "--greenish",
+        &[
+            "charts.green",
+            "scmGraph.foreground5",
+            "testing.iconPassed",
+            "gitDecoration.addedResourceForeground",
+        ],
+    ),
+    (
+        "--cyanish",
+        &[
+            "charts.foreground",
+            "scmGraph.foreground2",
+            "gitDecoration.modifiedResourceForeground",
+            "terminal.ansiCyan",
+            "editorMarkerNavigationInfo.background",
+        ],
+    ),
+    (
+        "--purplish",
+        &[
+            "charts.purple",
+            "textLink.activeForeground",
+            "problemsInfoIcon.foreground",
+        ],
+    ),
+    (
+        "--yellowish",
+        &[
+            "charts.yellow",
+            "terminal.ansiBrightYellow",
+            "testing.iconSkipped",
+        ],
+    ),
+];
+
+const DARK_BG_KEYS: &[&str] = &[
+    "editorGroupHeader.tabsBackground",
+    "panel.background",
+    "sideBar.background",
+    "tab.inactiveBackground",
+    "activityBar.background",
+];
+
+const MEDIUM_DARK_BG_KEYS: &[&str] = &[
+    "titleBar.inactiveBackground",
+    "sideBarSectionHeader.background",
+    "menu.background",
+    "tab.hoverBackground",
+    "panel.background",
+    "sideBar.background",
+    "editorWidget.background",
+];
+
+const MEDIUM_BG_KEYS: &[&str] = &[
+    "tab.hoverBackground",
+    "menubar.selectionBackground",
+    "menu.background",
+    "list.inactiveSelectionBackground",
+    "panel.background",
+    "sideBar.background",
+];
+
+const LIGHT_BG_KEYS: &[&str] = &[
+    "titleBar.activeBackground",
+    "sideBarSectionHeader.background",
+    "menu.background",
+    "tab.hoverBackground",
+    "menu.border",
+];
+
+const TOOL_TIP_BG_KEYS: &[&str] = &[
+    "editorHoverWidget.background",
+    "tooltip.background",
+    "editorWidget.background",
+];
+
+const TOOL_TIP_FG_KEYS: &[&str] = &[
+    "editorHoverWidget.foreground",
+    "tooltip.foreground",
+    "editor.foreground",
+];
+
+const TAB_LABEL_MUTED_KEYS: &[&str] = &[
+    "tab.inactiveForeground",
+    "list.deemphasizedForeground",
+    "disabledForeground",
+];
+
+const TAB_LABEL_KEYS: &[&str] = &[
+    "tab.activeForeground",
+    "list.activeSelectionForeground",
+    "editor.foreground",
+];
+
+const TAB_LABEL_FOCUS_KEYS: &[&str] = &[
+    "list.hoverForeground",
+    "list.highlightForeground",
+    "editor.foreground",
+];
+
+const SUGGEST_BG_KEYS: &[&str] = &[
+    "editorSuggestWidget.background",
+    "editorWidget.background",
+    "panel.background",
+];
+
+const SUGGEST_SELECTED_BG_KEYS: &[&str] = &[
+    "editorSuggestWidget.selectedBackground",
+    "list.activeSelectionBackground",
+    "tab.activeBackground",
+];
+
+const SUGGEST_TEXT_KEYS: &[&str] = &["editorSuggestWidget.foreground", "editor.foreground"];
+
+const SUGGEST_SELECTED_TEXT_KEYS: &[&str] = &[
+    "editorSuggestWidget.selectedForeground",
+    "list.activeSelectionForeground",
+    "editor.foreground",
+];
+
+const SUGGEST_BORDER_KEYS: &[&str] = &[
+    "editorSuggestWidget.border",
+    "editorHoverWidget.border",
+    "focusBorder",
+];
+
+const DISABLED_KEYS: &[&str] = &[
+    "disabledForeground",
+    "list.inactiveSelectionForeground",
+    "editorLineNumber.foreground",
+];
+
+const ADAPTIVE_DIVIDER_KEYS: &[&str] = &[
+    "editorGroup.border",
+    "menu.separatorBackground",
+    "tree.indentGuidesStroke",
+    "tree.inactiveIndentGuidesStroke",
+];
+
+const VCS_COLORS: &[(&str, &str)] = &[
+    ("vcs_modified", "var(--bluish)"),
+    ("vcs_missing", "var(--redish)"),
+    ("vcs_staged", "var(--bluish)"),
+    ("vcs_added", "var(--greenish)"),
+    ("vcs_deleted", "var(--redish)"),
+    ("vcs_unmerged", "var(--orangish)"),
+];
+
+const KIND_COLORS: &[(&str, &str)] = &[
+    ("kind_function_color", "var(--redish)"),
+    ("kind_keyword_color", "var(--pinkish)"),
+    ("kind_markup_color", "var(--orangish)"),
+    ("kind_namespace_color", "var(--bluish)"),
+    ("kind_navigation_color", "var(--yellowish)"),
+    ("kind_snippet_color", "var(--greenish)"),
+    ("kind_type_color", "var(--purplish)"),
+    ("kind_variable_color", "var(--cyanish)"),
+];
+
 #[derive(Deserialize)]
 struct Theme {
     name: String,
@@ -29,200 +235,47 @@ fn insert_json(
     map.insert(key.into(), val);
 }
 
+fn pick<'a>(
+    map: &'a serde_json::Map<String, serde_json::Value>,
+    keys: &[&str],
+    fallback: &'a str,
+) -> &'a str {
+    find_color(map, keys).unwrap_or(fallback)
+}
+
+fn alpha(var: &str, amount: f64) -> String {
+    format!("color({var} a({amount:.3}))")
+}
+
+fn min_contrast(var: &str, contrast: f64) -> String {
+    format!("color({var} min-contrast(var(--background) {contrast}))")
+}
+
+fn reduce_alpha(var: &str) -> String {
+    format!("color({var} a(- 70%))")
+}
+
 fn build_variables(
-    name: &str,
     colors: &serde_json::Map<String, serde_json::Value>,
 ) -> serde_json::Map<String, serde_json::Value> {
     let mut vars = serde_json::Map::with_capacity(200);
 
     let background = get(colors, "editor.background");
     let foreground = get(colors, "editor.foreground");
-    let accent = find_color(
-        colors,
-        &[
-            "scmGraph.foreground1",
-            "activityBar.activeBorder",
-            "statusBarItem.warningForeground",
-        ],
-    )
-    .unwrap_or(foreground);
+    let accent = find_color(colors, ACCENT_KEYS).unwrap_or(foreground);
 
     insert_str(&mut vars, "--background", background);
     insert_str(&mut vars, "--foreground", foreground);
     insert_str(&mut vars, "--accent", accent);
 
-    let redish = find_color(
-        colors,
-        &[
-            "charts.red",
-            "scmGraph.foreground1",
-            "problemsErrorIcon.foreground",
-            "gitDecoration.deletedResourceForeground",
-            "testing.iconFailed",
-        ],
-    )
-    .unwrap_or(accent);
-    let pinkish = find_color(
-        colors,
-        &[
-            "charts.blue",
-            "scmGraph.foreground2",
-            "textLink.foreground",
-            "editorSuggestWidget.focusHighlightForeground",
-        ],
-    )
-    .unwrap_or(accent);
-    let orangish = find_color(
-        colors,
-        &[
-            "charts.orange",
-            "scmGraph.foreground3",
-            "list.warningForeground",
-            "statusBarItem.warningForeground",
-        ],
-    )
-    .unwrap_or(accent);
-    let bluish = find_color(
-        colors,
-        &[
-            "charts.yellow",
-            "terminal.ansiBlue",
-            "scmGraph.foreground4",
-            "editorLink.activeForeground",
-            "activityBar.activeBorder",
-        ],
-    )
-    .unwrap_or(accent);
-    let greenish = find_color(
-        colors,
-        &[
-            "charts.green",
-            "scmGraph.foreground5",
-            "testing.iconPassed",
-            "gitDecoration.addedResourceForeground",
-        ],
-    )
-    .unwrap_or(accent);
-    let cyanish = find_color(
-        colors,
-        &[
-            "charts.foreground",
-            "scmGraph.foreground2",
-            "gitDecoration.modifiedResourceForeground",
-            "terminal.ansiCyan",
-            "editorMarkerNavigationInfo.background",
-        ],
-    )
-    .unwrap_or(accent);
-    let purplish = find_color(
-        colors,
-        &[
-            "charts.purple",
-            "textLink.activeForeground",
-            "problemsInfoIcon.foreground",
-        ],
-    )
-    .unwrap_or(accent);
-    let yellowish = find_color(
-        colors,
-        &[
-            "charts.yellow",
-            "terminal.ansiBrightYellow",
-            "testing.iconSkipped",
-        ],
-    )
-    .unwrap_or(accent);
+    for (name, keys) in HUE_KEYS {
+        insert_str(&mut vars, name, find_color(colors, keys).unwrap_or(accent));
+    }
 
-    insert_str(&mut vars, "--redish", redish);
-    insert_str(&mut vars, "--pinkish", pinkish);
-    insert_str(&mut vars, "--orangish", orangish);
-    insert_str(&mut vars, "--bluish", bluish);
-    insert_str(&mut vars, "--greenish", greenish);
-    insert_str(&mut vars, "--cyanish", cyanish);
-    insert_str(&mut vars, "--purplish", purplish);
-    insert_str(&mut vars, "--yellowish", yellowish);
-
-    let (dark_bg, medium_dark_bg, medium_bg, light_bg) = if is_compatibility_variant(colors) {
-        let dark = find_color(
-            colors,
-            &[
-                "editor.background",
-                "activityBar.background",
-            ],
-        )
-        .unwrap_or(background);
-        let medium_dark = find_color(
-            colors,
-            &[
-                "notebook.cellEditorBackground",
-                "editorGroupHeader.tabsBackground",
-                "panel.background",
-                "sideBar.background",
-            ],
-        )
-        .unwrap_or(dark);
-        let medium = find_color(
-            colors,
-            &[
-                "panel.background",
-                "activityBar.background",
-                "sideBar.background",
-            ],
-        )
-        .unwrap_or(medium_dark);
-        let light = find_color(
-            colors,
-            &[
-                "activityBar.background",
-                "panel.background",
-                "titleBar.activeBackground",
-            ],
-        )
-        .unwrap_or(medium);
-        (dark, medium_dark, medium, light)
-    } else {
-        let dark = find_color(
-            colors,
-            &[
-                "activityBar.background",
-                "sideBar.background",
-                "panel.background",
-                "editor.background",
-            ],
-        )
-        .unwrap_or(background);
-        let medium_dark = find_color(
-            colors,
-            &[
-                "editorGroupHeader.tabsBackground",
-                "sideBar.background",
-                "panel.background",
-                "notebook.cellEditorBackground",
-            ],
-        )
-        .unwrap_or(dark);
-        let medium = find_color(
-            colors,
-            &[
-                "panel.background",
-                "tab.inactiveBackground",
-                "peekViewResult.background",
-                "editorWidget.background",
-            ],
-        )
-        .unwrap_or(medium_dark);
-        let light = find_color(
-            colors,
-            &[
-                "menu.background",
-                "titleBar.activeBackground",
-                "list.inactiveSelectionBackground",
-                "tab.hoverBackground",
-            ],
-        )
-        .unwrap_or(medium);
-        (dark, medium_dark, medium, light)
-    };
+    let dark_bg = pick(colors, DARK_BG_KEYS, background);
+    let medium_dark_bg = pick(colors, MEDIUM_DARK_BG_KEYS, dark_bg);
+    let medium_bg = pick(colors, MEDIUM_BG_KEYS, medium_dark_bg);
+    let light_bg = pick(colors, LIGHT_BG_KEYS, medium_bg);
 
     insert_str(&mut vars, "dark_bg", dark_bg);
     insert_str(&mut vars, "medium_dark_bg", medium_dark_bg);
@@ -232,7 +285,6 @@ fn build_variables(
     let luminance = parse_hex_color(background)
         .map(|(rgb, _)| luminance_from_u8(rgb[0], rgb[1], rgb[2]) as f64)
         .unwrap_or(0.0);
-    let is_light_theme = luminance > 0.5;
     let contrast = if luminance < 0.02 {
         3.0
     } else if luminance < 0.08 {
@@ -245,79 +297,28 @@ fn build_variables(
         2.5
     };
 
-    insert_str(
-        &mut vars,
-        "vcs_modified",
-        &format!("color(var(--bluish) min-contrast(var(--background) {contrast}))"),
-    );
-    insert_str(
-        &mut vars,
-        "vcs_missing",
-        &format!("color(var(--redish) min-contrast(var(--background) {contrast}))"),
-    );
-    insert_str(
-        &mut vars,
-        "vcs_staged",
-        &format!("color(var(--bluish) min-contrast(var(--background) {contrast}))"),
-    );
-    insert_str(
-        &mut vars,
-        "vcs_added",
-        &format!("color(var(--greenish) min-contrast(var(--background) {contrast}))"),
-    );
-    insert_str(
-        &mut vars,
-        "vcs_deleted",
-        &format!("color(var(--redish) min-contrast(var(--background) {contrast}))"),
-    );
-    insert_str(
-        &mut vars,
-        "vcs_unmerged",
-        &format!("color(var(--orangish) min-contrast(var(--background) {contrast}))"),
-    );
+    for (key, var) in VCS_COLORS {
+        insert_str(&mut vars, key, &min_contrast(var, contrast));
+    }
 
-    let adaptive_dividers = if is_compatibility_variant(colors) {
-        find_color(colors, &["editorGroup.border", "menu.separatorBackground"])
-            .unwrap_or(foreground)
-    } else {
-        find_color(
-            colors,
-            &[
-                "menu.separatorBackground",
-                "tree.indentGuidesStroke",
-                "tree.inactiveIndentGuidesStroke",
-                "editorGroup.border",
-            ],
-        )
-        .unwrap_or(foreground)
-    };
-    insert_str(&mut vars, "adaptive_dividers", adaptive_dividers);
+    insert_str(
+        &mut vars,
+        "adaptive_dividers",
+        pick(colors, ADAPTIVE_DIVIDER_KEYS, foreground),
+    );
 
     insert_str(&mut vars, "icon_tint", "var(--foreground)");
-    let icon_light_tint = format!(
-        "color(var(--foreground) a({:.3}))",
-        if is_light_theme { 0.18 } else { 0.12 }
+    insert_str(
+        &mut vars,
+        "icon_light_tint",
+        &alpha(
+            "var(--foreground)",
+            if luminance > 0.5 { 0.18 } else { 0.12 },
+        ),
     );
-    insert_str(&mut vars, "icon_light_tint", &icon_light_tint);
 
-    let tool_tip_bg = find_color(
-        colors,
-        &[
-            "editorHoverWidget.background",
-            "tooltip.background",
-            "editorWidget.background",
-        ],
-    )
-    .unwrap_or(light_bg);
-    let tool_tip_fg = find_color(
-        colors,
-        &[
-            "editorHoverWidget.foreground",
-            "tooltip.foreground",
-            "editor.foreground",
-        ],
-    )
-    .unwrap_or(foreground);
+    let tool_tip_bg = pick(colors, TOOL_TIP_BG_KEYS, light_bg);
+    let tool_tip_fg = pick(colors, TOOL_TIP_FG_KEYS, foreground);
     insert_str(&mut vars, "tool_tip_bg", tool_tip_bg);
     insert_str(&mut vars, "tool_tip_fg", tool_tip_fg);
 
@@ -337,34 +338,49 @@ fn build_variables(
         serde_json::json!({"target":0.8,"speed":4.0,"interpolation":"smoothstep"}),
     );
 
-    let tabset_dark_tint_mod = format!(
-        "color(var(--foreground) a({:.3}))",
-        if is_light_theme { 0.060 } else { 0.080 }
-    );
-    let tabset_medium_dark_tint_mod = format!(
-        "color(var(--foreground) a({:.3}))",
-        if is_light_theme { 0.050 } else { 0.060 }
-    );
-    let tabset_medium_tint_mod = format!(
-        "color(var(--foreground) a({:.3}))",
-        if is_light_theme { 0.040 } else { 0.040 }
-    );
-    let tabset_light_tint_mod = format!(
-        "color(var(--foreground) a({:.3}))",
-        if is_light_theme { 0.020 } else { 0.025 }
-    );
-    insert_str(&mut vars, "tabset_dark_tint_mod", &tabset_dark_tint_mod);
-    insert_str(&mut vars, "tabset_dark_bg", "var(dark_bg)");
-    insert_str(
-        &mut vars,
-        "tabset_medium_dark_tint_mod",
-        &tabset_medium_dark_tint_mod,
-    );
-    insert_str(&mut vars, "tabset_medium_dark_bg", medium_dark_bg);
-    insert_str(&mut vars, "tabset_medium_tint_mod", &tabset_medium_tint_mod);
-    insert_str(&mut vars, "tabset_medium_bg", medium_bg);
-    insert_str(&mut vars, "tabset_light_tint_mod", &tabset_light_tint_mod);
-    insert_str(&mut vars, "tabset_light_bg", light_bg);
+    let tint_multiplier = contrast_scale(background, dark_bg, medium_bg, light_bg);
+    for (tint_key, alpha_if_light, alpha_if_dark, bg_key, bg_val) in [
+        (
+            "tabset_dark_tint_mod",
+            0.060,
+            0.080,
+            "tabset_dark_bg",
+            "var(dark_bg)",
+        ),
+        (
+            "tabset_medium_dark_tint_mod",
+            0.050,
+            0.060,
+            "tabset_medium_dark_bg",
+            medium_dark_bg,
+        ),
+        (
+            "tabset_medium_tint_mod",
+            0.040,
+            0.040,
+            "tabset_medium_bg",
+            medium_bg,
+        ),
+        (
+            "tabset_light_tint_mod",
+            0.020,
+            0.025,
+            "tabset_light_bg",
+            light_bg,
+        ),
+    ] {
+        let alpha_amount = if luminance > 0.5 {
+            alpha_if_light
+        } else {
+            alpha_if_dark * tint_multiplier
+        };
+        insert_str(
+            &mut vars,
+            tint_key,
+            &alpha("var(--foreground)", alpha_amount),
+        );
+        insert_str(&mut vars, bg_key, bg_val);
+    }
 
     insert_str(
         &mut vars,
@@ -390,54 +406,30 @@ fn build_variables(
     insert_str(
         &mut vars,
         "file_tab_selected_dark_tint",
-        "color(var(tabset_dark_tint_mod) a(- 70%))",
+        &reduce_alpha("var(tabset_dark_tint_mod)"),
     );
     insert_str(
         &mut vars,
         "file_tab_selected_medium_dark_tint",
-        "color(var(tabset_medium_dark_tint_mod) a(- 70%))",
+        &reduce_alpha("var(tabset_medium_dark_tint_mod)"),
     );
     insert_str(
         &mut vars,
         "file_tab_selected_medium_tint",
-        "color(var(tabset_medium_tint_mod) a(- 70%))",
+        &reduce_alpha("var(tabset_medium_tint_mod)"),
     );
     insert_str(
         &mut vars,
         "file_tab_selected_light_tint",
-        "color(var(tabset_light_tint_mod) a(- 70%))",
+        &reduce_alpha("var(tabset_light_tint_mod)"),
     );
 
-    let tab_label_muted = find_color(
-        colors,
-        &[
-            "tab.inactiveForeground",
-            "list.deemphasizedForeground",
-            "disabledForeground",
-        ],
-    )
-    .unwrap_or(foreground);
-    let tab_label = find_color(
-        colors,
-        &[
-            "tab.activeForeground",
-            "list.activeSelectionForeground",
-            "editor.foreground",
-        ],
-    )
-    .unwrap_or(foreground);
-    let tab_label_focus = find_color(
-        colors,
-        &[
-            "list.hoverForeground",
-            "list.highlightForeground",
-            "editor.foreground",
-        ],
-    )
-    .unwrap_or(tab_label);
+    let tab_label_muted = pick(colors, TAB_LABEL_MUTED_KEYS, foreground);
+    let tab_label = pick(colors, TAB_LABEL_KEYS, foreground);
+    let tab_label_focus = pick(colors, TAB_LABEL_FOCUS_KEYS, tab_label);
 
-    let label_shadow_dark = format!("color(var(--background) a(0.35))");
-    let label_shadow_light = format!("color(var(--foreground) a(0.25))");
+    let label_shadow_dark = alpha("var(--background)", 0.35);
+    let label_shadow_light = alpha("var(--foreground)", 0.25);
 
     insert_str(
         &mut vars,
@@ -520,68 +512,24 @@ fn build_variables(
     insert_str(&mut vars, "text_widget_dark_modifier", "l(- 4%) s(* 40%)");
     insert_str(&mut vars, "text_widget_light_modifier", "l(- 4%) s(* 40%)");
 
-    let viewport_alpha = if is_light_theme { 0.22 } else { 0.18 };
-    let viewport_hide_alpha = if viewport_alpha + 0.06 > 1.0 {
-        1.0
-    } else {
-        viewport_alpha + 0.06
-    };
-    let viewport_always_visible_color =
-        format!("color(var(--foreground) a({:.3}))", viewport_alpha);
-    let viewport_hide_show_color =
-        format!("color(var(--foreground) a({:.3}))", viewport_hide_alpha);
+    let viewport_alpha = if luminance > 0.5 { 0.22_f64 } else { 0.18_f64 };
+    let viewport_hide_alpha = (viewport_alpha + 0.06_f64).min(1.0);
     insert_str(
         &mut vars,
         "viewport_always_visible_color",
-        &viewport_always_visible_color,
+        &alpha("var(--foreground)", viewport_alpha),
     );
     insert_str(
         &mut vars,
         "viewport_hide_show_color",
-        &viewport_hide_show_color,
+        &alpha("var(--foreground)", viewport_hide_alpha),
     );
 
-    let suggest_bg = find_color(
-        colors,
-        &[
-            "editorSuggestWidget.background",
-            "editorWidget.background",
-            "panel.background",
-        ],
-    )
-    .unwrap_or(medium_bg);
-    let suggest_selected_bg = find_color(
-        colors,
-        &[
-            "editorSuggestWidget.selectedBackground",
-            "list.activeSelectionBackground",
-            "tab.activeBackground",
-        ],
-    )
-    .unwrap_or(medium_dark_bg);
-    let suggest_foreground = find_color(
-        colors,
-        &["editorSuggestWidget.foreground", "editor.foreground"],
-    )
-    .unwrap_or(foreground);
-    let suggest_selected_foreground = find_color(
-        colors,
-        &[
-            "editorSuggestWidget.selectedForeground",
-            "list.activeSelectionForeground",
-            "editor.foreground",
-        ],
-    )
-    .unwrap_or(foreground);
-    let suggest_border = find_color(
-        colors,
-        &[
-            "editorSuggestWidget.border",
-            "editorHoverWidget.border",
-            "focusBorder",
-        ],
-    )
-    .unwrap_or(accent);
+    let suggest_bg = pick(colors, SUGGEST_BG_KEYS, medium_bg);
+    let suggest_selected_bg = pick(colors, SUGGEST_SELECTED_BG_KEYS, medium_dark_bg);
+    let suggest_foreground = pick(colors, SUGGEST_TEXT_KEYS, foreground);
+    let suggest_selected_foreground = pick(colors, SUGGEST_SELECTED_TEXT_KEYS, foreground);
+    let suggest_border = pick(colors, SUGGEST_BORDER_KEYS, accent);
 
     insert_str(&mut vars, "auto_complete_bg_dark_tint", suggest_bg);
     insert_str(&mut vars, "auto_complete_bg_light_tint", suggest_bg);
@@ -626,14 +574,9 @@ fn build_variables(
         suggest_bg,
     );
 
-    insert_str(&mut vars, "kind_function_color", "var(--redish)");
-    insert_str(&mut vars, "kind_keyword_color", "var(--pinkish)");
-    insert_str(&mut vars, "kind_markup_color", "var(--orangish)");
-    insert_str(&mut vars, "kind_namespace_color", "var(--bluish)");
-    insert_str(&mut vars, "kind_navigation_color", "var(--yellowish)");
-    insert_str(&mut vars, "kind_snippet_color", "var(--greenish)");
-    insert_str(&mut vars, "kind_type_color", "var(--purplish)");
-    insert_str(&mut vars, "kind_variable_color", "var(--cyanish)");
+    for (key, value) in KIND_COLORS {
+        insert_str(&mut vars, key, value);
+    }
     insert_str(
         &mut vars,
         "kind_name_label_border_color",
@@ -651,15 +594,7 @@ fn build_variables(
         serde_json::json!({"target":1.0,"speed":5.0,"interpolation":"smoothstep"}),
     );
 
-    let disabled = find_color(
-        colors,
-        &[
-            "disabledForeground",
-            "list.inactiveSelectionForeground",
-            "editorLineNumber.foreground",
-        ],
-    )
-    .unwrap_or(foreground);
+    let disabled = pick(colors, DISABLED_KEYS, foreground);
     insert_str(&mut vars, "radio_back", "var(--background)");
     insert_str(&mut vars, "radio_border-unselected", disabled);
     insert_str(&mut vars, "radio_selected", "var(--bluish)");
@@ -674,22 +609,42 @@ fn build_variables(
     vars
 }
 
+fn contrast_scale(background: &str, dark: &str, medium: &str, light: &str) -> f64 {
+    let Some((bg_rgb, _)) = parse_hex_color(background) else {
+        return 1.0;
+    };
+    let Some((dark_rgb, _)) = parse_hex_color(dark) else {
+        return 1.0;
+    };
+    let Some((medium_rgb, _)) = parse_hex_color(medium) else {
+        return 1.0;
+    };
+    let Some((light_rgb, _)) = parse_hex_color(light) else {
+        return 1.0;
+    };
+
+    let bg_l = luminance_from_u8(bg_rgb[0], bg_rgb[1], bg_rgb[2]) as f64;
+    let dark_l = luminance_from_u8(dark_rgb[0], dark_rgb[1], dark_rgb[2]) as f64;
+    let medium_l = luminance_from_u8(medium_rgb[0], medium_rgb[1], medium_rgb[2]) as f64;
+    let light_l = luminance_from_u8(light_rgb[0], light_rgb[1], light_rgb[2]) as f64;
+
+    let spread = (bg_l - dark_l).abs() + (medium_l - dark_l).abs() + (light_l - medium_l).abs();
+    let bias = if bg_l < 0.08 {
+        1.4
+    } else if bg_l < 0.15 {
+        1.2
+    } else {
+        1.0
+    };
+    (1.0 + spread * 2.0).clamp(1.0, 1.6) * bias
+}
+
 fn find_color<'a>(
     map: &'a serde_json::Map<String, serde_json::Value>,
     keys: &[&str],
 ) -> Option<&'a str> {
     keys.iter()
         .find_map(|key| map.get(*key).and_then(|value| value.as_str()))
-}
-
-fn is_compatibility_variant(colors: &serde_json::Map<String, serde_json::Value>) -> bool {
-    let editor_bg = get(colors, "editor.background");
-    let activity_bar_bg = find_color(colors, &["activityBar.background"]).unwrap_or(editor_bg);
-    let side_bar_bg = find_color(colors, &["sideBar.background"]).unwrap_or(editor_bg);
-    let panel_bg = find_color(colors, &["panel.background"]).unwrap_or(editor_bg);
-
-    // Compatibility variant if UI colors are different from editor background
-    activity_bar_bg != editor_bg || side_bar_bg != editor_bg || panel_bg != editor_bg
 }
 
 fn infer_sheet_color(base: &str, target: &str) -> String {
@@ -711,7 +666,7 @@ fn main() {
     io::stdin().read_to_end(&mut buf).expect("read stdin");
 
     let Theme { name, colors } = serde_json::from_slice(&buf).expect("invalid theme json");
-    let variables = build_variables(&name, &colors);
+    let variables = build_variables(&colors);
 
     let theme = serde_json::json!({
         "extends": "Adaptive.sublime-theme",

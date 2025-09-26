@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          make all zed textmate xcode
+          make all zed textmate xcode sublime-ui
           mkdir -p out
           rm -f out/sublime-ui.zip
           (cd assets/sublime-ui && zip -q -r ../../out/sublime-ui.zip *.sublime-theme)
