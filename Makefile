@@ -18,6 +18,7 @@ TMDIR := textmate
 TM_CONVERTER := target/release/json2tm
 TM_USER := ~/Library/Application\ Support/TextMate/Themes
 SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
+SUBLIME_UI := $(ASSETS)/sublime-ui
 
 JB_REPO_URL := https://github.com/JetBrains/colorSchemeTool
 JB_SRC_DIR := target/colorSchemeTool
@@ -47,9 +48,9 @@ DEFAULT_THEMES := \
 	$(THEMESDIR)/PRINT.json
 
 .PHONY: all build clean dev dotfiles help install mono-coolgray mono-warmgray PRINT \
-	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
-	install-zed install-sublime install-textmate install-xcode textmate xcode \
-	benchmark
+ 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
+ 	install-zed install-sublime install-textmate install-xcode install-sublime-ui \
+ 	textmate xcode benchmark
 
 all: $(DEFAULT_THEMES)
 
@@ -227,6 +228,10 @@ install-sublime: textmate
 	mkdir -p $(SUBLIME_USER)
 	cp $(wildcard $(THEMESDIR)/*.json) $(SUBLIME_USER)/
 	cp $(ASSETS)/Preferences.sublime-settings $(SUBLIME_USER)/Preferences.sublime-settings
+
+install-sublime-ui:
+	mkdir -p $(SUBLIME_USER)
+	cp $(SUBLIME_UI)/*.sublime-theme $(SUBLIME_USER)/
 
 install-textmate: textmate
 	mkdir -p $(TM_USER)

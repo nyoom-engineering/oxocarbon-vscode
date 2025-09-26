@@ -1,3 +1,4 @@
+adacore.ada
 antfu.icons-carbon
 bradlc.vscode-tailwindcss
 bungcip.better-toml
@@ -22,6 +23,7 @@ pdconsec.vscode-print
 qingpeng.common-lisp
 redhat.java
 redhat.vscode-yaml
+ruoz.coq
 rust-lang.rust-analyzer
 sumneko.lua
 vscjava.vscode-gradle
