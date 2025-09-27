@@ -250,11 +250,11 @@ dotfiles-sublime:
 	mkdir -p $(ASSETS)
 	cp $(SUBLIME_USER)/Preferences.sublime-settings $(ASSETS)/Preferences.sublime-settings
 
-install: dotfiles
-	xargs -I {} cursor --install-extension {} < $(EXTENSIONS)
+install:
 	mkdir -p $(CURSOR_CFG)
 	cp $(ASSETS)/settings.json $(CURSOR_CFG)/
 	cp $(ASSETS)/keybindings.json $(CURSOR_CFG)/
+	xargs -I {} cursor --install-extension {} < $(EXTENSIONS)
 
 install-zed: zed
 	mkdir -p $(ZED_CFG)/themes
