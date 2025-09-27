@@ -1,6 +1,4 @@
-adacore.ada
 antfu.icons-carbon
-atlassian.atlascode
 bradlc.vscode-tailwindcss
 bungcip.better-toml
 dbaeumer.vscode-eslint
@@ -17,7 +15,6 @@ haskell.haskell
 jnoortheen.nix-ide
 julialang.language-julia
 leanprover.lean4
-leetcode.vscode-leetcode
 llvm-vs-code-extensions.vscode-clangd
 ms-python.python
 ms-toolsai.jupyter

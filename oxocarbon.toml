@@ -285,7 +285,7 @@ disabledForeground = "#8d8d8d"
 "activityBarBadge.foreground" = "#f2f4f8"
 "activityErrorBadge.background" = "#ee5396"
 "activityErrorBadge.foreground" = "#ffffff"
-"activityWarningBadge.background" = "#ff7eb6"
+"activityWarningBadge.background" = "#ee5396"
 "activityWarningBadge.foreground" = "#ffffff"
 
 "sideBar.background" = "#161616"
