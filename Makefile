@@ -68,7 +68,7 @@ DEFAULT_THEMES := \
 .PHONY: all build clean dev dotfiles help install mono-coolgray mono-warmgray PRINT \
 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
 	install-zed install-sublime install-textmate install-xcode install-sublime-ui \
-	textmate xcode benchmark sublime-ui
+	textmate xcode benchmark sublime-ui patch-cursor-marketplace
 
 all: $(DEFAULT_THEMES)
 
@@ -250,7 +250,10 @@ dotfiles-sublime:
 	mkdir -p $(ASSETS)
 	cp $(SUBLIME_USER)/Preferences.sublime-settings $(ASSETS)/Preferences.sublime-settings
 
-install:
+patch-cursor-marketplace:
+	@scripts/patch-cursor-marketplace.sh
+
+install: patch-cursor-marketplace
 	mkdir -p $(CURSOR_CFG)
 	cp $(ASSETS)/settings.json $(CURSOR_CFG)/
 	cp $(ASSETS)/keybindings.json $(CURSOR_CFG)/
@@ -285,3 +288,4 @@ benchmark: build $(TM_CONVERTER) $(XCODE_CONVERTER) all
 	$(call bench,rm -f $(THEMESDIR)/*.json,make -s all)
 	$(call bench,rm -f $(TMDIR)/*.tmTheme,make -s textmate)
 	$(call bench,rm -f $(XCODEDIR)/*.xccolortheme,make -s xcode)
+

@@ -128,7 +128,7 @@ disabledForeground = "#8d8d8d"
 "scmGraph.historyItemHoverDeletionsForeground" = "#ee5396"
 
 # imprv contrast
-"scmGraph.historyItemHoverLabelForeground" = "#000000"
+"scmGraph.historyItemHoverLabelForeground" = "#161616"
 "scmGraph.historyItemRefColor" = "#33b1ff"
 "scmGraph.historyItemRemoteRefColor" = "#ff7eb6"
 
@@ -285,7 +285,7 @@ disabledForeground = "#8d8d8d"
 "activityBarBadge.foreground" = "#f2f4f8"
 "activityErrorBadge.background" = "#ee5396"
 "activityErrorBadge.foreground" = "#ffffff"
-"activityWarningBadge.background" = "#ff7eb6"
+"activityWarningBadge.background" = "#ee5396"
 "activityWarningBadge.foreground" = "#ffffff"
 
 "sideBar.background" = "#161616"
@@ -450,7 +450,7 @@ disabledForeground = "#8d8d8d"
 "extensionButton.hoverBackground" = "#525252"
 
 # in list
-"extensionButton.prominentBackground" = "#262626"
+"extensionButton.prominentBackground" = "#262626" # doesn't accept color?
 "extensionButton.prominentForeground" = "#ffffff"
 "extensionButton.prominentHoverBackground" = "#525252"
 "extensionButton.separator" = "#00000000"

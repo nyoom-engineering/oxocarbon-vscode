@@ -1,6 +1,4 @@
-adacore.ada
 antfu.icons-carbon
-atlassian.atlascode
 bradlc.vscode-tailwindcss
 bungcip.better-toml
 dbaeumer.vscode-eslint
@@ -8,7 +6,6 @@ eduarddyckman.vscode-parinfer
 figma.figma-vscode-extension
 github.codespaces
 github.github-vscode-theme
-github.remotehub
 github.vscode-github-actions
 github.vscode-pull-request-github
 golang.go
@@ -16,16 +13,15 @@ grapecity.gc-excelviewer
 haskell.haskell
 jnoortheen.nix-ide
 julialang.language-julia
-leanprover.lean4
-leetcode.vscode-leetcode
 llvm-vs-code-extensions.vscode-clangd
 ms-python.python
 ms-toolsai.jupyter
+ms-vscode.cpptools-themes
 ms-vscode.hexeditor
 ms-vscode.makefile-tools
+ms-vscode-remote.vscode-remote-extensionpack
 mshr-h.veriloghdl
 ocamllabs.ocaml-platform
-pdconsec.vscode-print
 qingpeng.common-lisp
 redhat.java
 redhat.vscode-xml
@@ -34,4 +30,5 @@ rust-lang.rust-analyzer
 sumneko.lua
 vadimcn.vscode-lldb
 vscodevim.vim
+wayou.vscode-todo-highlight
 *.vsix
