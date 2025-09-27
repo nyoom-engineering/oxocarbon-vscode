@@ -6,7 +6,7 @@
     "--accent": "#575757",
     "--background": "#ffffff",
     "--bluish": "#575757",
-    "--cyanish": "#0d0b07",
+    "--cyanish": "#575757",
     "--foreground": "#0d0b07",
     "--greenish": "#575757",
     "--orangish": "#393939",
@@ -132,7 +132,7 @@
     "vcs_deleted": "color(var(--redish) min-contrast(var(--background) 2.2))",
     "vcs_missing": "color(var(--redish) min-contrast(var(--background) 2.2))",
     "vcs_modified": "color(var(--bluish) min-contrast(var(--background) 2.2))",
-    "vcs_staged": "color(var(--bluish) min-contrast(var(--background) 2.2))",
+    "vcs_staged": "color(var(--cyanish) min-contrast(var(--background) 2.2))",
     "vcs_unmerged": "color(var(--orangish) min-contrast(var(--background) 2.2))",
     "viewport_always_visible_color": "color(var(--foreground) a(0.220))",
     "viewport_hide_show_color": "color(var(--foreground) a(0.280))"

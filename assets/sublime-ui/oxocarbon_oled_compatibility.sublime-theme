@@ -5,8 +5,8 @@
   "variables": {
     "--accent": "#ff7eb6",
     "--background": "#000000",
-    "--bluish": "#33b1ff",
-    "--cyanish": "#f2f4f8",
+    "--bluish": "#ff7eb6",
+    "--cyanish": "#08bdba",
     "--foreground": "#f2f4f8",
     "--greenish": "#42be65",
     "--orangish": "#3ddbd9",
@@ -132,7 +132,7 @@
     "vcs_deleted": "color(var(--redish) min-contrast(var(--background) 3))",
     "vcs_missing": "color(var(--redish) min-contrast(var(--background) 3))",
     "vcs_modified": "color(var(--bluish) min-contrast(var(--background) 3))",
-    "vcs_staged": "color(var(--bluish) min-contrast(var(--background) 3))",
+    "vcs_staged": "color(var(--cyanish) min-contrast(var(--background) 3))",
     "vcs_unmerged": "color(var(--orangish) min-contrast(var(--background) 3))",
     "viewport_always_visible_color": "color(var(--foreground) a(0.180))",
     "viewport_hide_show_color": "color(var(--foreground) a(0.240))"

@@ -7,13 +7,12 @@ use serde::Deserialize;
 
 const ACCENT_KEYS: &[&str] = &[
     "scmGraph.foreground1",
-    "activityBar.activeBorder",
-    "statusBarItem.warningForeground",
+    "tab.activeBorderTop"
 ];
 
 const HUE_KEYS: &[(&str, &[&str])] = &[
     (
-        "--redish",
+        "--redish", // #ee5396
         &[
             "charts.red",
             "scmGraph.foreground1",
@@ -23,7 +22,7 @@ const HUE_KEYS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "--pinkish",
+        "--pinkish", // #ff7eb6
         &[
             "charts.blue",
             "scmGraph.foreground2",
@@ -32,7 +31,7 @@ const HUE_KEYS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "--orangish",
+        "--orangish", // #3ddbd9
         &[
             "charts.orange",
             "scmGraph.foreground3",
@@ -41,9 +40,9 @@ const HUE_KEYS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "--bluish",
+        "--bluish",  // #ff7eb6
         &[
-            "charts.yellow",
+            "charts.blue",
             "terminal.ansiBlue",
             "scmGraph.foreground4",
             "editorLink.activeForeground",
@@ -51,7 +50,7 @@ const HUE_KEYS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "--greenish",
+        "--greenish", // #42be65
         &[
             "charts.green",
             "scmGraph.foreground5",
@@ -60,17 +59,16 @@ const HUE_KEYS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "--cyanish",
+        "--cyanish", //  #08bdba
         &[
-            "charts.foreground",
+            "terminal.ansiBlue",
             "scmGraph.foreground2",
             "gitDecoration.modifiedResourceForeground",
-            "terminal.ansiCyan",
             "editorMarkerNavigationInfo.background",
         ],
     ),
     (
-        "--purplish",
+        "--purplish", // #be95ff
         &[
             "charts.purple",
             "textLink.activeForeground",
@@ -78,7 +76,7 @@ const HUE_KEYS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "--yellowish",
+        "--yellowish", // #33b1ff
         &[
             "charts.yellow",
             "terminal.ansiBrightYellow",
@@ -164,7 +162,10 @@ const SUGGEST_SELECTED_BG_KEYS: &[&str] = &[
     "tab.activeBackground",
 ];
 
-const SUGGEST_TEXT_KEYS: &[&str] = &["editorSuggestWidget.foreground", "editor.foreground"];
+const SUGGEST_TEXT_KEYS: &[&str] = &[
+    "editorSuggestWidget.foreground", 
+    "editor.foreground"
+];
 
 const SUGGEST_SELECTED_TEXT_KEYS: &[&str] = &[
     "editorSuggestWidget.selectedForeground",
@@ -194,10 +195,10 @@ const ADAPTIVE_DIVIDER_KEYS: &[&str] = &[
 const VCS_COLORS: &[(&str, &str)] = &[
     ("vcs_modified", "var(--bluish)"),
     ("vcs_missing", "var(--redish)"),
-    ("vcs_staged", "var(--bluish)"),
     ("vcs_added", "var(--pinkish)"),
     ("vcs_deleted", "var(--redish)"),
     ("vcs_unmerged", "var(--orangish)"),
+    ("vcs_staged", "var(--cyanish)"),
 ];
 
 const KIND_COLORS: &[(&str, &str)] = &[
