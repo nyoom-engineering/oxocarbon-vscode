@@ -10,11 +10,11 @@
 <br>
 <br>
 
-Oxocarbon is a High contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines
+Oxocarbon is a High-Contrast accessible colorscheme inspired by IBM Carbon. It delivers class-leading readability without strain by adhering to WCAG 2.1 guidelines.
 
 ## Variants
 
-There are 9 variants to the theme, the standard theme, an OLED variant, Compatibility variants for both, Monochrom variants for each of those, and a PRINT variant
+There are 9 variants to the theme: standard theme, an OLED variant, Compatibility variants for both, Monochrom variants for each of those, and a PRINT variant.
 
 The standard theme features a consistent dark background, modeled after a focus on the editor
 
@@ -43,7 +43,7 @@ The compatibility variants provide contrast for tabs and menus to enable a more 
 
 ### Monochrom
 
-A hallmark of oxocarbon is the attention to font styling alongside color, this is highlighted in the monochrom variants
+A hallmark of Oxocarbon is the attention to font styling alongside color, which is highlighted in the monochrome variants.
 
 <details>
   <summary>Oxocarbon Monochrom </summary>
@@ -92,7 +92,7 @@ The PRINT variant inverts Oxocarbon OLED Monochrom to create a paper-friendly li
 
 ### Language Support
 
-Any language with a textmate parser and/or semantic highlghting support is supported (i.e. almost all of them)
+Any language with a TextMate parser and/or semantic highlighting support is supported (i.e. almost all of them).
 
 Oxocarbon also provides handrolled syntax highlighting for:
 
@@ -129,7 +129,7 @@ It is recommended to enable Semantic Parsing by default
 }
 ```
 
-Rust semantic parsing is buggy so it is recommended to default back to TextMate Parsing. In your `settings.json`
+Rust semantic parsing is buggy, so it is recommended to default back to TextMate parsing. In your `settings.json`:
 
 ```json
 {
@@ -160,7 +160,7 @@ It is recommended to disable Bracket Pair Colorization by default and enable it 
 }
 ```
 
-On HiDPI/Retina displays, you may find text rendering improved by adjusting font ant-aliasing
+On HiDPI/Retina displays, you may find text rendering improved by adjusting font anti-aliasing.
 
 ```json
 {
@@ -182,7 +182,7 @@ On HiDPI/Retina displays, you may find text rendering improved by adjusting font
 }
 ```
 
-An opinionated `settings.json`, `keybindings.json`, and list of extensions is also provided under `assets/` in the GitHub Repository. On UNIX systems, you may clone this repository, install Cursor, and run `make install` to intall the configuration.
+An opinionated `settings.json`, `keybindings.json`, and list of extensions are also provided under `assets/` in the GitHub repository. On UNIX systems, you may clone this repository, install Cursor, and run `make install` to install the configuration.
 
 ## Development
 
@@ -190,7 +190,7 @@ The following requires `Cargo`/`Rust`. Changes should be made in `oxocarbon.toml
 
 To generate the JSON file, run `make` in the root directory. To test the colorscheme, press `F5`
 
-Reference the [Theme Color Reference](https://code.visualstudio.com/api/references/theme-color#editor-widget-colors) & [Semantic Highlight Guide]*https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide) for highlight groups
+Reference the [Theme Color Reference](https://code.visualstudio.com/api/references/theme-color#editor-widget-colors) & [Semantic Highlight Guide](https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide) for highlight groups.
 
 Additionally, add the following in your `keybindings.json` to use `cmd+shift+i` to inspect the highlight at cursor
 
@@ -205,11 +205,11 @@ You may also run `make dev` for file watcher & incremental compilation
 
 ## Contributing
 
-Before contributing, its recommended to read through the [style guide](https://github.com/nyoom-engineering/oxocarbon/blob/main/docs/style-guide.md). Discussion primarily takes place on the [Nyoom Engineering Discord Server](https://discord.gg/M528tDKXRG)
+Before contributing, it's recommended to read through the [style guide](https://github.com/nyoom-engineering/oxocarbon/blob/main/docs/style-guide.md). Discussion primarily takes place on the [Nyoom Engineering Discord Server](https://discord.gg/M528tDKXRG).
 
 ## License
 
-The project is vendored under the MIT license
+The project is vendored under the MIT license.
 
 # Converters (Beta)
 

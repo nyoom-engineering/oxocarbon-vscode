@@ -245,6 +245,8 @@ jobs:
               echo '- Copy the `.sublime-theme` files to `~/Library/Application Support/Sublime Text/Packages/User`'
               echo '- Select the theme via Preferences > Select Theme'
               echo
+              echo "### Sublime Merge:"
+              echo '- See https://github.com/sublimehq/sublime_merge/issues/198#issuecomment-471042729'
             fi
             if compgen -G "release/*.vsix" > /dev/null; then
               VSIX=$(basename "$(ls -1 release/*.vsix | head -n1)")
