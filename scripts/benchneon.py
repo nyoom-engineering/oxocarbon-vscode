@@ -7,6 +7,7 @@
 # Example usage:
 #   ./scripts/benchneon.py --iterations 2 --warmups 0 --tokens 1000 --color-keys 200
 #   ./scripts/benchneon.py --iterations 4 --warmups 1 --tokens 200000 --color-keys 40000
+#   for i in {1..100}; do ./scripts/benchneon.py --iterations 2 --warmups 0 --tokens 1000 --color-keys 200 | grep "Speedup" | awk '{print $3}' | sed 's/x//'; done | awk '{sum+=$1; count++} END {print "Average speedup: " sum/count "x"}'
 #
 # Options:
 #   --tokens, --color-keys, --iterations, --warmups, --profile, --bin, --no-build, --keep-temp
