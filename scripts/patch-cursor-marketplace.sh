@@ -83,11 +83,25 @@ apply_jq "$PRODUCT_JSON" '
   }
 ' --arg url "$MARKETPLACE_URL"
 
-echo "Remove extension overrides as well? (Y/n, default: Y)"
-read -r response
-response=${response:-Y}
+printf "Remove extension overrides as well? (Y/n, default: Y) "
+while true; do
+  IFS= read -rsn1 response
+  if [[ -z "$response" ]]; then
+    response="Y"
+    break
+  fi
+  case "$response" in
+    [Yy]) response="Y"; break ;;
+    [Nn]) response="n"; break ;;
+    *)    printf "\r\033[KPlease enter Y or n (Enter defaults to Y): " ;;
+  esac
+done
 
-if [[ "$response" =~ ^[Yy]$ ]]; then
+# drain input
+while IFS= read -rs -t 0 -n 1000 _; do :; done
+
+if [[ "$response" == "Y" ]]; then
+  printf "\r\033[K"
   echo "Removing extension overrides..."
   apply_jq "$PRODUCT_JSON" '
     del(
@@ -100,6 +114,7 @@ if [[ "$response" =~ ^[Yy]$ ]]; then
     )
   '
 else
+  printf "\r\033[K"
   echo "Skipping extension override removal..."
 fi
 
