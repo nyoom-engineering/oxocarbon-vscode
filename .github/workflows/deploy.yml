@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
 
       - name: Compute release metadata
         id: meta
@@ -76,6 +78,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -175,6 +179,11 @@ jobs:
     name: Package VSIX
     runs-on: ubuntu-latest
     needs: determine
+    env:
+      NAME: ${{ needs.determine.outputs.name }}
+      VERSION: ${{ needs.determine.outputs.version }}
+      RELEASE_TYPE: ${{ needs.determine.outputs.release_type }}
+      SHA_SHORT: ${{ needs.determine.outputs.sha_short }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -186,25 +195,14 @@ jobs:
 
       - name: Package VSCode extension (.vsix)
         shell: bash
-        env:
-          NAME: ${{ needs.determine.outputs.name }}
-          VERSION: ${{ needs.determine.outputs.version }}
-          RELEASE_TYPE: ${{ needs.determine.outputs.release_type }}
-          SHA_SHORT: ${{ needs.determine.outputs.sha_short }}
         run: |
           set -euo pipefail
-          npx --yes @vscode/vsce package
-          PACKAGED=$(ls -1 *.vsix | head -n1)
-          if [ -z "$PACKAGED" ]; then
-            echo "No VSIX produced" >&2
-            exit 1
-          fi
           if [ "$RELEASE_TYPE" = "nightly" ]; then
             TARGET="${NAME}-${VERSION}-${SHA_SHORT}.vsix"
           else
             TARGET="${NAME}-${VERSION}.vsix"
           fi
-          mv "$PACKAGED" "$TARGET"
+          npx --yes @vscode/vsce package -o "$TARGET"
 
       - name: Upload VSIX
         uses: actions/upload-artifact@v4
@@ -223,6 +221,9 @@ jobs:
       SUFFIX: ${{ needs.determine.outputs.suffix }}
       TAG: ${{ needs.determine.outputs.tag }}
       RELEASE_NAME: ${{ needs.determine.outputs.release_name }}
+      NAME: ${{ needs.determine.outputs.name }}
+      VERSION: ${{ needs.determine.outputs.version }}
+      SHA_SHORT: ${{ needs.determine.outputs.sha_short }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -357,8 +358,8 @@ jobs:
             echo "VSCE_PAT secret is required to publish" >&2
             exit 1
           fi
-          VSIX=$(ls -1 release/*.vsix | head -n1)
-          if [ -z "$VSIX" ]; then
+          VSIX="release/${NAME}-${VERSION}.vsix"
+          if [ ! -f "$VSIX" ]; then
             echo "VSIX package not found" >&2
             exit 1
           fi
@@ -375,8 +376,8 @@ jobs:
             echo "OVSX_TOKEN secret is required to publish" >&2
             exit 1
           fi
-          VSIX=$(ls -1 release/*.vsix | head -n1)
-          if [ -z "$VSIX" ]; then
+          VSIX="release/${NAME}-${VERSION}.vsix"
+          if [ ! -f "$VSIX" ]; then
             echo "VSIX package not found" >&2
             exit 1
           fi
