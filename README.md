@@ -211,13 +211,13 @@ Before contributing, it's recommended to read through the [style guide](https://
 
 The project is vendored under the MIT license.
 
-# Converters (Beta)
+## Converters (Beta)
 
 Preliminary support for autogenerating themes from VSCode implementation(s)
 
 Note, these are provided as-is under nightly releases
 
-## Zed
+### Zed
 
 Uses the Zed Team's `theme_importer` crate
 
@@ -245,7 +245,7 @@ make install-zed
 zed
 ```
 
-## Textmate
+### Textmate
 
 Uses in-house `json2tm` crate, works with Textmate-compatible editors
 
@@ -269,7 +269,19 @@ Tested with; including but not limited to
 
 As the Textmate themes only affect the code window, compatibility variants are not generated
 
-## Intellij 
+### Sublime Text
+
+Generates complementary themes for Sublime Text UI. Uses in-house `json2st` crate
+
+```sh
+# translate themes
+make sublime-ui
+
+# (optional) install to Sublime user folder (macOS only)
+make install-sublime-ui
+```
+
+### Intellij 
 
 (not recommended)
 
@@ -286,3 +298,25 @@ make intellij
 
 Use Microsoft's [Theme Converter for Visual Studio](https://github.com/microsoft/theme-converter-for-vs), requires .NET Desktop & the Visual Studio extension development enviornment. JSON files are in `themes`
 
+## Utilities
+
+Convert any VSCode theme 
+
+```sh
+./scripts/vsc.sh <input.json>
+
+# e.g. convert material theme
+./scripts/vsc.sh ./assets/Community-Material-Theme-Darker-High-Contrast.json
+```
+
+Patch Cursor to use VSCode's Proprietary Marketplace instead of OpenVSX
+
+```sh
+./scripts/patch-cursor-marketplace.sh
+```
+
+Benchmark the Neon implementation
+
+```sh
+./scripts/benchneon.py --iterations 2 --warmups 0 --tokens 1000 --color-keys 200
+```

@@ -13,12 +13,73 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  determine:
+    name: Determine Release Type
+    runs-on: ubuntu-latest
+    outputs:
+      release_type: ${{ steps.meta.outputs.release_type }}
+      tag: ${{ steps.meta.outputs.tag }}
+      suffix: ${{ steps.meta.outputs.suffix }}
+      release_name: ${{ steps.meta.outputs.release_name }}
+      version: ${{ steps.meta.outputs.version }}
+      name: ${{ steps.meta.outputs.name }}
+      display_name: ${{ steps.meta.outputs.display_name }}
+      sha_short: ${{ steps.meta.outputs.sha_short }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Compute release metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          NAME=$(jq -r .name package.json)
+          VERSION=$(jq -r .version package.json)
+          DISPLAY_NAME=$(jq -r .displayName package.json)
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          DATE=$(date -u +%Y%m%d)
+
+          PREV_VERSION=""
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            if git show HEAD^:package.json >/tmp/prev-package.json 2>/dev/null; then
+              PREV_VERSION=$(jq -r .version /tmp/prev-package.json)
+            fi
+          fi
+
+          if [ -n "$PREV_VERSION" ] && [ "$PREV_VERSION" = "$VERSION" ]; then
+            RELEASE_TYPE="nightly"
+            TAG="nightly-$DATE-$SHA_SHORT"
+            SUFFIX="$DATE-$SHA_SHORT"
+            RELEASE_NAME="Nightly $DATE ($SHA_SHORT)"
+          else
+            RELEASE_TYPE="stable"
+            TAG="v$VERSION"
+            SUFFIX="$VERSION"
+            RELEASE_NAME="$DISPLAY_NAME v$VERSION"
+          fi
+
+          {
+            echo "release_type=$RELEASE_TYPE"
+            echo "tag=$TAG"
+            echo "suffix=$SUFFIX"
+            echo "release_name=$RELEASE_NAME"
+            echo "version=$VERSION"
+            echo "name=$NAME"
+            echo "display_name=$DISPLAY_NAME"
+            echo "sha_short=$SHA_SHORT"
+          } >> "$GITHUB_OUTPUT"
+
   unix-themes:
     name: Build Unix Themes
     runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -117,6 +178,12 @@ jobs:
   vsix:
     name: Package VSIX
     runs-on: ubuntu-latest
+    needs: determine
+    env:
+      NAME: ${{ needs.determine.outputs.name }}
+      VERSION: ${{ needs.determine.outputs.version }}
+      RELEASE_TYPE: ${{ needs.determine.outputs.release_type }}
+      SHA_SHORT: ${{ needs.determine.outputs.sha_short }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -126,22 +193,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Compute metadata
-        id: meta
-        shell: bash
-        run: |
-          set -euo pipefail
-          NAME=$(jq -r .name package.json)
-          VERSION=$(jq -r .version package.json)
-          SHA_SHORT=$(git rev-parse --short HEAD)
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
-
       - name: Package VSCode extension (.vsix)
         shell: bash
         run: |
-          npx --yes @vscode/vsce package -o "${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.sha_short }}.vsix"
+          set -euo pipefail
+          if [ "$RELEASE_TYPE" = "nightly" ]; then
+            TARGET="${NAME}-${VERSION}-${SHA_SHORT}.vsix"
+          else
+            TARGET="${NAME}-${VERSION}.vsix"
+          fi
+          npx --yes @vscode/vsce package -o "$TARGET"
 
       - name: Upload VSIX
         uses: actions/upload-artifact@v4
@@ -150,11 +211,19 @@ jobs:
           path: "*.vsix"
 
   release:
-    name: Create GitHub prerelease
+    name: Create GitHub release
     runs-on: ubuntu-latest
-    needs: [unix-themes, visualstudio, vsix]
+    needs: [determine, unix-themes, visualstudio, vsix]
     permissions:
       contents: write
+    env:
+      RELEASE_TYPE: ${{ needs.determine.outputs.release_type }}
+      SUFFIX: ${{ needs.determine.outputs.suffix }}
+      TAG: ${{ needs.determine.outputs.tag }}
+      RELEASE_NAME: ${{ needs.determine.outputs.release_name }}
+      NAME: ${{ needs.determine.outputs.name }}
+      VERSION: ${{ needs.determine.outputs.version }}
+      SHA_SHORT: ${{ needs.determine.outputs.sha_short }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -163,20 +232,6 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           path: dist
-
-      - name: Compute metadata
-        id: meta
-        shell: bash
-        run: |
-          set -euo pipefail
-          DATE=$(date -u +%Y%m%d)
-          SHA_SHORT=$(git rev-parse --short HEAD)
-          TAG="nightly-$DATE-$SHA_SHORT"
-          SUFFIX="$DATE-$SHA_SHORT"
-          echo "date=$DATE" >> "$GITHUB_OUTPUT"
-          echo "sha_short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
 
       - name: Prepare release files
         shell: bash
@@ -191,7 +246,7 @@ jobs:
           while IFS='|' read -r src name; do
             [ -z "$src" ] && continue
             if [ -d "$src" ]; then
-              (cd "$src" && zip -r "${GITHUB_WORKSPACE}/release/${name}-${{ steps.meta.outputs.suffix }}.zip" .)
+              (cd "$src" && zip -r "${GITHUB_WORKSPACE}/release/${name}-${SUFFIX}.zip" .)
             fi
           done <<'EOF'
           dist/unix-themes/themes|themes
@@ -286,14 +341,56 @@ jobs:
             fi
           } >> "$BODY"
 
-      - name: Create GitHub prerelease
+      - name: Setup Node.js
+        if: env.RELEASE_TYPE == 'stable'
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Publish to Visual Studio Marketplace
+        if: env.RELEASE_TYPE == 'stable'
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${VSCE_PAT:-}" ]; then
+            echo "VSCE_PAT secret is required to publish" >&2
+            exit 1
+          fi
+          VSIX="release/${NAME}-${VERSION}.vsix"
+          if [ ! -f "$VSIX" ]; then
+            echo "VSIX package not found" >&2
+            exit 1
+          fi
+          npx --yes @vscode/vsce publish --packagePath "$VSIX"
+
+      - name: Publish to OpenVSX
+        if: env.RELEASE_TYPE == 'stable'
+        env:
+          OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${OVSX_TOKEN:-}" ]; then
+            echo "OVSX_TOKEN secret is required to publish" >&2
+            exit 1
+          fi
+          VSIX="release/${NAME}-${VERSION}.vsix"
+          if [ ! -f "$VSIX" ]; then
+            echo "VSIX package not found" >&2
+            exit 1
+          fi
+          npx --yes ovsx publish "$VSIX"
+
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.meta.outputs.tag }}
-          name: Nightly ${{ steps.meta.outputs.date }} (${{ steps.meta.outputs.sha_short }})
-          prerelease: true
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.RELEASE_NAME }}
+          prerelease: ${{ env.RELEASE_TYPE != 'stable' }}
           body_path: release/BODY.md
           files: ${{ steps.collect.outputs.list }}
 
