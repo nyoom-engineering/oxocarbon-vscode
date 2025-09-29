@@ -289,8 +289,10 @@ jobs:
               echo
             fi
             if compgen -G "release/sublime-ui-*.zip" > /dev/null; then
-              echo "### Sublime Text & Sublime Merge (macOS):"
+              echo "### Sublime Text (macOS):"
               echo
+              echo '  - Copy the `.tmTheme` files to `~/Library/Application Support/Sublime Text/Packages/User`'
+              echo "  - Then select it via Preferences > Color Scheme"
               echo "- Unzip the Sublime UI archive."
               echo '- Copy the `.tmTheme` files to `~/Library/Application Support/Sublime Text/Packages/User`'
               echo "  - Then select color scheme via Preferences > Color Scheme"
