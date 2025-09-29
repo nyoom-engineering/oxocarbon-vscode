@@ -8,6 +8,7 @@ node_modules
 # handled by CI/CD
 *.vsix
 /intellij
+/sublime-ui
 /textmate
 /visualstudio
 /zed

@@ -106,9 +106,6 @@ jobs:
         run: |
           set -euo pipefail
           make all zed textmate xcode sublime-ui
-          mkdir -p out
-          rm -f out/sublime-ui.zip
-          (cd assets/sublime-ui && zip -q -r ../../out/sublime-ui.zip *.sublime-theme)
 
       - name: Upload themes artifacts
         uses: actions/upload-artifact@v4
@@ -121,7 +118,7 @@ jobs:
             intellij/**/*.icls
             xcode/**/*.xccolortheme
             zed/oxocarbon.json
-            out/sublime-ui.zip
+            sublime-ui/
 
   visualstudio:
     name: Build Visual Studio Theme
@@ -253,7 +250,7 @@ jobs:
           dist/unix-themes/textmate|textmate
           dist/unix-themes/zed|zed
           dist/unix-themes/xcode|xcode
-          out/sublime-ui.zip|sublime-ui
+          dist/unix-themes/sublime-ui|sublime-ui
           dist/visualstudio|visualstudio
           EOF
 
@@ -292,11 +289,11 @@ jobs:
               echo
             fi
             if compgen -G "release/sublime-ui-*.zip" > /dev/null; then
-              echo "### Sublime Text (macOS):"
+              echo "### Sublime Text & Sublime Merge (macOS):"
               echo
-              echo '  - Copy the `.tmTheme` files to `~/Library/Application Support/Sublime Text/Packages/User`'
-              echo "  - Then select it via Preferences > Color Scheme"
               echo "- Unzip the Sublime UI archive."
+              echo '- Copy the `.tmTheme` files to `~/Library/Application Support/Sublime Text/Packages/User`'
+              echo "  - Then select color scheme via Preferences > Color Scheme"
               echo '- Copy the `.sublime-theme` files to `~/Library/Application Support/Sublime Text/Packages/User`'
               echo '- Select the theme via Preferences > Select Theme'
               echo

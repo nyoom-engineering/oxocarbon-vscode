@@ -18,7 +18,7 @@ TMDIR := textmate
 TM_CONVERTER := target/release/json2tm
 TM_USER := ~/Library/Application\ Support/TextMate/Themes
 SUBLIME_USER := ~/Library/Application\ Support/Sublime\ Text/Packages/User
-SUBLIME_UI := $(ASSETS)/sublime-ui
+SUBLIME_UI_DIR := sublime-ui
 JSON2ST := target/release/json2st
 
 JSON2ST_SRCS := $(shell find json2st/src -type f -name '*.rs')
@@ -188,10 +188,10 @@ $(TMDIR)/%.tmTheme: $(THEMESDIR)/%.json $(TM_CONVERTER)
 	$(TM_CONVERTER) $< $@
 
 sublime-ui: $(SUBLIME_UI_INPUTS) $(JSON2ST)
-	@mkdir -p $(SUBLIME_UI)
+	@mkdir -p $(SUBLIME_UI_DIR)
 	@for pair in $(SUBLIME_UI_PAIRS); do \
 		in=$(THEMESDIR)/$${pair%%:*}; \
-		out=$(SUBLIME_UI)/$${pair##*:}; \
+		out=$(SUBLIME_UI_DIR)/$${pair##*:}; \
 		echo "$$in -> $$out"; \
 		if [ "$$(basename $$in)" = "PRINT.json" ]; then \
 			temp_in=$$(mktemp); \
@@ -271,7 +271,7 @@ install-sublime: textmate
 
 install-sublime-ui:
 	mkdir -p $(SUBLIME_USER)
-	cp $(SUBLIME_UI)/*.sublime-theme $(SUBLIME_USER)/
+	cp $(SUBLIME_UI_DIR)/*.sublime-theme $(SUBLIME_USER)/
 
 install-textmate: textmate
 	mkdir -p $(TM_USER)
@@ -282,7 +282,7 @@ install-xcode: xcode
 	cp $(XCODEDIR)/*.xccolortheme $(XCODE_USER)/
 
 clean:
-	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls $(SUBLIME_UI)/*.sublime-theme
+	cargo clean; rm -f $(OUTDIR)/*.json $(THEMESDIR)/*.json $(ZEDDIR)/*.json $(TMDIR)/*.tmTheme $(INTELLIJDIR)/*.icls $(SUBLIME_UI_DIR)/*.sublime-theme
 
 benchmark: build $(TM_CONVERTER) $(XCODE_CONVERTER) all
 	$(call bench,rm -f $(THEMESDIR)/*.json,make -s all)

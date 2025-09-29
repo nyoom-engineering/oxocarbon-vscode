@@ -16,6 +16,9 @@
 	"bugs": {
 		"url": "https://github.com/nyoom-engineering/oxocarbon-vscode/issues"
 	},
+    "categories": [
+        "Themes"
+    ],
 	"keywords": [
 		"theme",
 		"dark",
