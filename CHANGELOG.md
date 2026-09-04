@@ -9,7 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - `semanticTokenColors` match TextMate roles; comments stay on TM so compat can lift Gray 50
 - Drop inherit-duplicate 1.136 keys (agents/surface/quickInput/sticky scroll) so compat remaps propagate
 - Command palette stays on Gray 100 (`quickInput` inherits `editorWidget`); unread agents badge is not error magenta
-- IBM Blue `#0f62fe` + white FG on remote/debug/noFolder/prominent, including remote hover
+- IBM Blue `#0f62fe` + white FG on remote/noFolder/prominent; debug status is Orange 40 `#ff832b` + Gray 100
 - Diagnostics follow Carbon g100 support: warning Yellow 30 `#f1c21b`, info Blue 50 `#4589ff`; error stays Magenta 50. Warning badges use Gray 100 on yellow (not white).
 - Chat describe/edit uses canvas (`input.background` Gray 100); the tip notice is a Gray 90 menu card (`agentsChatInput`)
 - Status error is Magenta 50 wash with status-bar FG; warning stays Yellow 30 text, no fill
@@ -19,7 +19,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Context attachment chips use Gray 80 `chat.requestBorder`
 - Error chip is Magenta 40 on Magenta 50 wash, white on hover
 - PRINT picker name `PRINT`; mono ramp remaps `#0f62fe`; trim trailing space on OLED monochrom label
-- Focus rings lift to Gray 70 (`focusBorder`); chat composer no longer darkens on select
+- Focus rings are IBM Blue 60 `#0f62fe` (1px); list outlines inherit `focusBorder`
 - SCM graph lanes are Carbon categorical; local branch Cyan 30, remote magenta, base Orange 40. Colored pill ink inherits `panel.background`
 
 ## [1.3.0]
