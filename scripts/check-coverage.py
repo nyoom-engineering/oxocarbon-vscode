@@ -20,6 +20,11 @@ FORBIDDEN = (
     "breadcrumbPicker.background",
     "agentsUnreadBadge.background",
     "agentsUnreadBadge.foreground",
+    # Settings option rows: inherit list.hover + 70% header dim. Do not author.
+    "settings.rowHoverBackground",
+    "settings.focusedRowBackground",
+    "settings.focusedRowBorder",
+    "settings.settingsHeaderHoverForeground",
 )
 
 

@@ -68,7 +68,7 @@
         "path": "./themes/oxocarbon-oled-mono-compat-color-theme.json"
       },
       {
-        "label": "oxocarbon PRINT",
+        "label": "PRINT",
         "uiTheme": "vs-light",
         "path": "./themes/PRINT.json"
       }

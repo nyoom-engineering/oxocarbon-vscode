@@ -21,7 +21,6 @@ tab.selectedBorderTop
 editorCodeLens.foreground
 editorBracketMatch.border
 editorSuggestWidget.focusOutline
-editorLightBulbAi.foreground
 editorCommentsWidget.rangeBackground
 editorCommentsWidget.rangeActiveBackground
 statusBarItem.prominentBackground
@@ -86,7 +85,16 @@ input.border
 sideBarSectionHeader.border
 breadcrumb.foreground
 breadcrumb.activeSelectionForeground
+agentsChatInput.background
+agentsChatInput.border
+agentsChatInput.foreground
 agentsChatInput.focusBorder
+statusBarItem.errorBackground
+statusBarItem.errorForeground
+statusBarItem.errorHoverBackground
+statusBarItem.errorHoverForeground
+statusBarItem.warningBackground
+statusBarItem.warningForeground
 agentsNewSessionButton.background
 agentsNewSessionButton.hoverBackground
 modernActivityBarItem.activeBackground

@@ -225,6 +225,7 @@ const COMPAT_BG_KEYS: &[&str] = &[
     "statusBar.background",
     "editorWidget.background",
     "commandCenter.background",
+    "input.background",
 ];
 
 const COMPAT_BG_KEYS_2: &[&str] = &["editorGutter.background"];
@@ -277,7 +278,7 @@ fn compute_theme_name(
     print: bool,
 ) -> Option<String> {
     if print {
-        return Some("Oxocarbon PRINT".to_string());
+        return Some("PRINT".to_string());
     }
     if monochrome {
         let base = if oled {

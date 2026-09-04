@@ -102,6 +102,8 @@ PAIRS = [
     ("statusBarItem.remoteForeground", "statusBarItem.remoteBackground", 4.5, "remote status"),
     ("statusBarItem.remoteHoverForeground", "statusBarItem.remoteHoverBackground", 4.5, "remote status hover"),
     ("statusBarItem.prominentForeground", "statusBarItem.prominentBackground", 4.5, "prominent status"),
+    ("statusBarItem.errorForeground", "statusBarItem.errorBackground", 4.5, "error status chip"),
+    ("statusBarItem.warningForeground", "statusBarItem.warningBackground", 4.5, "warning status chip"),
     ("activityWarningBadge.foreground", "activityWarningBadge.background", 4.5, "warning badge"),
     ("activityErrorBadge.foreground", "activityErrorBadge.background", 4.5, "error badge"),
     ("inputValidation.warningForeground", "inputValidation.warningBackground", 4.5, "warning validation"),
@@ -127,8 +129,19 @@ def main() -> int:
         if fg_key not in colors or bg_key not in colors:
             warnings.append(f"missing {fg_key} or {bg_key} ({label})")
             continue
-        fg_rgb = opaque_over(colors[fg_key], colors[bg_key])
-        bg_rgb = parse(colors[bg_key])[:3]
+        under = (
+            colors.get("statusBar.background", colors["editor.background"])
+            if bg_key.startswith("statusBarItem.")
+            else colors["editor.background"]
+        )
+        bg_hex = colors[bg_key]
+        if len(bg_hex.lstrip("#")) > 6:
+            bg_rgb = opaque_over(bg_hex, under)
+            bg_for_fg = "#{:02x}{:02x}{:02x}".format(*bg_rgb)
+        else:
+            bg_rgb = parse(bg_hex)[:3]
+            bg_for_fg = bg_hex
+        fg_rgb = opaque_over(colors[fg_key], bg_for_fg)
         ratio = contrast(fg_rgb, bg_rgb)
         status = "OK" if ratio + 1e-6 >= need else "FAIL"
         print(f"  {status:4} {ratio:5.2f}:1  need {need:.1f}  {label}")
@@ -168,7 +181,7 @@ def main() -> int:
     if colors.get("editorInfo.foreground") == colors.get("editorWarning.foreground"):
         failures.append("editorInfo.foreground == editorWarning.foreground")
         print("  FAIL editor info/warning share a color")
-    if colors.get("statusBarItem.warningForeground") == colors.get("statusBarItem.errorForeground"):
+    if colors.get("statusBarItem.warningBackground") == colors.get("statusBarItem.errorBackground"):
         failures.append("status bar warning == error")
         print("  FAIL statusBar warning/error share a color")
     if colors.get("activityWarningBadge.background") == colors.get("activityErrorBadge.background"):
