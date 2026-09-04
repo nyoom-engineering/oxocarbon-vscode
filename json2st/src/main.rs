@@ -5,10 +5,7 @@ use oxocarbon_utils::{
 };
 use serde::Deserialize;
 
-const ACCENT_KEYS: &[&str] = &[
-    "scmGraph.foreground1",
-    "tab.activeBorderTop"
-];
+const ACCENT_KEYS: &[&str] = &["scmGraph.foreground1", "tab.activeBorderTop"];
 
 const HUE_KEYS: &[(&str, &[&str])] = &[
     (
@@ -40,7 +37,7 @@ const HUE_KEYS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "--bluish",  // #ff7eb6
+        "--bluish", // #ff7eb6
         &[
             "charts.blue",
             "terminal.ansiBlue",
@@ -162,10 +159,7 @@ const SUGGEST_SELECTED_BG_KEYS: &[&str] = &[
     "tab.activeBackground",
 ];
 
-const SUGGEST_TEXT_KEYS: &[&str] = &[
-    "editorSuggestWidget.foreground", 
-    "editor.foreground"
-];
+const SUGGEST_TEXT_KEYS: &[&str] = &["editorSuggestWidget.foreground", "editor.foreground"];
 
 const SUGGEST_SELECTED_TEXT_KEYS: &[&str] = &[
     "editorSuggestWidget.selectedForeground",

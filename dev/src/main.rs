@@ -150,13 +150,9 @@ fn manifest_path() -> Result<PathBuf, String> {
 }
 
 fn ensure_compiler(root: &Path) -> Result<(), String> {
-    let binary = root.join("target/release/oxocarbon-themec");
-    if binary.exists() {
-        return Ok(());
-    }
-
     let status = Command::new("cargo")
-        .args(["build", "--release", "--quiet"])
+        .current_dir(root)
+        .args(["build", "--release", "--quiet", "-p", "oxocarbon-themec"])
         .status()
         .map_err(|e| format!("Failed to build compiler: {e}"))?;
 

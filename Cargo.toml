@@ -1,5 +1,5 @@
 [workspace]
-members = ["dev", "json2tm", "json2xccolor", "json2st"]
+members = ["dev", "json2tm", "json2xccolor", "json2st", "oxocarbon-utils"]
 resolver = "2"
 
 [package]

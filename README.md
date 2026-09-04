@@ -113,6 +113,14 @@ Install using your package manager of choice: [Oxocarbon Theme - Visual Studio M
 
 Alternatively, a VSIX package can be found under [releases](https://github.com/nyoom-engineering/oxocarbon-vscode/releases)
 
+### Nix
+
+```sh
+nix develop     # rustc, cargo, make, vsce, jq
+nix build       # oxocarbon-themec
+make coverage   # compile all variants and check VS Code 2026 Dark key coverage
+```
+
 ### Manual
 
 - Download repository source as ZIP

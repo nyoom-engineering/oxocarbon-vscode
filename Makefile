@@ -68,12 +68,18 @@ DEFAULT_THEMES := \
 .PHONY: all build clean dev dotfiles help install mono-coolgray mono-warmgray PRINT \
 	zed setup-zed intellij setup-intellij dotfiles-zed dotfiles-sublime \
 	install-zed install-sublime install-textmate install-xcode install-sublime-ui \
-	textmate xcode benchmark sublime-ui patch-cursor-marketplace
+	textmate xcode benchmark sublime-ui patch-cursor-marketplace coverage nix
 
 all: $(DEFAULT_THEMES)
 
 build:
-	cargo build --release
+	cargo build --release --workspace
+
+coverage: all
+	python3 scripts/check-coverage.py
+
+nix:
+	nix develop -c make coverage
 
 dev:
 	cargo run -r -p oxocarbon-dev

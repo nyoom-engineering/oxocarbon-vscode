@@ -1,65 +1,81 @@
 use std::sync::OnceLock;
 
-use oxocarbon_utils::{find_nearest_index, luminance_from_u8, pack_rgb, parse_hex_rgba_u8};
+use oxocarbon_utils::{find_nearest_index_sorted, luminance_from_u8, pack_rgb};
 
-// IBM Gray family (Carbon): darkest to lightest + white
-const GRAY_RAMP: [&str; 10] = [
-    "#161616", // Gray 100
-    "#262626", // Gray 90
-    "#393939", // Gray 80
-    "#525252", // Gray 70
-    "#6f6f6f", // Gray 60
-    "#8d8d8d", // Gray 50
-    "#a8a8a8", // Gray 40
-    "#c6c6c6", // Gray 30
-    "#e0e0e0", // Gray 20
-    "#f4f4f4", // Gray 10
+const GRAY_RGB: &[[u8; 3]] = &[
+    [0x00, 0x00, 0x00],
+    [0x0b, 0x0b, 0x0b],
+    [0x0f, 0x0f, 0x0f],
+    [0x16, 0x16, 0x16],
+    [0x1b, 0x1b, 0x1b],
+    [0x1e, 0x1e, 0x1e],
+    [0x21, 0x21, 0x21],
+    [0x26, 0x26, 0x26],
+    [0x39, 0x39, 0x39],
+    [0x52, 0x52, 0x52],
+    [0x6f, 0x6f, 0x6f],
+    [0x8d, 0x8d, 0x8d],
+    [0xa8, 0xa8, 0xa8],
+    [0xc6, 0xc6, 0xc6],
+    [0xe0, 0xe0, 0xe0],
+    [0xdd, 0xe1, 0xe6],
+    [0xf2, 0xf4, 0xf8],
+    [0xf4, 0xf4, 0xf4],
+    [0xff, 0xff, 0xff],
 ];
 
-// IBM Cool Gray family
-const COOL_GRAY_RAMP: [&str; 10] = [
-    "#121619", // Cool Gray 100
-    "#21272a", // Cool Gray 90
-    "#343a3f", // Cool Gray 80
-    "#4d5358", // Cool Gray 70
-    "#697077", // Cool Gray 60
-    "#878d96", // Cool Gray 50
-    "#a2a9b0", // Cool Gray 40
-    "#c1c7cd", // Cool Gray 30
-    "#dde1e6", // Cool Gray 20
-    "#f2f4f8", // Cool Gray 10
+const COOL_RGB: &[[u8; 3]] = &[
+    [0x00, 0x00, 0x00],
+    [0x0b, 0x0b, 0x0b],
+    [0x0f, 0x0f, 0x0f],
+    [0x12, 0x16, 0x19],
+    [0x16, 0x16, 0x16],
+    [0x1b, 0x1b, 0x1b],
+    [0x1e, 0x1e, 0x1e],
+    [0x21, 0x21, 0x21],
+    [0x26, 0x26, 0x26],
+    [0x21, 0x27, 0x2a],
+    [0x39, 0x39, 0x39],
+    [0x34, 0x3a, 0x3f],
+    [0x52, 0x52, 0x52],
+    [0x4d, 0x53, 0x58],
+    [0x69, 0x70, 0x77],
+    [0x87, 0x8d, 0x96],
+    [0xa2, 0xa9, 0xb0],
+    [0xc1, 0xc7, 0xcd],
+    [0xdd, 0xe1, 0xe6],
+    [0xf2, 0xf4, 0xf8],
+    [0xff, 0xff, 0xff],
 ];
 
-// IBM Warm Gray family
-const WARM_GRAY_RAMP: [&str; 10] = [
-    "#171414", // Warm Gray 100
-    "#272525", // Warm Gray 90
-    "#3c3838", // Warm Gray 80
-    "#565151", // Warm Gray 70
-    "#726e6e", // Warm Gray 60
-    "#8f8b8b", // Warm Gray 50
-    "#ada8a8", // Warm Gray 40
-    "#cac5c4", // Warm Gray 30
-    "#e5e0df", // Warm Gray 20
-    "#f7f3f2", // Warm Gray 10
+const WARM_RGB: &[[u8; 3]] = &[
+    [0x00, 0x00, 0x00],
+    [0x0b, 0x0b, 0x0b],
+    [0x0f, 0x0f, 0x0f],
+    [0x17, 0x14, 0x14],
+    [0x16, 0x16, 0x16],
+    [0x1b, 0x1b, 0x1b],
+    [0x1e, 0x1e, 0x1e],
+    [0x21, 0x21, 0x21],
+    [0x27, 0x25, 0x25],
+    [0x26, 0x26, 0x26],
+    [0x3c, 0x38, 0x38],
+    [0x39, 0x39, 0x39],
+    [0x52, 0x52, 0x52],
+    [0x56, 0x51, 0x51],
+    [0x72, 0x6e, 0x6e],
+    [0x8f, 0x8b, 0x8b],
+    [0xad, 0xa8, 0xa8],
+    [0xca, 0xc5, 0xc4],
+    [0xdd, 0xe1, 0xe6],
+    [0xe5, 0xe0, 0xdf],
+    [0xf7, 0xf3, 0xf2],
+    [0xf2, 0xf4, 0xf8],
+    [0xff, 0xff, 0xff],
 ];
 
-// common monochrome hues used in OLED mappings, include across all ramps
-const MONO_RAMP_EXTRAS: [&str; 13] = [
-    "#000000", "#0b0b0b", "#0f0f0f", "#161616", "#1b1b1b", "#1e1e1e", "#212121", "#262626",
-    "#393939", "#525252", "#dde1e6", "#f2f4f8", "#ffffff",
-];
+static RAMPS: OnceLock<MonochromeRamps> = OnceLock::new();
 
-const MONO_ACCENT_CANDIDATES: [u32; 10] = [
-    0x08bdba, 0x33b1ff, 0x3ddbd9, 0x42be65, 0x78a9ff, 0x82cfff, 0xa6c8ff, 0xbe95ff, 0xee5396,
-    0xff7eb6,
-];
-
-const MONO_PRINT_EXTRA_ACCENTS: u32 = 0x0f62fe;
-
-static MONOCHROME_RAMPS: OnceLock<MonochromeRamps> = OnceLock::new();
-
-#[repr(C)]
 struct MonochromeRamps {
     default: MonoRamp,
     cool: MonoRamp,
@@ -67,58 +83,38 @@ struct MonochromeRamps {
 }
 
 pub(crate) struct MonoRamp {
-    luminances: &'static [f32],
-    rgbs: &'static [[u8; 3]],
+    luminances: Vec<f32>,
+    rgbs: Vec<[u8; 3]>,
 }
 
 impl MonoRamp {
+    fn from_rgb(src: &[[u8; 3]]) -> Self {
+        let mut pairs: Vec<(f32, [u8; 3])> = src
+            .iter()
+            .map(|&rgb| (luminance_from_u8(rgb[0], rgb[1], rgb[2]), rgb))
+            .collect();
+        pairs.sort_unstable_by(|a, b| a.0.total_cmp(&b.0));
+        let (luminances, rgbs) = pairs.into_iter().unzip();
+        Self { luminances, rgbs }
+    }
+
     #[inline(always)]
     pub(crate) fn nearest_rgb(&self, target: f32) -> [u8; 3] {
-        self.rgbs[find_nearest_index(self.luminances, target)]
+        self.rgbs[find_nearest_index_sorted(&self.luminances, target)]
     }
 }
 
-#[inline]
-fn monochrome_ramps() -> &'static MonochromeRamps {
-    MONOCHROME_RAMPS.get_or_init(build_monochrome_ramps)
-}
-
-fn build_monochrome_ramps() -> MonochromeRamps {
-    MonochromeRamps {
-        default: build_ramp(&GRAY_RAMP),
-        cool: build_ramp(&COOL_GRAY_RAMP),
-        warm: build_ramp(&WARM_GRAY_RAMP),
-    }
-}
-
-fn build_ramp(base: &'static [&'static str]) -> MonoRamp {
-    let mut entries: Vec<(f32, [u8; 3])> = Vec::with_capacity(MONO_RAMP_EXTRAS.len() + base.len());
-    let mut seen = 0u64;
-
-    for &hex in MONO_RAMP_EXTRAS.iter().chain(base.iter()) {
-        let (rgb, _) = parse_hex_rgba_u8(hex).unwrap();
-        let packed = pack_rgb(rgb) as u64;
-        if seen & (1u64 << (packed % 64)) != 0 {
-            continue;
-        }
-        seen |= 1u64 << (packed % 64);
-        let lum = luminance_from_u8(rgb[0], rgb[1], rgb[2]);
-        entries.push((lum, rgb));
-    }
-
-    entries.sort_unstable_by(|a, b| a.0.total_cmp(&b.0));
-
-    let (luminances, rgbs): (Vec<f32>, Vec<[u8; 3]>) = entries.into_iter().unzip();
-
-    MonoRamp {
-        luminances: Box::leak(luminances.into_boxed_slice()),
-        rgbs: Box::leak(rgbs.into_boxed_slice()),
-    }
+fn ramps() -> &'static MonochromeRamps {
+    RAMPS.get_or_init(|| MonochromeRamps {
+        default: MonoRamp::from_rgb(GRAY_RGB),
+        cool: MonoRamp::from_rgb(COOL_RGB),
+        warm: MonoRamp::from_rgb(WARM_RGB),
+    })
 }
 
 #[inline(always)]
 pub(crate) fn select_monochrome_ramp(family: &str) -> &'static MonoRamp {
-    let ramps = monochrome_ramps();
+    let ramps = ramps();
     match family {
         "coolgray" | "cool-gray" | "cool" => &ramps.cool,
         "warmgray" | "warm-gray" | "warm" => &ramps.warm,
@@ -127,7 +123,37 @@ pub(crate) fn select_monochrome_ramp(family: &str) -> &'static MonoRamp {
 }
 
 #[inline(always)]
-pub(crate) fn is_monochrome_candidate(rgb: [u8; 3], is_print: bool) -> bool {
+pub(crate) fn is_monochrome_candidate(rgb: [u8; 3], _is_print: bool) -> bool {
     let value = pack_rgb(rgb);
-    MONO_ACCENT_CANDIDATES.contains(&value) || (is_print && value == MONO_PRINT_EXTRA_ACCENTS)
+    matches!(
+        value,
+        0x08bdba
+            | 0x33b1ff
+            | 0x3ddbd9
+            | 0x42be65
+            | 0x78a9ff
+            | 0x82cfff
+            | 0xa6c8ff
+            | 0xbe95ff
+            | 0xee5396
+            | 0xff7eb6
+            | 0x0f62fe
+            | 0xf1c21b
+            | 0x4589ff
+            | 0xff832b
+    )
+}
+
+/// OLED ramp
+#[inline(always)]
+pub(crate) fn oled_rgb(rgb: [u8; 3]) -> Option<[u8; 3]> {
+    match pack_rgb(rgb) {
+        0x161616 => Some([0x00, 0x00, 0x00]),
+        0x1b1b1b | 0x1e1e1e => Some([0x0b, 0x0b, 0x0b]),
+        0x212121 => Some([0x0f, 0x0f, 0x0f]),
+        0x262626 => Some([0x16, 0x16, 0x16]),
+        0x393939 => Some([0x26, 0x26, 0x26]),
+        0x525252 => Some([0x39, 0x39, 0x39]),
+        _ => None,
+    }
 }

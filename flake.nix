@@ -1,5 +1,5 @@
 {
-  description = "Oxocarbon VS Code theme compiler (Rust) with dev shell";
+  description = "Oxocarbon theme compiler and converters";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -10,16 +10,28 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        rustPlatform = pkgs.rustPlatform;
+        inherit (pkgs) rustPlatform;
+        src = builtins.path {
+          path = ./.;
+          name = "oxocarbon-vscode";
+        };
+
+        rustTools = with pkgs; [
+          cargo
+          rustc
+          rustfmt
+          clippy
+          rust-analyzer
+        ];
       in
       rec {
         packages.default = rustPlatform.buildRustPackage {
           pname = "oxocarbon-themec";
           version = "0.1.0";
-          src = builtins.path { path = ./.; name = "source"; };
-          cargoLock = {
-            lockFile = ./Cargo.lock;
-          };
+          inherit src;
+          cargoLock.lockFile = ./Cargo.lock;
+          cargoBuildFlags = [ "-p" "oxocarbon-themec" ];
+          cargoTestFlags = [ "-p" "oxocarbon-themec" "-p" "oxocarbon-utils" ];
         };
 
         apps.default = {
@@ -28,21 +40,15 @@
         };
 
         devShells.default = pkgs.mkShell {
-          packages = with pkgs; [
-            # make
+          packages = rustTools ++ (with pkgs; [
             gnumake
-            # toml->json, json->tm
-            cargo
-            rustc
-            rust-analyzer
-            # vsc extension gen
+            pkg-config
             nodejs_24
             vsce
-            # zed patching
             jq
-            # intellij/icls gen
             python3
-          ];
+          ]);
+          RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
       }
     );

@@ -9,7 +9,7 @@ mod ramp;
 use oxocarbon_utils::{
     format_hex_color, luminance_from_u8, midpoint_hex, parse_hex_rgba_u8 as parse_hex_color,
 };
-use ramp::{MonoRamp, is_monochrome_candidate, select_monochrome_ramp};
+use ramp::{MonoRamp, is_monochrome_candidate, oled_rgb, select_monochrome_ramp};
 use std::{env, fs, io, process};
 
 #[derive(Default)]
@@ -49,10 +49,23 @@ impl Options {
                         process::exit(2);
                     }
                 }
+                "-h" | "--help" => {
+                    eprint_usage();
+                    process::exit(0);
+                }
+                other if other.starts_with('-') => {
+                    eprintln!("Unknown flag: {other}");
+                    eprint_usage();
+                    process::exit(2);
+                }
                 other if opts.input_src == "-" => {
                     opts.input_src = other.to_string();
                 }
-                _ => {}
+                extra => {
+                    eprintln!("Unexpected argument: {extra}");
+                    eprint_usage();
+                    process::exit(2);
+                }
             }
         }
 
@@ -95,7 +108,7 @@ fn main() {
     if opts.is_oled()
         && let Some(colors) = colors_table_mut(&mut value)
     {
-        apply_replacements_in_table(colors, &OLED_REPLACEMENTS);
+        apply_oled(colors);
     }
 
     // monochrome transform
@@ -108,33 +121,35 @@ fn main() {
     }
 
     // compatibility adjustments
-    if opts.is_compat()
-        && let Some(colors) = colors_table_mut(&mut value)
-    {
-        // compatibility variants - contrast panels
-        // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
-        // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
-        #[rustfmt::skip]
-        let (from, to) = if opts.is_oled() {("#000000", "#161616")} else {("#161616", "#262626")};
-        let c1 = midpoint_hex(from, to);
-        insert_value(colors, &COMPAT_BG_KEYS, &toml::Value::String(c1));
-        // compatibility variants - gutter, six deviations
-        // - Standard compat: #131313
-        // - OLED compat:     #030303
-        let c2 = if opts.is_oled() { "#030303" } else { "#131313" }.to_string();
-        insert_value(colors, &COMPAT_BG_KEYS_2, &toml::Value::String(c2));
-        // compatibility variants - contrast headers, borders
-        // - Standard compat: #393939
-        // - OLED compat:     #262626
-        let c3 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
-        #[rustfmt::skip]
-        insert_value(colors, &COMPAT_CONTRAST_KEYS, &toml::Value::String(c3.clone()));
-        // compatibility variants - additional contrast
-        // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
-        // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
-        let base = if opts.is_oled() { "#161616" } else { "#262626" };
-        let c4 = midpoint_hex(base, &c3);
-        insert_value(colors, &COMPAT_CONTRAST_KEYS_2, &toml::Value::String(c4));
+    if opts.is_compat() {
+        if let Some(colors) = colors_table_mut(&mut value) {
+            // compatibility variants - contrast panels
+            // - Standard compat: midpoint(#161616, #262626) = #1e1e1e
+            // - OLED compat:     midpoint(#000000, #161616) = #0b0b0b
+            #[rustfmt::skip]
+            let (from, to) = if opts.is_oled() {("#000000", "#161616")} else {("#161616", "#262626")};
+            let c1 = midpoint_hex(from, to);
+            insert_value(colors, COMPAT_BG_KEYS, &toml::Value::String(c1));
+            // compatibility variants - gutter, six deviations
+            // - Standard compat: #131313
+            // - OLED compat:     #030303
+            let c2 = if opts.is_oled() { "#030303" } else { "#131313" }.to_string();
+            insert_value(colors, COMPAT_BG_KEYS_2, &toml::Value::String(c2));
+            // compatibility variants - contrast headers, borders
+            // - Standard compat: #393939
+            // - OLED compat:     #262626
+            let c3 = if opts.is_oled() { "#262626" } else { "#393939" }.to_string();
+            #[rustfmt::skip]
+            insert_value(colors, COMPAT_CONTRAST_KEYS, &toml::Value::String(c3.clone()));
+            // compatibility variants - additional contrast
+            // - Standard compat: midpoint(#161616, contrast_mid_val_1) = #1a1a1a
+            // - OLED compat:     midpoint(#000000, contrast_mid_val_1) = #050505
+            let base = if opts.is_oled() { "#161616" } else { "#262626" };
+            let c4 = midpoint_hex(base, &c3);
+            insert_value(colors, COMPAT_CONTRAST_KEYS_2, &toml::Value::String(c4));
+        }
+        // Standard/OLED keep Gray 60 comments for the look; compat lifts to Gray 50 (WCAG AA).
+        apply_compat_comment_contrast(&mut value);
     }
 
     // name override
@@ -143,6 +158,7 @@ fn main() {
         opts.is_compat(),
         opts.is_monochrome(),
         opts.mono_family.as_deref(),
+        opts.is_print(),
     ) {
         value
             .as_table_mut()
@@ -170,24 +186,36 @@ fn main() {
     }
 }
 
-fn read_input(input_src: &str) -> String {
-    fs::read_to_string(input_src).unwrap_or_else(|e| {
-        eprintln!("Failed to read '{input_src}': {e}");
-        process::exit(1);
-    })
+fn eprint_usage() {
+    eprintln!(
+        "\
+oxocarbon-themec [options] [input.toml|-]
+  --oled                         OLED background ramp
+  --compat, -c                   compatibility chrome contrast
+  --monochrome, -m               map accents onto an IBM gray ramp
+  --monochrome-family <family>   gray | coolgray | warmgray
+  --print                        invert for the PRINT (light) variant
+  --pretty, -p                   pretty-print JSON
+  --help, -h                     this message
+Input defaults to stdin when '-' or omitted."
+    );
 }
 
-const OLED_REPLACEMENTS: [(&str, &str); 7] = [
-    ("#161616", "#000000"),
-    ("#1b1b1b", "#0b0b0b"),
-    ("#1e1e1e", "#0b0b0b"),
-    ("#212121", "#0f0f0f"),
-    ("#262626", "#161616"),
-    ("#393939", "#262626"),
-    ("#525252", "#393939"),
-];
+fn read_input(input_src: &str) -> String {
+    if input_src == "-" {
+        io::read_to_string(io::stdin()).unwrap_or_else(|e| {
+            eprintln!("Failed to read stdin: {e}");
+            process::exit(1);
+        })
+    } else {
+        fs::read_to_string(input_src).unwrap_or_else(|e| {
+            eprintln!("Failed to read '{input_src}': {e}");
+            process::exit(1);
+        })
+    }
+}
 
-const COMPAT_BG_KEYS: [&str; 8] = [
+const COMPAT_BG_KEYS: &[&str] = &[
     "titleBar.activeBackground",
     "editorGroupHeader.tabsBackground",
     "tab.inactiveBackground",
@@ -196,26 +224,24 @@ const COMPAT_BG_KEYS: [&str; 8] = [
     "panel.background",
     "statusBar.background",
     "editorWidget.background",
+    "commandCenter.background",
 ];
 
-#[rustfmt::skip]
-const COMPAT_BG_KEYS_2: [&str; 1] = [
-    "editorGutter.background"
-];
+const COMPAT_BG_KEYS_2: &[&str] = &["editorGutter.background"];
 
-const COMPAT_CONTRAST_KEYS: [&str; 7] = [
-    // borders
+const COMPAT_CONTRAST_KEYS: &[&str] = &[
     "titleBar.border",
     "tab.border",
     "activityBar.border",
     "statusBar.border",
-    // additional contrast for readability
+    "commandCenter.border",
+    "agentsPanel.border",
     "titleBar.activeBackground",
     "list.hoverBackground",
     "dropdown.background",
 ];
 
-const COMPAT_CONTRAST_KEYS_2: [&str; 4] = [
+const COMPAT_CONTRAST_KEYS_2: &[&str] = &[
     "tab.border",
     "sideBar.border",
     "panel.border",
@@ -232,12 +258,13 @@ fn insert_value(table: &mut toml::value::Table, keys: &[&str], value: &toml::Val
     }
 }
 
-fn apply_replacements_in_table(table: &mut toml::value::Table, replacements: &[(&str, &str)]) {
+fn apply_oled(table: &mut toml::value::Table) {
     walk_table_strings_mut(table, &mut |s: &mut String| {
-        for &(from, to) in replacements {
-            if let Some(pos) = s.find(from) {
-                s.replace_range(pos..pos + from.len(), to);
-            }
+        let Some((rgb, alpha)) = parse_hex_color(s) else {
+            return;
+        };
+        if let Some(mapped) = oled_rgb(rgb) {
+            *s = format_hex_color(mapped, alpha);
         }
     });
 }
@@ -247,7 +274,11 @@ fn compute_theme_name(
     compat: bool,
     monochrome: bool,
     mono_family: Option<&str>,
+    print: bool,
 ) -> Option<String> {
+    if print {
+        return Some("Oxocarbon PRINT".to_string());
+    }
     if monochrome {
         let base = if oled {
             "Oxocarbon OLED Monochrom"
@@ -287,6 +318,49 @@ fn apply_monochrome(value: &mut toml::Value, ramp: &MonoRamp, is_print: bool) {
             *s = format_hex_color(pick, alpha);
         }
     });
+}
+
+fn apply_compat_comment_contrast(value: &mut toml::Value) {
+    const COMMENT_FG: &str = "#8d8d8d";
+    if let Some(arr) = value.get_mut("tokenColors").and_then(|v| v.as_array_mut()) {
+        for item in arr.iter_mut() {
+            if !token_scope_mentions(item, "comment") {
+                continue;
+            }
+            let Some(settings) = item.get_mut("settings").and_then(|v| v.as_table_mut()) else {
+                continue;
+            };
+            settings.insert("foreground".into(), toml::Value::String(COMMENT_FG.into()));
+        }
+    }
+    if let Some(sem) = value
+        .get_mut("semanticTokenColors")
+        .and_then(|v| v.as_table_mut())
+    {
+        match sem.get_mut("comment") {
+            Some(toml::Value::String(s)) => *s = COMMENT_FG.into(),
+            Some(toml::Value::Table(t)) => {
+                t.insert("foreground".into(), toml::Value::String(COMMENT_FG.into()));
+            }
+            _ => {
+                sem.insert(
+                    "comment".into(),
+                    toml::Value::String(COMMENT_FG.into()),
+                );
+            }
+        }
+    }
+}
+
+fn token_scope_mentions(item: &toml::Value, needle: &str) -> bool {
+    match item.get("scope") {
+        Some(toml::Value::String(s)) => s.contains(needle),
+        Some(toml::Value::Array(a)) => a.iter().any(|v| {
+            v.as_str()
+                .is_some_and(|s| s.split(',').any(|p| p.trim().contains(needle)))
+        }),
+        _ => false,
+    }
 }
 
 fn apply_monochrome_style_overrides(value: &mut toml::Value) {

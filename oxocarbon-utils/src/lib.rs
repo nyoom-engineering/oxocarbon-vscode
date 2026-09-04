@@ -3,6 +3,7 @@
 const INV_255: f32 = 1.0 / 255.0;
 const INVALID: u8 = 0xFF;
 const HEX_DECODE: [u8; 256] = build_hex_decode();
+const HEX_ENCODE: &[u8; 16] = b"0123456789abcdef";
 
 #[inline(always)]
 const fn expand_nibble(n: u8) -> u8 {
@@ -28,25 +29,19 @@ const fn build_hex_decode() -> [u8; 256] {
 
 #[inline(always)]
 fn decode_nibble(b: u8) -> Option<u8> {
+    // SAFETY: `b` is u8 and the table is 256 entries.
     let value = unsafe { *HEX_DECODE.get_unchecked(b as usize) };
     (value != INVALID).then_some(value)
 }
 
 #[inline(always)]
 fn decode_pair(h: u8, l: u8) -> Option<u8> {
-    let h_val = decode_nibble(h)?;
-    let l_val = decode_nibble(l)?;
-    Some((h_val << 4) | l_val)
+    Some((decode_nibble(h)? << 4) | decode_nibble(l)?)
 }
 
 #[inline(always)]
 pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
     let data = input.as_bytes().strip_prefix(b"#")?;
-
-    if !matches!(data.len(), 3 | 4 | 6 | 8) {
-        return None;
-    }
-
     match data.len() {
         3 => Some((
             [
@@ -80,7 +75,7 @@ pub fn parse_hex_rgba_u8(input: &str) -> Option<([u8; 3], Option<u8>)> {
             ],
             Some(decode_pair(data[6], data[7])?),
         )),
-        _ => unsafe { std::hint::unreachable_unchecked() }, // We checked length above
+        _ => None,
     }
 }
 
@@ -129,23 +124,22 @@ fn linear_to_srgb_u8(c: f32) -> u8 {
 
 #[inline(always)]
 pub fn format_hex_color(rgb: [u8; 3], alpha: Option<u8>) -> String {
-    const HEX: &[u8; 16] = b"0123456789abcdef";
-    let len = 7 + alpha.map_or(0, |_| 2);
+    let len = 7 + usize::from(alpha.is_some()) * 2;
     let mut out = String::with_capacity(len);
-    // fill the backing buffer in place, avoids intermediate alloc
+    // SAFETY: we write `len` ASCII bytes then set_len; HEX_ENCODE is 0-9a-f.
     unsafe {
-        let vec = out.as_mut_vec();
-        vec.set_len(len);
-        vec[0] = b'#';
+        let buf = out.as_mut_vec();
+        buf.set_len(len);
+        buf[0] = b'#';
         let mut idx = 1;
         for &byte in &rgb {
-            vec[idx] = HEX[(byte >> 4) as usize];
-            vec[idx + 1] = HEX[(byte & 0x0f) as usize];
+            buf[idx] = HEX_ENCODE[(byte >> 4) as usize];
+            buf[idx + 1] = HEX_ENCODE[(byte & 0x0f) as usize];
             idx += 2;
         }
         if let Some(a) = alpha {
-            vec[idx] = HEX[(a >> 4) as usize];
-            vec[idx + 1] = HEX[(a & 0x0f) as usize];
+            buf[idx] = HEX_ENCODE[(a >> 4) as usize];
+            buf[idx + 1] = HEX_ENCODE[(a & 0x0f) as usize];
         }
     }
     out
@@ -208,6 +202,24 @@ fn strict_rgb(input: &str, label: &'static str) -> [u8; 3] {
         .0
 }
 
+/// Nearest neighbour on a luminance table sorted ascending.
+#[inline]
+#[must_use]
+pub fn find_nearest_index_sorted(luminances: &[f32], target: f32) -> usize {
+    match luminances.binary_search_by(|x| x.total_cmp(&target)) {
+        Ok(i) => i,
+        Err(0) => 0,
+        Err(i) if i >= luminances.len() => luminances.len().saturating_sub(1),
+        Err(i) => {
+            if (target - luminances[i - 1]).abs() <= (luminances[i] - target).abs() {
+                i - 1
+            } else {
+                i
+            }
+        }
+    }
+}
+
 #[inline(always)]
 pub fn find_nearest_index(luminances: &[f32], target: f32) -> usize {
     let len = luminances.len();
@@ -222,14 +234,14 @@ pub fn find_nearest_index(luminances: &[f32], target: f32) -> usize {
 
     #[cfg(not(all(target_arch = "aarch64", target_feature = "neon")))]
     {
-        nearest_index_scaler(luminances, target)
+        nearest_index_scalar(luminances, target)
     }
 }
 
 #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
 #[inline]
 #[target_feature(enable = "neon")]
-pub unsafe fn nearest_index_neon(luminances: &[f32], target: f32) -> usize {
+unsafe fn nearest_index_neon(luminances: &[f32], target: f32) -> usize {
     use std::arch::aarch64::*;
 
     let len = luminances.len();
@@ -244,7 +256,7 @@ pub unsafe fn nearest_index_neon(luminances: &[f32], target: f32) -> usize {
 
     // smaller arrays scaler anyways
     if len < 4 {
-        return nearest_index_scaler(luminances, target);
+        return nearest_index_scalar(luminances, target);
     }
 
     let chunks = len / 4;
@@ -302,7 +314,7 @@ pub unsafe fn nearest_index_neon(luminances: &[f32], target: f32) -> usize {
 }
 
 #[inline]
-fn nearest_index_scaler(luminances: &[f32], target: f32) -> usize {
+fn nearest_index_scalar(luminances: &[f32], target: f32) -> usize {
     let mut best_idx = 0;
     let mut best_diff = f32::INFINITY;
 
@@ -315,4 +327,52 @@ fn nearest_index_scaler(luminances: &[f32], target: f32) -> usize {
     }
 
     best_idx
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_rgb_and_rgba() {
+        assert_eq!(
+            parse_hex_rgba_u8("#1a2b3c"),
+            Some(([0x1a, 0x2b, 0x3c], None))
+        );
+        assert_eq!(
+            parse_hex_rgba_u8("#1a2b3c80"),
+            Some(([0x1a, 0x2b, 0x3c], Some(0x80)))
+        );
+        assert_eq!(parse_hex_rgba_u8("#abc"), Some(([0xaa, 0xbb, 0xcc], None)));
+        assert_eq!(parse_hex_rgba_u8("nope"), None);
+    }
+
+    #[test]
+    fn format_roundtrip() {
+        let rgb = [0x08, 0xbd, 0xba];
+        assert_eq!(format_hex_color(rgb, None), "#08bdba");
+        assert_eq!(format_hex_color(rgb, Some(0x40)), "#08bdba40");
+        let (parsed, alpha) = parse_hex_rgba_u8("#08bdba40").unwrap();
+        assert_eq!(parsed, rgb);
+        assert_eq!(alpha, Some(0x40));
+    }
+
+    #[test]
+    fn midpoint_is_channelwise_average() {
+        assert_eq!(midpoint_hex("#000000", "#ffffff"), "#7f7f7f");
+        assert_eq!(midpoint_hex("#161616", "#262626"), "#1e1e1e");
+    }
+
+    #[test]
+    fn nearest_luminance_picks_closest() {
+        let lum = [0.0_f32, 0.25, 0.5, 0.75, 1.0];
+        assert_eq!(find_nearest_index(&lum, 0.0), 0);
+        assert_eq!(find_nearest_index(&lum, 0.51), 2);
+        assert_eq!(find_nearest_index(&lum, 1.0), 4);
+        assert_eq!(find_nearest_index_sorted(&lum, 0.0), 0);
+        assert_eq!(find_nearest_index_sorted(&lum, 0.51), 2);
+        assert_eq!(find_nearest_index_sorted(&lum, 1.0), 4);
+        assert_eq!(find_nearest_index_sorted(&lum, -1.0), 0);
+        assert_eq!(find_nearest_index_sorted(&lum, 2.0), 4);
+    }
 }
