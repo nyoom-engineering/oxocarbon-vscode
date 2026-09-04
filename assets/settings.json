@@ -1,5 +1,6 @@
 {
   "update.releaseTrack": "prerelease",
+  "update.showReleaseNotes": false,
 
   "editor.fontFamily": "Berkeley Mono Retina",
   "editor.fontLigatures": "'calt', 'ss01', 'ss04', 'ss05', 'ss06'",
@@ -10,19 +11,17 @@
 
   "telemetry.enableCrashReporter": false,
   "telemetry.enableTelemetry": false,
-
-  "cursor.composer.textSizeScale": 1.15,
-  "cursor.general.enableShadowWorkspace": true,
-  "cursor.terminal.usePreviewBox": true,
+  "telemetry.telemetryLevel": "off",
 
   // experimental
-  "editor.experimental.treeSitterTelemetry": true,
+  //  "editor.experimental.treeSitterTelemetry": true,
   "editor.experimentalEditContextEnabled": true,
   "diffEditor.experimental.showMoves": true,
   "diffEditor.experimental.useTrueInlineView": true,
   "notebook.diff.experimental.toggleInline": true,
   "workbench.experimental.share.enabled": true,
   "workbench.commandPalette.experimental.suggestCommands": true,
+  "workbench.experimental.modernUI": false,
   "http.experimental.systemCertificatesV2": true,
   "notebook.variablesView": true,
   "ipynb.experimental.serialization": true,
@@ -49,7 +48,9 @@
   "editor.formatOnPaste": true,
 
   "workbench.colorTheme": "oxocarbon",
-  "workbench.preferredDarkColorTheme": "oxocarbon",
+  "workbench.preferredDarkColorTheme": "oxocarbon OLED",
+  //  "workbench.preferredLightColorTheme": "oxocarbon",
+  "workbench.preferredLightColorTheme": "PRINT",
   "workbench.productIconTheme": "icons-carbon",
   "workbench.iconTheme": null,
   "workbench.list.smoothScrolling": true,
@@ -64,6 +65,8 @@
 
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
+  "git.ignoreLegacyWarning": true,
+  "git.ignoreMissingGitWarning": true,
 
   "zenMode.showTabs": "none",
   "zenMode.centerLayout": false,
@@ -77,64 +80,33 @@
   "files.hotExit": "off",
 
   "window.customTitleBarVisibility": "windowed",
+  "window.menuStyle": "native",
+  "window.commandCenter": false,
+  "workbench.layoutControl.enabled": false,
   "window.autoDetectColorScheme": true,
 
   "search.globalFindClipboard": true,
   "search.decorations.badges": false,
 
-  // https://forum.cursor.com/t/extension-marketplace-changes-transition-to-openvsx/109138/31
-  "extensions.gallery.serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
-  "extensions.gallery.useUnpkgResourceApi": true,
-
   "extensions.autoCheckUpdates": false,
-  "extensions.autoUpdate": false,
+  "extensions.autoUpdate": "off",
   "extensions.ignoreRecommendations": true,
 
   "vim.statusBarColorControl": false,
-  "vim.statusBarColors.commandlineinprogress": [
-    "#0f62fe",
-    "#ffffff"
-  ],
-  // Status bar color when in Insert mode.
-  "vim.statusBarColors.insert": [
-    "#161616",
-    "#ffffff"
-  ],
-  // Status bar color when in Normal mode.
-  "vim.statusBarColors.normal": [
-    "#000000",
-    "#ffffff"
-  ],
-  // Status bar color when in Replace mode.
-  "vim.statusBarColors.replace": [
-    "#0f62fe",
-    "#ffffff"
-  ],
-  // Status bar color when in SearchInProgress mode.
-  "vim.statusBarColors.searchinprogressmode": [
-    "#0f62fe",
-    "#ffffff"
-  ],
-  // Status bar color when in SurroundInput mode.
-  "vim.statusBarColors.surroundinputmode": [
-    "#0f62fe",
-    "#ffffff"
-  ],
-  // Status bar color when in Visual mode.
-  "vim.statusBarColors.visual": [
-    "#0f62fe",
-    "#ffffff"
-  ],
-  // Status bar color when in VisualBlock mode.
-  "vim.statusBarColors.visualblock": [
-    "#0f62fe",
-    "#ffffff"
-  ],
+  //  "vim.statusBarColors.commandlineinprogress": ["#0f62fe", "#ffffff"],
+  //  "vim.statusBarColors.insert": ["#161616", "#ffffff"],
+  //  "vim.statusBarColors.normal": ["#000000", "#ffffff"],
+  //  "vim.statusBarColors.replace": ["#0f62fe", "#ffffff"],
+  //  "vim.statusBarColors.searchinprogressmode": ["#0f62fe", "#ffffff"],
+  //  "vim.statusBarColors.surroundinputmode": ["#0f62fe", "#ffffff"],
+  //  "vim.statusBarColors.visual": ["#0f62fe", "#ffffff"],
+  //  "vim.statusBarColors.visualblock": ["#0f62fe", "#ffffff"],
 
   "print.sourcecode.colourScheme": "Google Code",
   "print.sourcecode.lineNumbers": "off",
 
   "excel-viewer.showInfo": false,
+  "editor.minimap.enabled": false,
 
   "[rust]": {
     "editor.semanticHighlighting.enabled": false
@@ -146,5 +118,46 @@
   "editor.bracketPairColorization.enabled": false,
   "[commonlisp]": {
     "editor.bracketPairColorization.enabled": true
-  }
+  },
+
+  "security.workspace.trust.untrustedFiles": "open",
+
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js, ${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.js": "${capture}.js.map",
+    "*.jsx": "${capture}.js",
+    "*.tsx": "${capture}.ts",
+    "tsconfig.json": "tsconfig.*.json",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+    "*.sqlite": "${capture}.${extname}-*",
+    "*.db": "${capture}.${extname}-*",
+    "*.sqlite3": "${capture}.${extname}-*",
+    "*.db3": "${capture}.${extname}-*",
+    "*.sdb": "${capture}.${extname}-*",
+    "*.s3db": "${capture}.${extname}-*"
+  },
+
+  "chat.agent.enabled": true,
+  "chat.viewSessions.orientation": "stacked",
+  "chat.tools.urls.autoApprove": {
+    "https://code.visualstudio.com": true,
+    "https://github.com/microsoft/vscode/wiki": true,
+    "https://developer.apple.com": true,
+    "https://pypi.org": true,
+    "https://codeberg.org": true,
+    "https://github.com": true
+  },
+  //  "chat.agent.maxRequests": 90000,
+  "chat.editing.confirmEditRequestRemoval": false,
+  "chat.editing.confirmEditRequestRetry": false,
+  "chat.agent.sandbox.enabled": "on",
+  "yaml.disableSchemaDetection": [
+    "**/.github/workflows/*.yml",
+    "**/.github/workflows/*.yaml",
+    "**/.gitea/workflows/*.yml",
+    "**/.gitea/workflows/*.yaml",
+    "**/.forgejo/workflows/*.yml",
+    "**/.forgejo/workflows/*.yaml"
+  ]
 }

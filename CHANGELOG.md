@@ -19,6 +19,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Context attachment chips use Gray 80 `chat.requestBorder`
 - Error chip is Magenta 40 on Magenta 50 wash, white on hover
 - PRINT picker name `PRINT`; mono ramp remaps `#0f62fe`; trim trailing space on OLED monochrom label
+- Focus rings lift to Gray 70 (`focusBorder`); chat composer no longer darkens on select
+- SCM graph lanes are Carbon categorical; local branch Cyan 30, remote magenta, base Orange 40. Colored pill ink inherits `panel.background`
 
 ## [1.3.0]
 
