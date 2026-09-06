@@ -130,7 +130,7 @@ disabledForeground = "#8d8d8d"
 "scmGraph.historyItemHoverDeletionsForeground" = "#ee5396"
 
 # imprv contrast
-# "scmGraph.historyItemHoverLabelForeground" = "#161616"
+"scmGraph.historyItemHoverLabelForeground" = "#161616"
 "scmGraph.historyItemRefColor" = "#33b1ff"
 "scmGraph.historyItemRemoteRefColor" = "#ff7eb6"
 
@@ -590,10 +590,14 @@ disabledForeground = "#8d8d8d"
 "input.border" = "#393939"
 "sideBarSectionHeader.border" = "#262626"
 
-"editor.lineHighlightBorder" = "#00000000"
+# Current line: boundary box (pre-1.3 look = stock VS lineHighlightBorderBox; Carbon Gray 90 ≈ stock #282828)
+"editor.lineHighlightBackground" = "#00000000"
+"editor.lineHighlightBorder" = "#262626"
 "editorIndentGuide.background" = "#262626"
 "editorIndentGuide.activeBackground" = "#525252"
 "surface.border" = "#262626"
+"modernActivityBarItem.activeBackground" = "#393939"
+"modernActivityBarItem.hoverBackground" = "#262626"
 
 "commandCenter.background" = "#161616"
 "commandCenter.activeBackground" = "#39393940"
@@ -628,8 +632,6 @@ disabledForeground = "#8d8d8d"
 "agentsNewSessionButton.background" = "#393939"
 "agentsNewSessionButton.hoverBackground" = "#525252"
 
-"modernActivityBarItem.activeBackground" = "#393939"
-"modernActivityBarItem.hoverBackground" = "#262626"
 
 "chat.requestBubbleBackground" = "#26262680"
 "chat.requestBubbleHoverBackground" = "#39393980"

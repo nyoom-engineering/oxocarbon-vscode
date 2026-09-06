@@ -2,29 +2,29 @@
   "name": "oxocarbon-vscode",
   "displayName": "Oxocarbon Theme",
   "description": "Oxocarbon theme for VSCode",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "publisher": "NyoomEngineering",
-	"license": "MIT",
+  "license": "MIT",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.96.2"
   },
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/nyoom-engineering/oxocarbon-vscode"
-	},
-	"bugs": {
-		"url": "https://github.com/nyoom-engineering/oxocarbon-vscode/issues"
-	},
-    "categories": [
-        "Themes"
-    ],
-	"keywords": [
-		"theme",
-		"dark",
-		"protanopia",
-		"colorblind"
-	],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nyoom-engineering/oxocarbon-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/nyoom-engineering/oxocarbon-vscode/issues"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "keywords": [
+    "theme",
+    "dark",
+    "protanopia",
+    "colorblind"
+  ],
   "contributes": {
     "themes": [
       {

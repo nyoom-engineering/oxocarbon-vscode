@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.3.1]
+
+- Current line is a Gray 90 boundary box (`lineHighlightBorder` `#262626`, no wash) — pre-1.3 stock box look, Carbon token
 - `semanticTokenColors` match TextMate roles; comments stay on TM so compat can lift Gray 50
 - Drop inherit-duplicate 1.136 keys (agents/surface/quickInput/sticky scroll) so compat remaps propagate
 - Command palette stays on Gray 100 (`quickInput` inherits `editorWidget`); unread agents badge is not error magenta
