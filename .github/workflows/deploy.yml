@@ -380,12 +380,13 @@ jobs:
       - name: Publish to OpenVSX
         if: env.RELEASE_TYPE == 'stable'
         env:
-          OVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
+          # ovsx CLI reads OVSX_PAT (not OVSX_TOKEN); keep secret name stable
+          OVSX_PAT: ${{ secrets.OVSX_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
-          if [ -z "${OVSX_TOKEN:-}" ]; then
-            echo "OVSX_TOKEN secret is required to publish" >&2
+          if [ -z "${OVSX_PAT:-}" ]; then
+            echo "OVSX_TOKEN secret is required to publish (mapped to OVSX_PAT)" >&2
             exit 1
           fi
           VSIX="release/${NAME}-${VERSION}.vsix"
@@ -393,7 +394,7 @@ jobs:
             echo "VSIX package not found" >&2
             exit 1
           fi
-          npx --yes ovsx publish "$VSIX"
+          npx --yes ovsx publish "$VSIX" --pat "$OVSX_PAT"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
