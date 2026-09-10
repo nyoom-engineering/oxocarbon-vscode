@@ -10,6 +10,7 @@ semanticHighlighting = true
 
 [colors]
 foreground = "#f2f4f8"
+# focusBorder = "#525252"
 focusBorder = "#0f62fe"
 errorForeground = "#ee5396"
 disabledForeground = "#8d8d8d"
@@ -143,7 +144,7 @@ disabledForeground = "#8d8d8d"
 "chart.line" = "#262626"
 "charts.lines" = "#f2f4f8"
 "charts.foreground" = "#f2f4f8"
-"charts.blue" = "#78a9ff"
+"charts.blue" = "#ff7eb6"
 "charts.orange" = "#ff832b"
 "charts.purple" = "#be95ff"
 "charts.red" = "#ee5396"
@@ -244,7 +245,7 @@ disabledForeground = "#8d8d8d"
 "gitDecoration.stageDeletedResourceForeground" = "#ee5396"
 "gitDecoration.stageModifiedResourceForeground" = "#08bdba"
 
-"input.background" = "#161616"
+"input.background" = "#1e1e1e"
 "input.foreground" = "#dde1e6"
 "input.placeholderForeground" = "#8d8d8d"
 
@@ -260,7 +261,7 @@ disabledForeground = "#8d8d8d"
 "inputValidation.infoBackground" = "#262626"
 "inputValidation.infoBorder" = "#4589ff"
 
-"icon.foreground" = "#c6c6c6"
+"icon.foreground" = "#dde1e6"
 
 "titleBar.border" = "#262626"
 "titleBar.activeForeground" = "#ffffff"
@@ -581,6 +582,8 @@ disabledForeground = "#8d8d8d"
 "activityBarTop.activeBorder" = "#ff7eb6"
 
 "activityBar.inactiveForeground" = "#8d8d8d"
+# "descriptionForeground" = "#8d8d8d"
+# "descriptionForeground" = "#dde1e6"
 "descriptionForeground" = "#c6c6c6"
 "panelTitle.inactiveForeground" = "#8d8d8d"
 "inputValidation.errorForeground" = "#ee5396"

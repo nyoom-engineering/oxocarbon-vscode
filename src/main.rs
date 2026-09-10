@@ -147,6 +147,10 @@ fn main() {
             let base = if opts.is_oled() { "#161616" } else { "#262626" };
             let c4 = midpoint_hex(base, &c3);
             insert_value(colors, COMPAT_CONTRAST_KEYS_2, &toml::Value::String(c4));
+            // colors.insert(
+            //     "focusBorder".into(),
+            //     toml::Value::String("#0f62fe".into()),
+            // );
         }
         // Standard/OLED keep Gray 60 comments for the look; compat lifts to Gray 50 (WCAG AA).
         apply_compat_comment_contrast(&mut value);
@@ -225,7 +229,6 @@ const COMPAT_BG_KEYS: &[&str] = &[
     "statusBar.background",
     "editorWidget.background",
     "commandCenter.background",
-    "input.background",
 ];
 
 const COMPAT_BG_KEYS_2: &[&str] = &["editorGutter.background"];
@@ -237,7 +240,6 @@ const COMPAT_CONTRAST_KEYS: &[&str] = &[
     "statusBar.border",
     "commandCenter.border",
     "agentsPanel.border",
-    "titleBar.activeBackground",
     "list.hoverBackground",
     "dropdown.background",
 ];

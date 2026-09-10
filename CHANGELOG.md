@@ -14,15 +14,15 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Command palette stays on Gray 100 (`quickInput` inherits `editorWidget`); unread agents badge is not error magenta
 - IBM Blue `#0f62fe` + white FG on remote/noFolder/prominent; debug status is Orange 40 `#ff832b` + Gray 100
 - Diagnostics follow Carbon g100 support: warning Yellow 30 `#f1c21b`, info Blue 50 `#4589ff`; error stays Magenta 50. Warning badges use Gray 100 on yellow (not white).
-- Chat describe/edit uses canvas (`input.background` Gray 100); the tip notice is a Gray 90 menu card (`agentsChatInput`)
+- Chat describe/edit is a Gray 90 field (`input.background`) with Gray 80 border; the tip notice matches that layer
 - Status error is Magenta 50 wash with status-bar FG; warning stays Yellow 30 text, no fill
 - AI lightbulb inherits the regular bulb (no special purple)
-- Intelligence and AI lightbulbs share `#dde1e6`; chrome icons Gray 30
+- Intelligence and AI lightbulbs share `#dde1e6`; chrome icons and secondary copy match that off-white
 - Hover widgets (`editorHoverWidget`) match menus: Gray 90 fill, Gray 80 border. Settings option rows inherit (labels dim on hover)
 - Context attachment chips use Gray 80 `chat.requestBorder`
 - Error chip is Magenta 40 on Magenta 50 wash, white on hover
 - PRINT picker name `PRINT`; mono ramp remaps `#0f62fe`; trim trailing space on OLED monochrom label
-- Focus rings are IBM Blue 60 `#0f62fe` (1px); list outlines inherit `focusBorder`
+- Focus rings are IBM Blue 60 `#0f62fe`. Secondary copy is Carbon Gray 30 `#c6c6c6` (nearest step to the old 70% foreground inherit). Input fields sit on `#1e1e1e` with a Gray 80 border.
 - SCM graph lanes are Carbon categorical; local branch Cyan 30, remote magenta, base Orange 40. Colored pill ink inherits `panel.background`
 
 ## [1.3.0]
